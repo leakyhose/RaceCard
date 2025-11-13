@@ -9,7 +9,7 @@ export default function Lobby() {
   const navigate = useNavigate();
   const [lobby, setLobby] = useState<LobbyType | null | undefined>(undefined);
   const [nickname, setNickname] = useState<string>(
-    location.state?.nickname || ""
+    location.state?.nickname || "",
   );
   const [nicknameInput, setNicknameInput] = useState("");
 
@@ -17,19 +17,19 @@ export default function Lobby() {
   const normalizedCode = code?.toUpperCase();
   const needsRedirect = code && normalizedCode && code !== normalizedCode;
 
-  // Handle invalid format
-  useEffect(() => {
-    if (!isValidFormat) {
-      navigate("/", { replace: true, state: { notFound: true } });
-    }
-  }, [isValidFormat, navigate]);
-
   // Redirects when code isnt capitalized
   useEffect(() => {
     if (needsRedirect) {
       navigate(`/${normalizedCode}`, { replace: true });
     }
   }, [needsRedirect, normalizedCode, navigate]);
+
+  // Redirects when invalid code
+  useEffect(() => {
+    if (!isValidFormat) {
+      navigate("/", { replace: true, state: { notFound: true } });
+    }
+  }, [isValidFormat, navigate]);
 
   // Handle inital lobby fetch
   useEffect(() => {
@@ -50,7 +50,10 @@ export default function Lobby() {
   // Handle lobby updating
   useEffect(() => {
     const handleLobbyUpdated = (updatedLobby: LobbyType) => {
-        setLobby(updatedLobby);
+      if (!updatedLobby) {
+        navigate("/", { replace: true, state: { notFound: true } });
+      }
+      setLobby(updatedLobby);
     };
 
     socket.on("lobbyUpdated", handleLobbyUpdated);

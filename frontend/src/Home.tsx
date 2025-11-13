@@ -19,16 +19,27 @@ export default function Home() {
 
   useEffect(() => {
     const handleLobbyUpdated = (lobby: Lobby) => {
-      navigate(`/${lobby.code}`, { 
-        replace: true, 
-        state: { nickname } 
+      navigate(`/${lobby.code}`, {
+        replace: true,
+        state: { nickname },
       });
     };
 
+    const handleLobbyData = (lobby: Lobby | null) => {
+      if (lobby === null) {
+        alert("Lobby not found! Please check the code.");
+      } else {
+        // Lobby exists, now join it
+        socket.emit("joinLobby", lobby.code, nickname);
+      }
+    };
+
     socket.on("lobbyUpdated", handleLobbyUpdated);
+    socket.on("lobbyData", handleLobbyData);
 
     return () => {
       socket.off("lobbyUpdated", handleLobbyUpdated);
+      socket.off("lobbyData", handleLobbyData);
     };
   }, [navigate, nickname]);
 
@@ -39,7 +50,7 @@ export default function Home() {
 
   const handleJoinLobby = () => {
     if (!nickname.trim() || !codeInput.trim()) return;
-    socket.emit("joinLobby", codeInput, nickname);
+    socket.emit("getLobby", codeInput);
   };
 
   return (

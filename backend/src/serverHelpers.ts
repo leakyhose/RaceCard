@@ -20,10 +20,11 @@ export function generateCode(length: number = 4) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let code = "";
 
-  while(codes.has(code)){
+  while (codes.has(code)) {
     for (let i = 0; i < length; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }}
+    }
+  }
 
   codes.add(code);
   return code;
@@ -58,4 +59,3 @@ export function updateFlashcards(code: string, flashcards: Flashcard[]) {
   const lobby = getLobby(code);
   if (lobby) lobby.flashcards = flashcards;
 }
-

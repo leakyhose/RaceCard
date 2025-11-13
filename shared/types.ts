@@ -31,6 +31,7 @@ export interface ServerToClientEvents {
   scoreUpdate: (players: Player[]) => void;
   chatMessage: (msg: { player: string; text: string }) => void;
   gameOver: (finalScores: Player[]) => void;
+  lobbyData: (lobby: Lobby | null) => void;
 }
 
 export interface ClientToServerEvents {
@@ -40,4 +41,5 @@ export interface ClientToServerEvents {
   startGame: () => void;
   answer: (text: string) => void;
   sendChat: (msg: string) => void;
+  getLobby: (code: string) => void;
 }
