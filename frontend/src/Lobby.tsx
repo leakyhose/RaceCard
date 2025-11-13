@@ -1,17 +1,119 @@
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { socket } from "./socket";
+import type { Lobby as LobbyType } from "../../shared/types";
 
 export default function Lobby() {
   const { code } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [lobby, setLobby] = useState<LobbyType | null | undefined>(undefined);
+  const [nickname, setNickname] = useState<string>(
+    location.state?.nickname || ""
+  );
+  const [nicknameInput, setNicknameInput] = useState("");
 
-  if (!code || !/^[A-Za-z]{4}$/.test(code)) {
-    return <Navigate to="/" replace state={{ notFound: true }} />;
+  const isValidFormat = code && /^[A-Za-z]{4}$/.test(code);
+  const normalizedCode = code?.toUpperCase();
+  const needsRedirect = code && normalizedCode && code !== normalizedCode;
+
+  // Handle invalid format
+  useEffect(() => {
+    if (!isValidFormat) {
+      navigate("/", { replace: true, state: { notFound: true } });
+    }
+  }, [isValidFormat, navigate]);
+
+  // Redirects when code isnt capitalized
+  useEffect(() => {
+    if (needsRedirect) {
+      navigate(`/${normalizedCode}`, { replace: true });
+    }
+  }, [needsRedirect, normalizedCode, navigate]);
+
+  // Handle inital lobby fetch
+  useEffect(() => {
+    if (!isValidFormat || needsRedirect) return;
+
+    const handleLobbyData = (lobbyData: LobbyType | null) => {
+      setLobby(lobbyData);
+    };
+
+    socket.on("lobbyData", handleLobbyData);
+    socket.emit("getLobby", normalizedCode!);
+
+    return () => {
+      socket.off("lobbyData", handleLobbyData);
+    };
+  }, [normalizedCode, isValidFormat, needsRedirect]);
+
+  // Handle lobby updating
+  useEffect(() => {
+    const handleLobbyUpdated = (updatedLobby: LobbyType) => {
+        setLobby(updatedLobby);
+    };
+
+    socket.on("lobbyUpdated", handleLobbyUpdated);
+
+    return () => {
+      socket.off("lobbyUpdated", handleLobbyUpdated);
+    };
+  }, [normalizedCode]);
+
+  // Redirects back to home when code is invalid in any way
+  useEffect(() => {
+    if (lobby === null) {
+      navigate("/", { replace: true, state: { notFound: true } });
+    }
+  }, [lobby, navigate]);
+
+  const handleJoinLobby = () => {
+    if (!nicknameInput.trim() || !normalizedCode) return;
+    setNickname(nicknameInput);
+    socket.emit("joinLobby", normalizedCode, nicknameInput);
+  };
+
+  if (lobby === undefined) {
+    return <div>Loading lobby...</div>;
   }
 
-  const normalizedCode = code.toUpperCase();
-
-  if (code !== normalizedCode) {
-    return <Navigate to={`/${normalizedCode}`} replace />;
+  if (lobby === null) {
+    return null;
   }
 
-  return <div>Lobby: {normalizedCode}</div>;
+  if (!nickname) {
+    return (
+      <div>
+        <h2>Join Lobby: {lobby.code}</h2>
+        <p>Please enter your nickname to join:</p>
+        <input
+          type="text"
+          placeholder="Your nickname"
+          value={nicknameInput}
+          onChange={(e) => setNicknameInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleJoinLobby();
+          }}
+          autoFocus
+        />
+        <button onClick={handleJoinLobby}>Join</button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h2>Lobby Code: {lobby.code}</h2>
+      <h3>Players:</h3>
+      <ul>
+        {lobby.players.map((player) => (
+          <li key={player.id}>
+            {player.name} - Score: {player.score}
+          </li>
+        ))}
+      </ul>
+      <p>Status: {lobby.status}</p>
+      <p>Flashcards: {lobby.flashcards.length}</p>
+    </div>
+  );
 }

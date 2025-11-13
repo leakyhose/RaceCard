@@ -6,7 +6,6 @@ export default function App() {
   const [nickname, setNickname] = useState("");
   const [codeInput, setCodeInput] = useState("");
   const [lobby, setLobby] = useState<Lobby | null>(null);
-  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     socket.on("lobbyUpdated", (lobby) => {

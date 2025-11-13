@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { socket } from "./socket";
+import type { Lobby } from "../../shared/types";
 
 export default function Home() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [notFound, setNotFound] = useState(false);
+  const [nickname, setNickname] = useState("");
+  const [codeInput, setCodeInput] = useState("");
 
   useEffect(() => {
     if (location.state?.notFound) {
@@ -12,8 +17,55 @@ export default function Home() {
     }
   }, [location]);
 
-  if (notFound) {
-    return <div>NOT FOUND!</div>;
-  }
-  return <div>New Home</div>;
+  useEffect(() => {
+    const handleLobbyUpdated = (lobby: Lobby) => {
+      navigate(`/${lobby.code}`, { 
+        replace: true, 
+        state: { nickname } 
+      });
+    };
+
+    socket.on("lobbyUpdated", handleLobbyUpdated);
+
+    return () => {
+      socket.off("lobbyUpdated", handleLobbyUpdated);
+    };
+  }, [navigate, nickname]);
+
+  const handleCreateLobby = () => {
+    if (!nickname.trim()) return;
+    socket.emit("createLobby", nickname);
+  };
+
+  const handleJoinLobby = () => {
+    if (!nickname.trim() || !codeInput.trim()) return;
+    socket.emit("joinLobby", codeInput, nickname);
+  };
+
+  return (
+    <>
+      {notFound && <div>That lobby doesnt exist!</div>}
+      <div>
+        <h1>Flashcard</h1>
+
+        <input
+          value={nickname}
+          onChange={(name) => setNickname(name.target.value)}
+        />
+
+        <div>
+          <button onClick={handleCreateLobby}>Create Lobby</button>
+        </div>
+
+        <div>
+          <input
+            placeholder="Lobby code"
+            value={codeInput}
+            onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+          />
+          <button onClick={handleJoinLobby}>Join Lobby</button>
+        </div>
+      </div>
+    </>
+  );
 }
