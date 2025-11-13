@@ -32,14 +32,14 @@ io.on("connection", (socket) => {
 
   socket.on("joinLobby", (code, nickname) => {
     const lobby = addPlayer(code, socket.id, nickname);
-    if (!lobby) return;
+    if (!lobby) throw new Error("Null lobby while in joinLobby");
     socket.join(code);
     io.to(code).emit("lobbyUpdated", lobby);
   });
 
   socket.on("loadFlashcards", (cards) => {
     const lobby = getLobbyFromSocket(socket);
-    if (!lobby) return;
+    if (!lobby) throw new Error("Null lobby while in loadFlashcards");
     updateFlashcards(lobby.code, cards);
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
@@ -50,7 +50,7 @@ function getLobbyFromSocket(socket: any): Lobby | null {
     const l = getLobby(lobby);
     if (l && l.players.find((p) => p.id === socket.id)) return l;
   }
-  return null;
+  throw new Error("Null lobby while in getLobbyFromSocket");
 }
 
 httpServer.listen(3000, () => console.log("Server running on :3000"));
