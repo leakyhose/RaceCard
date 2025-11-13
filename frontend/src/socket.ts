@@ -1,17 +1,17 @@
-import { io, Socket } from "socket.io-client"
+import { io, Socket } from "socket.io-client";
 import type {
   ServerToClientEvents,
   ClientToServerEvents,
-} from "../../shared/types"
+} from "../../shared/types";
 
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-  "http://localhost:3000"
-)
+  "http://localhost:3000",
+);
 
 socket.on("connect", () => {
-  console.log("Connected to backend:", socket.id)
-})
+  console.log("Connected to backend:", socket.id);
+});
 
 socket.on("disconnect", () => {
-  console.log("Disconnected from backend")
-})
+  console.log("Disconnected from backend");
+});

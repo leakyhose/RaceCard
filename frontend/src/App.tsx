@@ -1,32 +1,33 @@
-import { useState, useEffect } from "react"
-import { socket } from "./socket"
-import type { Lobby } from "../../shared/types"
+import { useState, useEffect } from "react";
+import { socket } from "./socket";
+import type { Lobby } from "../../shared/types";
 
 export default function App() {
-  const [nickname, setNickname] = useState("")
-  const [codeInput, setCodeInput] = useState("")
-  const [lobby, setLobby] = useState<Lobby | null>(null)
+  const [nickname, setNickname] = useState("");
+  const [codeInput, setCodeInput] = useState("");
+  const [lobby, setLobby] = useState<Lobby | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     socket.on("lobbyUpdated", (lobby) => {
-      setLobby(lobby)
-    })
+      setLobby(lobby);
+    });
 
     return () => {
-      socket.off("lobbyUpdated")
-    }
-  }, [])
+      socket.off("lobbyUpdated");
+    };
+  }, []);
 
   const handleCreateLobby = () => {
-    if (!nickname) return
-    console.log(nickname)
-    socket.emit("createLobby", nickname)
-  }
+    if (!nickname) return;
+    console.log(nickname);
+    socket.emit("createLobby", nickname);
+  };
 
   const handleJoinLobby = () => {
-    if (!nickname || !codeInput) return
-    socket.emit("joinLobby", codeInput, nickname)
-  }
+    if (!nickname || !codeInput) return;
+    socket.emit("joinLobby", codeInput, nickname);
+  };
 
   if (!lobby) {
     return (
@@ -51,7 +52,7 @@ export default function App() {
           <button onClick={handleJoinLobby}>Join Lobby</button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -64,5 +65,5 @@ export default function App() {
         ))}
       </ul>
     </div>
-  )
+  );
 }
