@@ -1,5 +1,6 @@
 import type { Lobby, Player, Flashcard } from "@shared/types.js";
 const lobbies = new Map<string, Lobby>();
+const codes = new Set();
 
 export function createLobby(hostID: string, hostName: string): Lobby {
   const code = generateCode();
@@ -18,12 +19,19 @@ export function createLobby(hostID: string, hostName: string): Lobby {
 export function generateCode(length: number = 4) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let code = "";
+  
+  while(codes.has(code)){
+    for (let i = 0; i < length; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }}
 
-  for (let i = 0; i < length; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-
+  codes.add(code);
   return code;
+}
+
+export function deleteLobby(code: string){
+  codes.delete(code);
+  lobbies.delete(code);
 }
 
 export function getLobby(code: string) {
