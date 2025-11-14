@@ -3,6 +3,9 @@ import { useState } from "react";
 import { socket } from "../socket";
 import { useCodeValidation } from "../hooks/useCodeValidation";
 import { useLobbyData } from "../hooks/useLobbyData";
+import { Tabs } from "./Tabs"
+import { Players } from "./Players"
+import { Chat } from "./Chat"
 
 export default function Lobby() {
   const { code } = useParams();
@@ -11,7 +14,7 @@ export default function Lobby() {
     location.state?.nickname || "",
   );
   const [nicknameInput, setNicknameInput] = useState("");
-  const [leader, setLeader] = useState(false);
+  const [tabNum, setTabNum] = useState(0);
 
   useCodeValidation(code);
 
@@ -31,7 +34,9 @@ export default function Lobby() {
     return null;
   }
 
-  if (!nickname) {
+  const isInLobby = lobby.players.some(player => player.id === socket.id);
+
+  if (!nickname || !isInLobby) {
     return (
       <div>
         <h2>Join Lobby: {lobby.code}</h2>
@@ -54,16 +59,15 @@ export default function Lobby() {
   return (
     <div>
       <h2>Lobby Code: {lobby.code}</h2>
-      <h3>Players:</h3>
-      <ul>
-        {lobby.players.map((player) => (
-          <li key={player.id}>
-            {player.name} - Score: {player.score}
-          </li>
-        ))}
-      </ul>
-      <p>Status: {lobby.status}</p>
-      <p>Flashcards: {lobby.flashcards.length}</p>
+      <h2>Your name: {nickname}</h2>
+      <Tabs tabNum={tabNum} setTabNum={setTabNum} />
+      <div>
+      {tabNum === 0 ? (
+        <Chat />
+      ) : (
+        <Players players={lobby.players}/>
+      )}
+        </div>
     </div>
   );
 }

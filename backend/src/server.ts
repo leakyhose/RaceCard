@@ -15,6 +15,7 @@ import {
   updateFlashcard,
   updateSettings,
   removePlayerFromLobby,
+  updateLeader,
 } from "./lobbyManager.js";
 
 const app = express();
@@ -68,6 +69,15 @@ io.on("connection", (socket) => {
     }
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
+
+  socket.on("updateLeader", (nextLeaderId) => {
+    const lobby = updateLeader(nextLeaderId);
+    if (!lobby) {
+      console.log(`Failed to update leader`);
+      return;
+    }
+    io.to(lobby.code).emit("lobbyUpdated", lobby);
+  })
 
   socket.on("getLobby", (code) => {
     const lobby = getLobbyByCode(code);

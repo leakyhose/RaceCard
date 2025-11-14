@@ -17,7 +17,36 @@ export default function Home() {
     }
   }, [location]);
 
-  useEffect(() => {
+  const handleCreateLobby = () => {
+    if (!nickname.trim()) return;
+
+    const handleLobbyUpdated = (lobby: Lobby) => {
+      socket.off("lobbyUpdated", handleLobbyUpdated);
+      navigate(`/${lobby.code}`, {
+        replace: true,
+        state: { nickname },
+      });
+    };
+
+    socket.on("lobbyUpdated", handleLobbyUpdated);
+    socket.emit("createLobby", nickname);
+  };
+
+  const handleJoinLobby = () => {
+    if (!nickname.trim() || !codeInput.trim()) return;
+
+    const handleLobbyData = (lobby: Lobby | null) => {
+      socket.off("lobbyData", handleLobbyData);
+      socket.off("lobbyUpdated", handleLobbyUpdated);
+
+      if (lobby === null) {
+        alert("Lobby not found! Please check the code.");
+      } else {
+        // Lobby exists, now join it
+        socket.emit("joinLobby", lobby.code, nickname);
+      }
+    };
+
     const handleLobbyUpdated = (lobby: Lobby) => {
       socket.off("lobbyUpdated", handleLobbyUpdated);
       socket.off("lobbyData", handleLobbyData);
@@ -28,31 +57,8 @@ export default function Home() {
       });
     };
 
-    const handleLobbyData = (lobby: Lobby | null) => {
-      if (lobby === null) {
-        alert("Lobby not found! Please check the code.");
-      } else {
-        // Lobby exists, now join it
-        socket.emit("joinLobby", lobby.code, nickname);
-      }
-    };
-
-    socket.on("lobbyUpdated", handleLobbyUpdated);
     socket.on("lobbyData", handleLobbyData);
-
-    return () => {
-      socket.off("lobbyUpdated", handleLobbyUpdated);
-      socket.off("lobbyData", handleLobbyData);
-    };
-  }, [navigate, nickname]);
-
-  const handleCreateLobby = () => {
-    if (!nickname.trim()) return;
-    socket.emit("createLobby", nickname);
-  };
-
-  const handleJoinLobby = () => {
-    if (!nickname.trim() || !codeInput.trim()) return;
+    socket.on("lobbyUpdated", handleLobbyUpdated);
     socket.emit("getLobby", codeInput);
   };
 

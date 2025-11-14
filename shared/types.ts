@@ -41,7 +41,7 @@ export interface ClientToServerEvents {
   joinLobby: (code: string, nickname: string) => void;
   updateFlashcard: (cards: Flashcard[]) => void;
   updateSettings: (settings: Settings) => void;
-  updateLeader: () => void;
+  updateLeader: (nextLeaderId: string) => void;
   startGame: () => void;
   answer: (text: string) => void;
   sendChat: (msg: string) => void;
