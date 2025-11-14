@@ -10,7 +10,7 @@ import type {
 
 import {
   createLobby,
-  getLobby,
+  getLobbyCode,
   addPlayerToLobby,
   updateFlashcard,
 } from "./lobbyManager.js";
@@ -47,13 +47,8 @@ io.on("connection", (socket) => {
 
   // Loads flashcards, doesnt take code rather figures it out itself
   socket.on("loadFlashcards", (cards) => {
-    const lobby = getLobbyFromSocket(socket);
+    const lobby = updateFlashcard(socket.id, cards)
     if (!lobby) {
-      console.log(`Failed to load flashcards: player not in a lobby`);
-      return;
-    }
-    const success = updateFlashcard(lobby.code, cards);
-    if (!success) {
       console.log(`Failed to update flashcards`);
       return;
     }
@@ -61,17 +56,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("getLobby", (code) => {
-    const lobby = getLobby(code);
+    const lobby = getLobbyCode(code);
     socket.emit("lobbyData", lobby || null);
   });
 });
-
-function getLobbyFromSocket(socket: any): Lobby | null {
-  for (const lobby of io.sockets.adapter.rooms.keys()) {
-    const l = getLobby(lobby);
-    if (l && l.players.find((p) => p.id === socket.id)) return l;
-  }
-  return null;
-}
 
 httpServer.listen(3000, () => console.log("Server running on :3000"));

@@ -3,6 +3,17 @@ import { generateCode, deleteCode } from "./codeGenerator.js";
 import { addPlayer } from "./playerManager.js";
 
 const lobbies = new Map<string, Lobby>();
+const socketToLobby = new Map<string, string>();
+
+// Tracks a socket's lobby membership
+export function trackSocket(socketId: string, code: string) {
+  socketToLobby.set(socketId, code);
+}
+
+// Untracks a socket (for when they leave/disconnect)
+export function untrackSocket(socketId: string) {
+  socketToLobby.delete(socketId);
+}
 
 // Creates a lobby
 // @returns new lobby
@@ -17,22 +28,23 @@ export function createLobby(hostID: string, hostName: string): Lobby {
     settings: { shuffle: false, fuzzyTolerance: true },
   };
   lobbies.set(code, newLobby);
+  socketToLobby.set(hostID, code);
   return newLobby;
 }
 
 // Updates flashcards in a lobby
-// @returns true, returns false when lobby not found (should never happen)
-export function updateFlashcard(code: string, flashcards: Flashcard[]){
-    const lobby = getLobby(code);
+// @returns updated lobby
+export function updateFlashcard(socketId: string, flashcards: Flashcard[]){
+    const lobby = getLobbySocket(socketId);
     if (!lobby){
         return false;
     }
     lobby.flashcards = flashcards;
-    return true
+    return lobby
 }
 
 // Adds player to lobby
-// @returns the lobby again 
+// @returns updated lobby
 export function addPlayerToLobby(code: string, id: string, name: string){
     return addPlayer(code, id, name);
 }
@@ -44,8 +56,15 @@ export function deleteLobby(code: string){
 }
 
 // Returns lobby from code
-export function getLobby(code: string) {
-  return lobbies.get(code);
+export function getLobbyCode(code: string) {
+  return lobbies.get(code) || null;
+}
+
+// Returns lobby from socket
+export function getLobbySocket(socketId: string): Lobby | null{
+  const lobbyCode = socketToLobby.get(socketId);
+  if (!lobbyCode) return null;
+  return getLobbyCode(lobbyCode);
 }
 
 // Gets list of all lobbies
