@@ -74,6 +74,17 @@ export default function Lobby() {
       <Tabs tabNum={tabNum} setTabNum={setTabNum} />
       <div>{tabNum === 0 ? <Chat /> : <Players players={lobby.players} />}</div>
       <UploadFlashcard isLeader={isLeader} />
+
+
+      
+      <ul>
+        {lobby.flashcards.map((flashcard) => (
+          <li key={flashcard.id}>
+            {flashcard.question} : {flashcard.answer}
+          </li>
+        ))}
+      </ul>
+
     </div>
   );
 }
