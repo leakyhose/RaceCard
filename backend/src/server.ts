@@ -169,8 +169,8 @@ io.on("connection", (socket) => {
                   endGame(lobbyCode);
                 }
               }
-            }, 3000);
-          }, 5000);
+            }, 5000);
+          }, 10000);
         };
 
         runGameplayLoop(lobby.code);
