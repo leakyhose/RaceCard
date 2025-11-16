@@ -29,13 +29,13 @@ export interface Lobby {
 export interface FlashcardEnd {
   Answer: string;
   fastestPlayers: { player: string; time: Number }[];
-  wrongAnswers: { player: string; answer: string }[];
+  wrongAnswers: { player: string; answer: string[] }[];
 }
 
 export interface Gamestate {
   flashcards: Flashcard[];
   roundStart: number;
-  wrongAnswers: { player: string; answer: string }[];
+  wrongAnswers: { player: string; answer: string[] }[];
   correctAnswers: { player: string; time: number }[];
 }
 

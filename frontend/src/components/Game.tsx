@@ -3,6 +3,7 @@ import { socket } from "../socket";
 import type { FlashcardEnd } from "@shared/types";
 
 export function Game() {
+  const [countdown, setCountdown] = useState<number | string | null>(3);
   const [currentQuestion, setCurrentQuestion] = useState<string | null>(null);
   const [answer, setAnswer] = useState("");
   const [hasAnsweredCorrectly, setHasAnsweredCorrectly] = useState(false);
@@ -10,8 +11,14 @@ export function Game() {
   const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
+    const handleCountdown = (seconds: number | string) => {
+        console.log(seconds);
+      setCountdown(seconds);
+    };
+
     const handleNewFlashcard = (question: string) => {
       console.log(question);
+      setCountdown(null); // Clear countdown when question arrives
       setCurrentQuestion(question);
       setAnswer("");
       setHasAnsweredCorrectly(false);
@@ -28,15 +35,13 @@ export function Game() {
       setShowResults(true);
     };
 
-    // Attach listeners first
+    socket.on("startCountdown", handleCountdown);
     socket.on("newFlashcard", handleNewFlashcard);
     socket.on("correctGuess", handleCorrectGuess);
     socket.on("endFlashcard", handleEndFlashcard);
 
-    // Request current question in case we missed the initial event
-    socket.emit("requestCurrentQuestion");
-
     return () => {
+      socket.off("startCountdown", handleCountdown);
       socket.off("newFlashcard", handleNewFlashcard);
       socket.off("correctGuess", handleCorrectGuess);
       socket.off("endFlashcard", handleEndFlashcard);
@@ -50,6 +55,14 @@ export function Game() {
       setAnswer("");
     }
   };
+
+  if (countdown !== null) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-9xl font-bold">{countdown}</div>
+      </div>
+    );
+  }
 
   if (!currentQuestion) {
     return (
@@ -103,12 +116,12 @@ export function Game() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 flex-1 p-8 pt-0">
-            <div className="border-2 border-blue-300 rounded-lg p-4 bg-blue-50">
+          <div className="flex gap-6 flex-1 p-8 pt-0 justify-center">
+            {results.fastestPlayers.length > 0 && (
+            <div className="border-2 border-blue-300 rounded-lg p-4 bg-blue-50 flex-1 max-w-md">
               <h3 className="text-xl font-semibold mb-3 text-blue-800">
                 Fastest Correct Answers
               </h3>
-              {results.fastestPlayers.length > 0 ? (
                 <div className="space-y-2">
                   {results.fastestPlayers.map((player, index) => (
                     <div
@@ -122,30 +135,31 @@ export function Game() {
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="text-gray-500 italic">No correct answers</div>
-              )}
             </div>
+            )}
 
-            <div className="border-2 border-red-300 rounded-lg p-4 bg-red-50">
+            {results.wrongAnswers.length > 0 && (
+            <div className="border-2 border-red-300 rounded-lg p-4 bg-red-50 flex-1 max-w-md">
               <h3 className="text-xl font-semibold mb-3 text-red-800">
-                Incorrect Guesses
+                Wall of Shame
               </h3>
-              {results.wrongAnswers.length > 0 ? (
                 <div className="space-y-2">
                   {results.wrongAnswers.map((wrong, index) => (
                     <div key={index} className="p-2 bg-white rounded border">
                       <div className="font-medium">{wrong.player}</div>
-                      <div className="text-sm text-gray-600 italic">
-                        "{wrong.answer}"
+                      <div className="space-y-1">
+                        {wrong.answer.map((ans, ansIndex) => (
+                          <div key={ansIndex} className="text-sm text-gray-600 italic">
+                            "{ans}"
+                          </div>
+                        ))}
                       </div>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="text-gray-500 italic">No wrong answers</div>
-              )}
+              
             </div>
+            )}
           </div>
         </div>
       )}

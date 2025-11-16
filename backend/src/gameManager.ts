@@ -76,9 +76,9 @@ export function validateAnswer(socketId: string, answerText: string) {
   } else {
     const existing = gs.wrongAnswers.find((w) => w.player === player.name);
     if (existing) {
-      existing.answer = answerText;
+      existing.answer.push(answerText);
     } else {
-      gs.wrongAnswers.push({ player: player.name, answer: answerText });
+      gs.wrongAnswers.push({ player: player.name, answer: [answerText] });
     }
   }
 
