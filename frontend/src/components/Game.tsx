@@ -12,7 +12,7 @@ export function Game() {
 
   useEffect(() => {
     const handleCountdown = (seconds: number | string) => {
-        console.log(seconds);
+      console.log(seconds);
       setCountdown(seconds);
     };
 
@@ -100,14 +100,19 @@ export function Game() {
           <div className="text-center">
             <div className="text-6xl mb-4">✓</div>
             <div className="text-2xl font-bold text-green-600">Correct!</div>
-            <div className="text-gray-600 mt-2">Waiting for round to end...</div>
+            <div className="text-gray-600 mt-2">
+              Waiting for round to end...
+            </div>
           </div>
         </div>
       )}
 
       {showResults && results && (
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-center p-8" style={{ height: '30%' }}>
+          <div
+            className="flex items-center justify-center p-8"
+            style={{ height: "30%" }}
+          >
             <div className="text-center">
               <h3 className="text-xl font-semibold mb-2">Correct Answer:</h3>
               <div className="text-4xl font-bold text-green-600 p-4 bg-green-50 rounded-lg border-2 border-green-300 max-h-32 overflow-auto">
@@ -118,10 +123,10 @@ export function Game() {
 
           <div className="flex gap-6 flex-1 p-8 pt-0 justify-center">
             {results.fastestPlayers.length > 0 && (
-            <div className="border-2 border-blue-300 rounded-lg p-4 bg-blue-50 flex-1 max-w-md">
-              <h3 className="text-xl font-semibold mb-3 text-blue-800">
-                Fastest Correct Answers
-              </h3>
+              <div className="border-2 border-blue-300 rounded-lg p-4 bg-blue-50 flex-1 max-w-md">
+                <h3 className="text-xl font-semibold mb-3 text-blue-800">
+                  Fastest Correct Answers
+                </h3>
                 <div className="space-y-2">
                   {results.fastestPlayers.map((player, index) => (
                     <div
@@ -135,21 +140,24 @@ export function Game() {
                     </div>
                   ))}
                 </div>
-            </div>
+              </div>
             )}
 
             {results.wrongAnswers.length > 0 && (
-            <div className="border-2 border-red-300 rounded-lg p-4 bg-red-50 flex-1 max-w-md">
-              <h3 className="text-xl font-semibold mb-3 text-red-800">
-                Wall of Shame
-              </h3>
+              <div className="border-2 border-red-300 rounded-lg p-4 bg-red-50 flex-1 max-w-md">
+                <h3 className="text-xl font-semibold mb-3 text-red-800">
+                  Wall of Shame
+                </h3>
                 <div className="space-y-2">
                   {results.wrongAnswers.map((wrong, index) => (
                     <div key={index} className="p-2 bg-white rounded border">
                       <div className="font-medium">{wrong.player}</div>
                       <div className="space-y-1">
                         {wrong.answer.map((ans, ansIndex) => (
-                          <div key={ansIndex} className="text-sm text-gray-600 italic">
+                          <div
+                            key={ansIndex}
+                            className="text-sm text-gray-600 italic"
+                          >
                             "{ans}"
                           </div>
                         ))}
@@ -157,8 +165,7 @@ export function Game() {
                     </div>
                   ))}
                 </div>
-              
-            </div>
+              </div>
             )}
           </div>
         </div>

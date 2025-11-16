@@ -115,7 +115,7 @@ io.on("connection", (socket) => {
     let countdown = 3;
     io.to(lobby.code).emit("startCountdown", countdown);
     countdown--;
-    
+
     // Shuffle cards asynchronously during countdown
     shuffleGameCards(lobby.code);
 
@@ -125,11 +125,11 @@ io.on("connection", (socket) => {
         countdown--;
       } else {
         clearInterval(countdownInterval);
-        
+
         // Set status to ongoing before starting game loop
         lobby.status = "ongoing";
         io.to(lobby.code).emit("lobbyUpdated", lobby);
-        
+
         const runGameplayLoop = (lobbyCode: string) => {
           const currentQuestion = getCurrentQuestion(lobbyCode);
           if (!currentQuestion) {
@@ -141,7 +141,7 @@ io.on("connection", (socket) => {
             }
             return;
           }
-          
+
           // Set round start time when emitting question
           setRoundStart(lobbyCode);
           io.to(lobbyCode).emit("newFlashcard", currentQuestion);
@@ -184,6 +184,5 @@ io.on("connection", (socket) => {
     socket.emit("correctGuess", result.timeTaken);
     io.to(result.lobby.code).emit("lobbyUpdated", result.lobby);
   });
-
 });
 httpServer.listen(3000, () => console.log("Server running on :3000"));

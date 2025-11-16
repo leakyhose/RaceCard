@@ -70,6 +70,7 @@ export default function Home() {
         <h1>Flashcard</h1>
         <div>
           <input
+            maxLength={15}
             placeholder="Your nickname"
             value={nickname}
             onChange={(name) => setNickname(name.target.value)}
@@ -79,6 +80,7 @@ export default function Home() {
 
         <div>
           <input
+            maxLength={4}
             placeholder="Lobby code"
             value={codeInput}
             onChange={(e) => setCodeInput(e.target.value.toUpperCase())}

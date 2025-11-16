@@ -54,6 +54,7 @@ export default function Lobby() {
         <h2>Join Lobby: {lobby.code}</h2>
         <p>Please enter your nickname to join:</p>
         <input
+          maxLength={15}
           type="text"
           placeholder="Your nickname"
           value={nicknameInput}
@@ -70,10 +71,15 @@ export default function Lobby() {
 
   return (
     <div className="flex flex-col h-screen">
-      <LobbyHeader code={code!} nickname={nickname} isLeader={isLeader} lobby={lobby} />
+      <LobbyHeader
+        code={code!}
+        nickname={nickname}
+        isLeader={isLeader}
+        lobby={lobby}
+      />
 
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-64 border-r flex flex-col">
+        <div className="w-64 flex flex-col">
           <Players players={lobby.players} />
           <UploadFlashcard isLeader={isLeader} />
         </div>

@@ -11,17 +11,29 @@ export function Players({ players }: PlayersProps) {
     socket.emit("updateLeader", nextLeaderId);
   };
 
+  const isLeader = players[0]?.id === socket.id;
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <ul className="flex-1 overflow-auto">
+      <ul className="flex-1 overflow-auto border border-grey-100">
         {players.map((player) => (
-          <li key={player.id} className="border-b">
-            <div
-              onClick={() => handleUpdateLeader(player.id)}
-              className="p-3 hover:bg-gray-100 cursor-pointer truncate"
+          <li key={player.id} className="border border-grey-100 flex w-full group relative">
+            <div 
+              className={`flex w-full ${isLeader && player.id != socket.id ? 'cursor-pointer group-hover:opacity-0 transition-opacity' : ''}`}
+              onClick={() => isLeader && handleUpdateLeader(player.id)}
             >
-              {player.name} - {player.score}
+              <div className="truncate basis-[70%] shrink p-3">
+                {player.name}
+              </div>
+              <div className="p-3 truncate basis-[30%] shrink-0 flex justify-center">
+                {player.score}
+              </div>
             </div>
+            {isLeader && player.id != socket.id && (
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <span className="text-sm font-semibold">Click to promote</span>
+              </div>
+            )}
           </li>
         ))}
       </ul>
