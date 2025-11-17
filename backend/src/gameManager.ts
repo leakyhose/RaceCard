@@ -87,16 +87,16 @@ export function validateAnswer(socketId: string, answerText: string) {
   return { isCorrect, timeTaken, lobby };
 }
 
-// Check if all players have answered
-export function allPlayersAnswered(lobbyCode: string): boolean {
+// Check if all players have answered correctly
+export function allPlayersAnsweredCorrectly(lobbyCode: string): boolean {
   const lobby = getLobbyByCode(lobbyCode);
   const gs = codeToGamestate.get(lobbyCode);
   if (!lobby || !gs) return false;
 
   const totalPlayers = lobby.players.length;
-  const answeredPlayers = gs.correctAnswers.length + gs.wrongAnswers.length;
+  const correctPlayers = gs.correctAnswers.length;
   
-  return answeredPlayers >= totalPlayers;
+  return correctPlayers >= totalPlayers;
 }
 
 // Get results for current round

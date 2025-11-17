@@ -29,7 +29,7 @@ import {
   getRoundResults,
   advanceToNextFlashcard,
   endGame,
-  allPlayersAnswered,
+  allPlayersAnsweredCorrectly,
 } from "./gameManager.js";
 
 const app = express();
@@ -213,9 +213,9 @@ io.on("connection", (socket) => {
     }
     io.to(result.lobby.code).emit("lobbyUpdated", result.lobby);
 
-    // Check if all players have answered
+    // Check if all players have answered correctly
     const roundInfo = activeRounds.get(result.lobby.code);
-    if (roundInfo && !roundInfo.roundEnded && allPlayersAnswered(result.lobby.code)) {
+    if (roundInfo && !roundInfo.roundEnded && allPlayersAnsweredCorrectly(result.lobby.code)) {
       const elapsedTime = Date.now() - roundInfo.roundStartTime;
       const ROUND_DURATION = 10000;
       const MIN_DELAY_AFTER_ALL_ANSWERED = 1000;
