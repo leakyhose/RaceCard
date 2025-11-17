@@ -33,11 +33,14 @@ export function Players({ players, gameStatus }: PlayersProps) {
                 <div className="flex-1 flex flex-col justify-center overflow-hidden p-2">
                   {hasMiniStatus ? (
                     <>
-                      <div className="text-xs truncate leading-tight">
+                      <div className="truncate leading-tight">
                         {player.name}
                       </div>
                       <div className="text-sm truncate leading-tight mt-1">
-                        {player.miniStatus}
+                        {(typeof player.miniStatus) === 'number'
+                          ? `${(Number(player.miniStatus) / 1000).toFixed(3)}s`
+                          : ((player.miniStatus))}
+
                       </div>
                     </>
                   ) : (
