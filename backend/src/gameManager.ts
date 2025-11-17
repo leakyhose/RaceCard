@@ -72,10 +72,12 @@ export function validateAnswer(socketId: string, answerText: string) {
     if (!gs.correctAnswers.find((a) => a.player === player.name)) {
       gs.correctAnswers.push({ player: player.name, time: timeTaken });
       player.score += 1;
+      player.miniStatus = timeTaken;
     }
   } else {
-    const existing = gs.wrongAnswers.find((w) => w.player === player.name);
-    if (existing) {
+      player.miniStatus = answerText;
+      const existing = gs.wrongAnswers.find((w) => w.player === player.name);
+      if (existing) {
       existing.answer.push(answerText);
     } else {
       gs.wrongAnswers.push({ player: player.name, answer: [answerText] });

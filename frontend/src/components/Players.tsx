@@ -3,42 +3,65 @@ import { socket } from "../socket";
 
 interface PlayersProps {
   players: Player[];
+  gameStatus: string;
 }
 
-export function Players({ players }: PlayersProps) {
+export function Players({ players, gameStatus }: PlayersProps) {
   const handleUpdateLeader = (nextLeaderId: string) => {
     if (players[0].id !== socket.id) return; // Only current leader can change leader
     socket.emit("updateLeader", nextLeaderId);
   };
 
   const isLeader = players[0]?.id === socket.id;
+  const isOngoing = gameStatus === "ongoing";
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       <ul className="flex-1 overflow-auto border border-grey-100">
-        {players.map((player) => (
-          <li
-            key={player.id}
-            className="border border-grey-100 flex w-full group relative"
-          >
-            <div
-              className={`flex w-full ${isLeader && player.id != socket.id ? "cursor-pointer group-hover:opacity-0 transition-opacity" : ""}`}
-              onClick={() => isLeader && handleUpdateLeader(player.id)}
+        {players.map((player) => {
+          const hasMiniStatus = isOngoing && player.miniStatus !== null;
+          
+          return (
+            <li
+              key={player.id}
+              className="border border-grey-100 flex w-full group relative h-16"
             >
-              <div className="truncate basis-[70%] shrink p-3">
-                {player.name}
+              <div
+                className={`flex w-full ${isLeader && player.id != socket.id ? "cursor-pointer group-hover:opacity-30 transition-opacity" : ""}`}
+                onClick={() => isLeader && handleUpdateLeader(player.id)}
+              >
+                <div className="flex-1 flex flex-col justify-center overflow-hidden p-2">
+                  {hasMiniStatus ? (
+                    <>
+                      <div className="text-xs truncate leading-tight">
+                        {player.name}
+                      </div>
+                      <div className="text-sm truncate leading-tight mt-1">
+                        {player.miniStatus}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="truncate">
+                      {player.name}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="w-16 shrink-0 flex items-center justify-center">
+                  {gameStatus === "" ? (
+                    <div className="w-16 shrink-0 flex items-center justify-center"> {player.wins} </div>) : (
+                    <div className="w-16 shrink-0 flex items-center justify-center"> {player.score} </div>
+                    )}
+                </div>
               </div>
-              <div className="p-3 truncate basis-[30%] shrink-0 flex justify-center">
-                {player.score}
-              </div>
-            </div>
-            {isLeader && player.id != socket.id && (
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <span className="text-sm font-semibold">Click to promote</span>
-              </div>
-            )}
-          </li>
-        ))}
+              {isLeader && player.id != socket.id && (
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  <span className="text-sm font-semibold">Click to promote</span>
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

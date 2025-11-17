@@ -8,6 +8,8 @@ export interface Player {
   id: string;
   name: string;
   score: number;
+  wins: number;
+  miniStatus: number | string | null;
 }
 
 export interface Settings {

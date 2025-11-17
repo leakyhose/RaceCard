@@ -80,7 +80,7 @@ export default function Lobby() {
 
       <div className="flex flex-1 overflow-hidden">
         <div className="w-64 flex flex-col">
-          <Players players={lobby.players} />
+          <Players players={lobby.players} gameStatus={lobby.status} />
           <UploadFlashcard isLeader={isLeader} />
         </div>
 

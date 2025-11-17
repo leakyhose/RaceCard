@@ -24,7 +24,7 @@ export function createLobby(hostID: string, hostName: string): Lobby {
   const newLobby: Lobby = {
     code,
     hostID,
-    players: [{ id: hostID, name: hostName, score: 0 }],
+    players: [{ id: hostID, name: hostName, score: 0, wins: 0, miniStatus: null}],
     flashcards: [],
     status: "waiting",
     settings: { shuffle: true, fuzzyTolerance: true },
@@ -70,6 +70,16 @@ export function removePlayerFromLobby(socketId: string) {
   if (lobby && lobby.players.length == 0) {
     deleteLobby(lobby.code);
     return null;
+  }
+
+  return lobby;
+}
+
+export function wipeMiniStatus(lobbyCode: string) {
+  const lobby = getLobbyByCode(lobbyCode)
+
+  for(const player of lobby?.players || []) {
+    player.miniStatus = null;
   }
 
   return lobby;

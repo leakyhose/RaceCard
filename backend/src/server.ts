@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 import type {
   ServerToClientEvents,
   ClientToServerEvents,
+  Lobby,
 } from "@shared/types.js";
 
 import {
@@ -16,6 +17,7 @@ import {
   updateSettings,
   removePlayerFromLobby,
   updateLeader,
+  wipeMiniStatus,
 } from "./lobbyManager.js";
 
 import {
@@ -152,7 +154,9 @@ io.on("connection", (socket) => {
             if (results) {
               io.to(lobbyCode).emit("endFlashcard", results);
             }
-
+            
+            const lobby = wipeMiniStatus(lobbyCode);
+            if (lobby) io.to(lobbyCode).emit("lobbyUpdated", lobby);
             // Wait 3 seconds to show results
             setTimeout(() => {
               const nextQuestion = advanceToNextFlashcard(lobbyCode);
@@ -180,8 +184,10 @@ io.on("connection", (socket) => {
 
   socket.on("answer", (text) => {
     const result = validateAnswer(socket.id, text);
-    if (!result || !result.isCorrect) return;
-    socket.emit("correctGuess", result.timeTaken);
+    if (!result) return;
+    if (result.isCorrect){
+      socket.emit("correctGuess", result.timeTaken);
+    }
     io.to(result.lobby.code).emit("lobbyUpdated", result.lobby);
   });
 });
