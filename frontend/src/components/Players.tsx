@@ -8,9 +8,16 @@ interface PlayersProps {
   leader: string;
 }
 
-export function Players({ players, gameStatus, isLeader, leader }: PlayersProps) {
+export function Players({
+  players,
+  gameStatus,
+  isLeader,
+  leader,
+}: PlayersProps) {
   const handleUpdateLeader = (nextLeaderId: string) => {
-    if (!isLeader){return;}
+    if (!isLeader) {
+      return;
+    }
     socket.emit("updateLeader", nextLeaderId);
   };
 
@@ -21,7 +28,7 @@ export function Players({ players, gameStatus, isLeader, leader }: PlayersProps)
       <ul className="flex-1 overflow-auto border border-grey-100">
         {players.map((player) => {
           const hasMiniStatus = isOngoing && player.miniStatus !== null;
-          
+
           return (
             <li
               key={player.id}
@@ -36,46 +43,54 @@ export function Players({ players, gameStatus, isLeader, leader }: PlayersProps)
                     <>
                       {player.id === leader ? (
                         <div className="truncate leading-tight">
-                        👑{player.name}
+                          👑{player.name}
                         </div>
                       ) : (
                         <div className="truncate leading-tight">
-                        {player.name}
+                          {player.name}
                         </div>
                       )}
-                      
-                      <div className="text-sm truncate leading-tight mt-1">
-                        {(typeof player.miniStatus) === 'number'
-                          ? `${(Number(player.miniStatus) / 1000).toFixed(3)}s`
-                          : ((player.miniStatus))}
 
+                      <div className="text-sm truncate leading-tight mt-1">
+                        {typeof player.miniStatus === "number"
+                          ? `${(Number(player.miniStatus) / 1000).toFixed(3)}s`
+                          : player.miniStatus}
                       </div>
                     </>
                   ) : (
                     <div className="truncate">
                       {player.id === leader ? (
                         <div className="truncate leading-tight">
-                        👑 {player.name}
+                          👑 {player.name}
                         </div>
                       ) : (
                         <div className="truncate leading-tight">
-                        {player.name}
+                          {player.name}
                         </div>
                       )}
                     </div>
                   )}
                 </div>
-                
+
                 <div className="w-16 shrink-0 flex items-center justify-center">
                   {gameStatus === "waiting" || gameStatus === "finished" ? (
-                    <div className="w-16 shrink-0 flex items-center justify-center"> {player.wins} </div>) : (
-                    <div className="w-16 shrink-0 flex items-center justify-center"> {player.score} </div>
-                    )}
+                    <div className="w-16 shrink-0 flex items-center justify-center">
+                      {" "}
+                      {player.wins}{" "}
+                    </div>
+                  ) : (
+                    <div className="w-16 shrink-0 flex items-center justify-center">
+                      {" "}
+                      {player.score}{" "}
+                    </div>
+                  )}
                 </div>
               </div>
               {isLeader && player.id != socket.id && (
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  <span className="text-sm font-semibold">Click to promote</span>
+                  <span className="text-sm font-semibold">
+                    Click to promote
+                  </span>
                 </div>
               )}
             </li>

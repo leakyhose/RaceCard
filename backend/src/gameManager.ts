@@ -75,9 +75,9 @@ export function validateAnswer(socketId: string, answerText: string) {
       player.miniStatus = timeTaken;
     }
   } else {
-      player.miniStatus = answerText;
-      const existing = gs.wrongAnswers.find((w) => w.player === player.name);
-      if (existing) {
+    player.miniStatus = answerText;
+    const existing = gs.wrongAnswers.find((w) => w.player === player.name);
+    if (existing) {
       existing.answer.push(answerText);
     } else {
       gs.wrongAnswers.push({ player: player.name, answer: [answerText] });
@@ -95,7 +95,7 @@ export function allPlayersAnsweredCorrectly(lobbyCode: string): boolean {
 
   const totalPlayers = lobby.players.length;
   const correctPlayers = gs.correctAnswers.length;
-  
+
   return correctPlayers >= totalPlayers;
 }
 

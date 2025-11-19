@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import type { FlashcardEnd } from "@shared/types";
+import { MiniLeaderboard } from "./MiniLeaderboard";
 
 export function Game() {
   const [countdown, setCountdown] = useState<number | string | null>(3);
@@ -122,25 +123,8 @@ export function Game() {
           </div>
 
           <div className="flex gap-6 flex-1 p-8 pt-0 justify-center">
-            {results.fastestPlayers.length > 0 && (
-              <div className="border-2 border-blue-300 rounded-lg p-4 bg-blue-50 flex-1 max-w-md">
-                <h3 className="text-xl font-semibold mb-3 text-blue-800">
-                  Fastest Correct Answers
-                </h3>
-                <div className="space-y-2">
-                  {results.fastestPlayers.map((player, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-between items-center p-2 bg-white rounded border"
-                    >
-                      <span className="font-medium">{player.player}</span>
-                      <span className="text-sm text-gray-600">
-                        {(Number(player.time) / 1000).toFixed(3)}s
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {results && results.fastestPlayers.length > 0 && (
+              <MiniLeaderboard results={results} />
             )}
 
             {results.wrongAnswers.length > 0 && (

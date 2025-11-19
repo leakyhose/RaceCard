@@ -40,13 +40,16 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
 });
 
 // Store callbacks for active rounds to enable event-driven early ending
-const activeRounds = new Map<string, { 
-  endRound: () => void;
-  roundStartTime: number;
-  roundEnded: boolean;
-}>();
+const activeRounds = new Map<
+  string,
+  {
+    endRound: () => void;
+    roundStartTime: number;
+    roundEnded: boolean;
+  }
+>();
 
-// NOTE: THERE ARE SOME INCONSISTENCIES WITH FUNCTIONS TAKING IN CODE OR LOBBY ID, 
+// NOTE: THERE ARE SOME INCONSISTENCIES WITH FUNCTIONS TAKING IN CODE OR LOBBY ID,
 // MAKE SURE THEY MATCH THE ONES IN THE MANAGER FILES
 io.on("connection", (socket) => {
   console.log(`connected to: ${socket.id}`);
@@ -88,7 +91,7 @@ io.on("connection", (socket) => {
     }
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
-  
+
   // Updates leader
   socket.on("updateLeader", (nextLeaderId) => {
     const lobby = updateLeader(nextLeaderId);
@@ -112,7 +115,7 @@ io.on("connection", (socket) => {
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
 
-  // Starts game, and gameplay loop 
+  // Starts game, and gameplay loop
   socket.on("startGame", () => {
     const lobby = startGame(socket.id);
     if (!lobby) {
@@ -172,10 +175,10 @@ io.on("connection", (socket) => {
             if (results) {
               io.to(lobbyCode).emit("endFlashcard", results);
             }
-            
+
             const lobby = wipeMiniStatus(lobbyCode);
             if (lobby) io.to(lobbyCode).emit("lobbyUpdated", lobby);
-            
+
             // Wait 5 seconds to show results
             setTimeout(() => {
               const nextQuestion = advanceToNextFlashcard(lobbyCode);
@@ -211,20 +214,24 @@ io.on("connection", (socket) => {
   socket.on("answer", (text) => {
     const result = validateAnswer(socket.id, text);
     if (!result) return;
-    if (result.isCorrect){
+    if (result.isCorrect) {
       socket.emit("correctGuess", result.timeTaken);
     }
     io.to(result.lobby.code).emit("lobbyUpdated", result.lobby);
 
     // Check if all players have answered correctly
     const roundInfo = activeRounds.get(result.lobby.code);
-    if (roundInfo && !roundInfo.roundEnded && allPlayersAnsweredCorrectly(result.lobby.code)) {
+    if (
+      roundInfo &&
+      !roundInfo.roundEnded &&
+      allPlayersAnsweredCorrectly(result.lobby.code)
+    ) {
       const elapsedTime = Date.now() - roundInfo.roundStartTime;
       const ROUND_DURATION = 10000;
       const MIN_DELAY_AFTER_ALL_ANSWERED = 1000;
       const timeUntilEnd = ROUND_DURATION - elapsedTime;
       const delay = Math.min(timeUntilEnd, MIN_DELAY_AFTER_ALL_ANSWERED);
-      
+
       setTimeout(() => roundInfo.endRound(), delay);
     }
   });

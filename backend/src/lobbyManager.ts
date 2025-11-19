@@ -24,11 +24,13 @@ export function createLobby(hostID: string, hostName: string): Lobby {
   const newLobby: Lobby = {
     code,
     hostID,
-    players: [{ id: hostID, name: hostName, score: 0, wins: 0, miniStatus: null}],
+    players: [
+      { id: hostID, name: hostName, score: 0, wins: 0, miniStatus: null },
+    ],
     flashcards: [],
     status: "waiting",
     settings: { shuffle: true, fuzzyTolerance: true },
-    leader: hostID
+    leader: hostID,
   };
   lobbies.set(code, newLobby);
   socketToLobby.set(hostID, code);
@@ -78,9 +80,9 @@ export function removePlayerFromLobby(socketId: string) {
 
 // Wipes miniStatus for all players in a lobby
 export function wipeMiniStatus(lobbyCode: string) {
-  const lobby = getLobbyByCode(lobbyCode)
-  
-  for(const player of lobby?.players || []) {
+  const lobby = getLobbyByCode(lobbyCode);
+
+  for (const player of lobby?.players || []) {
     player.miniStatus = null;
   }
 
@@ -90,7 +92,9 @@ export function wipeMiniStatus(lobbyCode: string) {
 // Updates leader in a lobby
 export function updateLeader(socketId: string) {
   const lobby = getLobbyBySocket(socketId);
-  if (!lobby){return;}
+  if (!lobby) {
+    return;
+  }
   lobby.leader = socketId;
   return lobby;
 }
