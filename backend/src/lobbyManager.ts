@@ -76,6 +76,7 @@ export function removePlayerFromLobby(socketId: string) {
   return lobby;
 }
 
+// Wipes miniStatus for all players in a lobby
 export function wipeMiniStatus(lobbyCode: string) {
   const lobby = getLobbyByCode(lobbyCode)
   
@@ -86,6 +87,7 @@ export function wipeMiniStatus(lobbyCode: string) {
   return lobby;
 }
 
+// Updates leader in a lobby
 export function updateLeader(socketId: string) {
   const lobby = getLobbyBySocket(socketId);
   if (!lobby){return;}

@@ -10,9 +10,9 @@ export function startGame(socketId: string) {
   const lobby = getLobbyBySocket(socketId);
   if (!lobby) return null;
 
-  // Don't set status or shuffle yet - just prepare the state
+  // Shuffling will be done alongside countdown later o ne
   codeToGamestate.set(lobby.code, {
-    flashcards: [...lobby.flashcards], // Will be shuffled later
+    flashcards: [...lobby.flashcards],
     roundStart: 0,
     wrongAnswers: [],
     correctAnswers: [],

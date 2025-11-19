@@ -46,11 +46,8 @@ const activeRounds = new Map<string, {
   roundEnded: boolean;
 }>();
 
-/*
- All socket.on that change lobby should emit, "lobbyUpdated", with accomanying lobby
- Requests to change the lobby should not include code either, server can figure it out itself
- Only exception are adding players to lobby
-*/
+// NOTE: THERE ARE SOME INCONSISTENCIES WITH FUNCTIONS TAKING IN CODE OR LOBBY ID, 
+// MAKE SURE THEY MATCH THE ONES IN THE MANAGER FILES
 io.on("connection", (socket) => {
   console.log(`connected to: ${socket.id}`);
 
@@ -82,6 +79,7 @@ io.on("connection", (socket) => {
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
 
+  // Updates settings
   socket.on("updateSettings", (settings) => {
     const lobby = updateSettings(socket.id, settings);
     if (!lobby) {
@@ -90,7 +88,8 @@ io.on("connection", (socket) => {
     }
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
-
+  
+  // Updates leader
   socket.on("updateLeader", (nextLeaderId) => {
     const lobby = updateLeader(nextLeaderId);
     if (!lobby) {
@@ -100,17 +99,20 @@ io.on("connection", (socket) => {
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
 
+  // Gets lobby data, used to check when lobby exists too when null is emitted
   socket.on("getLobby", (code) => {
     const lobby = getLobbyByCode(code);
     socket.emit("lobbyData", lobby || null);
   });
 
+  // Handles disconnection
   socket.on("disconnect", () => {
     const lobby = removePlayerFromLobby(socket.id);
     if (!lobby) return;
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
 
+  // Starts game, and gameplay loop 
   socket.on("startGame", () => {
     const lobby = startGame(socket.id);
     if (!lobby) {
@@ -160,6 +162,7 @@ io.on("connection", (socket) => {
           const ROUND_DURATION = 10000;
           let roundEnded = false;
 
+          // Ends round, is also called when everyone answers correctly
           const endRound = () => {
             if (roundEnded) return;
             roundEnded = true;
