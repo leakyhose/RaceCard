@@ -7,8 +7,8 @@ export interface Flashcard {
 export interface Player {
   id: string;
   name: string;
-  score: number;
   wins: number;
+  score: number
   miniStatus: number | string | null;
 }
 

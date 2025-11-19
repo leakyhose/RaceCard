@@ -83,7 +83,6 @@ export function validateAnswer(socketId: string, answerText: string) {
       gs.wrongAnswers.push({ player: player.name, answer: [answerText] });
     }
   }
-
   return { isCorrect, timeTaken, lobby };
 }
 

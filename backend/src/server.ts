@@ -18,6 +18,7 @@ import {
   removePlayerFromLobby,
   updateLeader,
   wipeMiniStatus,
+  sortPlayersByMetric,
 } from "./lobbyManager.js";
 
 import {
@@ -69,6 +70,7 @@ io.on("connection", (socket) => {
       return;
     }
     socket.join(code);
+    lobby.players = sortPlayersByMetric(lobby);
     io.to(code).emit("lobbyUpdated", lobby);
   });
 
@@ -111,7 +113,21 @@ io.on("connection", (socket) => {
   // Handles disconnection
   socket.on("disconnect", () => {
     const lobby = removePlayerFromLobby(socket.id);
+
+    if (!lobby) { // Lobby was deleted, as it became empty
+      return;
+    }
+
+    if (lobby?.leader === socket.id) {
+      if (lobby.players.length > 0) {
+        if (!lobby.players[0]){
+          console.log("No players found when updating leader on disconnect"); 
+          return;}
+        lobby.leader = lobby.players[0].id;
+      }
+    }
     if (!lobby) return;
+    lobby.players = sortPlayersByMetric(lobby);
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
 
@@ -124,6 +140,7 @@ io.on("connection", (socket) => {
     }
 
     lobby.status = "starting";
+    lobby.players = sortPlayersByMetric(lobby);
     io.to(lobby.code).emit("lobbyUpdated", lobby);
 
     // Start countdown
@@ -143,6 +160,7 @@ io.on("connection", (socket) => {
 
         // Set status to ongoing before starting game loop
         lobby.status = "ongoing";
+        lobby.players = sortPlayersByMetric(lobby);
         io.to(lobby.code).emit("lobbyUpdated", lobby);
 
         const runGameplayLoop = (lobbyCode: string) => {
@@ -151,7 +169,10 @@ io.on("connection", (socket) => {
             const finalLobby = getLobbyByCode(lobbyCode);
             if (finalLobby) {
               finalLobby.status = "finished";
-              
+              if (finalLobby.players[0]){
+                  finalLobby.players[0].wins += 1;
+              }
+              finalLobby.players = sortPlayersByMetric(finalLobby);
               io.to(lobbyCode).emit("lobbyUpdated", finalLobby);
               endGame(lobbyCode);
             }
@@ -189,12 +210,17 @@ io.on("connection", (socket) => {
                 runGameplayLoop(lobbyCode);
               } else {
                 // Game over
-                const finalLobby = getLobbyByCode(lobbyCode);
-                if (finalLobby) {
-                  finalLobby.status = "finished";
-                  io.to(lobbyCode).emit("lobbyUpdated", finalLobby);
-                  endGame(lobbyCode);
-                }
+                            const finalLobby = getLobbyByCode(lobbyCode);
+            if (finalLobby) {
+              finalLobby.status = "finished";
+              if (finalLobby.players[0]){
+                  finalLobby.players[0].wins += 1;
+              }
+              finalLobby.players = sortPlayersByMetric(finalLobby);
+              io.to(lobbyCode).emit("lobbyUpdated", finalLobby);
+              endGame(lobbyCode);
+            }
+            return;
               }
             }, 3000);
           };
@@ -215,9 +241,11 @@ io.on("connection", (socket) => {
   socket.on("answer", (text) => {
     const result = validateAnswer(socket.id, text);
     if (!result) return;
+
     if (result.isCorrect) {
       socket.emit("correctGuess", result.timeTaken);
     }
+    result.lobby.players = sortPlayersByMetric(result.lobby);
     io.to(result.lobby.code).emit("lobbyUpdated", result.lobby);
 
     // Check if all players have answered correctly
@@ -250,11 +278,13 @@ io.on("connection", (socket) => {
     }
 
     lobby.status = "waiting";
+    lobby.players = sortPlayersByMetric(lobby);
 
     lobby.players.forEach((player) => {
       player.score = 0;
     });
-
+    
+    lobby.players = sortPlayersByMetric(lobby);
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
 });

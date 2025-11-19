@@ -1,4 +1,4 @@
-import type { Flashcard, Lobby, Settings } from "@shared/types.js";
+import type { Flashcard, Lobby, Settings, Player } from "@shared/types.js";
 import { generateCode, deleteCode } from "./codeGenerator.js";
 import { addPlayer, removePlayer } from "./playerManager.js";
 
@@ -121,3 +121,13 @@ export function getLobbyBySocket(socketId: string): Lobby | null {
 export function getAllLobbies() {
   return Array.from(lobbies.values());
 }
+
+// Sorts players in lobby with metric
+export function sortPlayersByMetric(lobby: Lobby): Player[] {
+  const players = [...lobby.players]; 
+  
+  if (lobby.status === "waiting" || lobby.status === "finished") {
+    return players.sort((a, b) => b.wins - a.wins);
+  } else {
+    return players.sort((a, b) => b.score - a.score);
+  }}
