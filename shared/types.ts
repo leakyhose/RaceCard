@@ -61,6 +61,7 @@ export interface ClientToServerEvents {
   updateSettings: (settings: Settings) => void;
   updateLeader: (nextLeaderId: string) => void;
   startGame: () => void;
+  continueGame: () => void;
   sendChat: (msg: string) => void;
   getLobby: (code: string) => void;
   requestCurrentQuestion: () => void;

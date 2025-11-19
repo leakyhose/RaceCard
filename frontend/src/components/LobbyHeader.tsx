@@ -27,7 +27,7 @@ export function LobbyHeader({
             <div>Upload or create Flashcards to start</div>
           ) : lobby.status === "waiting" || lobby.status === "finished" ? (
             <button onClick={handleStartGame}>
-              {lobby.status === "finished" ? "Play Again" : "Start"}
+              {lobby.status === "finished" ? "Press continue..." : "Start"}
             </button>
           ) : (
             <div>Game in Progress</div>
@@ -36,6 +36,8 @@ export function LobbyHeader({
           <div>Waiting for leader to upload or create Flashcards...</div>
         ) : lobby.status === "ongoing" ? (
           <div>Game in progress...</div>
+        ) : lobby.status === "finished" ? (
+          <div>Waiting for leader to continue...</div>
         ) : (
           <div>Waiting for leader to start...</div>
         )}

@@ -151,6 +151,7 @@ io.on("connection", (socket) => {
             const finalLobby = getLobbyByCode(lobbyCode);
             if (finalLobby) {
               finalLobby.status = "finished";
+              
               io.to(lobbyCode).emit("lobbyUpdated", finalLobby);
               endGame(lobbyCode);
             }
@@ -234,6 +235,27 @@ io.on("connection", (socket) => {
 
       setTimeout(() => roundInfo.endRound(), delay);
     }
+  });
+
+  socket.on("continueGame", () => {
+    const lobby = getLobbyBySocket(socket.id);
+    if (!lobby) {
+      console.log("Failed to continue game: lobby not found");
+      return;
+    }
+    
+    if (lobby.leader !== socket.id) {
+      console.log("Only leader can continue the game");
+      return;
+    }
+
+    lobby.status = "waiting";
+
+    lobby.players.forEach((player) => {
+      player.score = 0;
+    });
+
+    io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
 });
 httpServer.listen(3000, () => console.log("Server running on :3000"));

@@ -2,14 +2,19 @@ import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import type { FlashcardEnd } from "@shared/types";
 import { MiniLeaderboard } from "./MiniLeaderboard";
+import { useParams } from "react-router-dom";
+import { useLobbyData } from "../hooks/useLobbyData";
 
 export function Game() {
+  const { code } = useParams();
+  const lobby = useLobbyData(code);
   const [countdown, setCountdown] = useState<number | string | null>(3);
   const [currentQuestion, setCurrentQuestion] = useState<string | null>(null);
   const [answer, setAnswer] = useState("");
   const [hasAnsweredCorrectly, setHasAnsweredCorrectly] = useState(false);
   const [results, setResults] = useState<FlashcardEnd | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const isLeader = lobby?.leader === socket.id;
 
   useEffect(() => {
     const handleCountdown = (seconds: number | string) => {
@@ -61,6 +66,37 @@ export function Game() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-9xl font-bold">{countdown}</div>
+      </div>
+    );
+  }
+
+  if (lobby?.status === "finished") {
+    const leaderboardData = lobby.players.map(player => ({
+      player: player.name,
+      value: player.score
+    }));
+
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-8 gap-8">
+        <h2 className="text-4xl font-bold">Game Finished!</h2>
+        <MiniLeaderboard 
+          leaderboardName="Final Scores" 
+          playerList={leaderboardData}
+        />
+        <div>
+          {isLeader ? (
+            <button
+              onClick={() => socket.emit("continueGame")}
+              className="px-8 py-4 bg-blue-500 text-white text-xl font-semibold rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Continue
+            </button>
+          ) : (
+            <div className="text-xl text-gray-500">
+              Waiting for leader to continue...
+            </div>
+          )}
+        </div>
       </div>
     );
   }

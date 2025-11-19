@@ -86,7 +86,7 @@ export default function Lobby() {
         </div>
 
         <div className="flex-1 p-4 overflow-auto">
-          {lobby.status === "starting" || lobby.status === "ongoing" ? (
+          {lobby.status === "starting" || lobby.status === "ongoing" || lobby.status === "finished" ? (
             <Game />
           ) : (
             <FlashcardPreview flashcards={lobby.flashcards} />

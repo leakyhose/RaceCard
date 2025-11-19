@@ -5,7 +5,7 @@ type FlashcardEndProps = {
 
 export function MiniLeaderboard({ leaderboardName, playerList }: FlashcardEndProps) {
     return (
-        <div className="border-2 border-blue-300 rounded-lg p-4 bg-blue-50 flex-1 max-w-md">
+        <div className="border-2 border-blue-300 rounded-lg p-4 bg-blue-50 w-80 min-h-96">
             <h3 className="text-xl font-semibold mb-3 text-blue-800">
                 {leaderboardName}
             </h3>
