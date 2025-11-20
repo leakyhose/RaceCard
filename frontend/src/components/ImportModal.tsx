@@ -53,8 +53,13 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-6 border-b-4 border-coffee pb-2">
-          <h2 className="text-2xl font-bold uppercase tracking-wide text-coffee">Import Flashcards</h2>
-          <button onClick={onClose} className="text-xl font-bold px-2 text-coffee hover:text-terracotta transition-colors">
+          <h2 className="text-2xl font-bold uppercase tracking-wide text-coffee">
+            Import Flashcards
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-xl font-bold px-2 text-coffee hover:text-terracotta transition-colors"
+          >
             ✕
           </button>
         </div>
@@ -64,32 +69,30 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
           <div className="w-3/7 border-r-4 border-coffee pr-6 overflow-y-auto">
             <h3 className="font-bold text-lg mb-4 uppercase">How to Import</h3>
             <div className="space-y-4 text-sm font-bold">
-              <p>
-                How to import from Quizlet
-              </p>
+              <p>How to import from Quizlet</p>
               <div>
                 <p className="mb-2">
-                  1. Make sure that the set you want to import is in your own library. If it isn't, click the "Make a copy" then "Create"
+                  1. Make sure that the set you want to import is in your own
+                  library. If it isn't, click the "Make a copy" then "Create"
                 </p>
-                <img 
-                  src={step1Image} 
-                  alt="Step 1: Make a copy" 
+                <img
+                  src={step1Image}
+                  alt="Step 1: Make a copy"
                   className="w-full border-2 border-coffee mb-4"
                 />
               </div>
               <div>
                 <p className="mb-2">
-                  2. Click the three dot menu button the flashcard set, then click "Export".
+                  2. Click the three dot menu button the flashcard set, then
+                  click "Export".
                 </p>
-                <img 
-                  src={step2Image} 
-                  alt="Step 2: Export flashcards" 
+                <img
+                  src={step2Image}
+                  alt="Step 2: Export flashcards"
                   className="w-full border-2 border-coffee mb-4"
                 />
               </div>
-              <p>
-                3. Copy the text over and import!
-              </p>
+              <p>3. Copy the text over and import!</p>
             </div>
           </div>
 
@@ -97,7 +100,9 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
           <div className="w-4/7 flex flex-col overflow-hidden">
             <div className="flex gap-8 mb-6 shrink-0">
               <div>
-                <h3 className="font-bold mb-2 uppercase">Between term and definition</h3>
+                <h3 className="font-bold mb-2 uppercase">
+                  Between term and definition
+                </h3>
                 <div className="space-y-1 font-bold">
                   <label className="flex items-center gap-2 cursor-pointer hover:text-terracotta transition-colors">
                     <input

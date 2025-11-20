@@ -29,10 +29,12 @@ export function Players({
         {players.map((player) => {
           const hasMiniStatus = isOngoing && player.miniStatus !== null;
 
+          const hasCorrectAnswer = typeof player.miniStatus === "number";
+
           return (
             <li
               key={player.id}
-              className="border-b-4 border-coffee flex w-full group relative h-16 hover:bg-terracotta/20 transition-colors bg-vanilla"
+              className={`border-b-4 border-coffee flex w-full group relative h-16 hover:bg-terracotta/20 transition-colors ${hasCorrectAnswer ? "bg-coffee/30" : "bg-vanilla"}`}
             >
               <div
                 className={`flex w-full ${isLeader && player.id != socket.id ? "cursor-pointer" : ""}`}
@@ -61,7 +63,7 @@ export function Players({
                     <div className="truncate">
                       {player.id === leader ? (
                         <div className="truncate leading-tight text-coffee font-bold uppercase">
-                           👑 {player.name}
+                          👑 {player.name}
                         </div>
                       ) : (
                         <div className="truncate leading-tight text-coffee font-bold uppercase">

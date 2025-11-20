@@ -38,7 +38,10 @@ export function SettingsModal({
     onClose();
   };
 
-  const handleChange = (key: keyof Settings, value: Settings[keyof Settings]) => {
+  const handleChange = (
+    key: keyof Settings,
+    value: Settings[keyof Settings],
+  ) => {
     setSettings((prev) => {
       const updatedSettings = { ...prev, [key]: value };
       onUpdate(updatedSettings);
@@ -56,8 +59,13 @@ export function SettingsModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6 border-b-4 border-coffee pb-2">
-          <h2 className="text-xl font-bold uppercase tracking-wide text-coffee">Game Settings</h2>
-          <button onClick={handleClose} className="text-xl font-bold text-coffee hover:text-terracotta transition-colors">
+          <h2 className="text-xl font-bold uppercase tracking-wide text-coffee">
+            Game Settings
+          </h2>
+          <button
+            onClick={handleClose}
+            className="text-xl font-bold text-coffee hover:text-terracotta transition-colors"
+          >
             ✕
           </button>
         </div>

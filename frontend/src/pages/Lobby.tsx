@@ -86,19 +86,26 @@ export default function Lobby() {
 
           {isLeader && lobby.status === "waiting" && (
             <div className="p-4 border-t-4 border-coffee flex flex-row justify-center gap-15 bg-vanilla">
-              <ChangeSettings isLeader={isLeader} currentSettings={lobby.settings} />
+              <ChangeSettings
+                isLeader={isLeader}
+                currentSettings={lobby.settings}
+              />
               <UploadFlashcard isLeader={isLeader} />
             </div>
           )}
-          
         </div>
 
         <div className="flex-1 p-0 overflow-y-auto overflow-x-hidden bg-light-vanilla relative">
-          {lobby.status === "starting" || lobby.status === "ongoing" || lobby.status === "finished" ? (
+          {lobby.status === "starting" ||
+          lobby.status === "ongoing" ||
+          lobby.status === "finished" ? (
             <Game />
           ) : (
             <div className="h-full p-8 bg-light-vanilla">
-                <FlashcardPreview flashcards={lobby.flashcards} answerByTerm={lobby.settings.answerByTerm} />
+              <FlashcardPreview
+                flashcards={lobby.flashcards}
+                answerByTerm={lobby.settings.answerByTerm}
+              />
             </div>
           )}
         </div>

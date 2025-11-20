@@ -10,7 +10,6 @@ export function startGame(socketId: string) {
   const lobby = getLobbyBySocket(socketId);
   if (!lobby) return null;
 
-
   let gameFlashcards = [...lobby.flashcards];
   if (lobby.settings.answerByTerm) {
     gameFlashcards = swap(gameFlashcards);

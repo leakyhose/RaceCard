@@ -3,10 +3,10 @@
 @theme {
   --color-vanilla: #f3eaca;
   --color-coffee: #644536;
-  --color-terracotta: #B2675E;
-  --color-powder: #B4CDED;
-  --color-thistle: #E7C8DD;
-  --color-light-vanilla: #EEE1B3;   
+  --color-terracotta: #b2675e;
+  --color-powder: #b4cded;
+  --color-thistle: #e7c8dd;
+  --color-light-vanilla: #eee1b3;
 
   --font-executive: "F25 Executive", monospace;
 
@@ -20,8 +20,8 @@
 }
 
 @font-face {
-  font-family: 'F25 Executive';
-  src: url('/fonts/F25_Executive.ttf') format('truetype');
+  font-family: "F25 Executive";
+  src: url("/fonts/F25_Executive.ttf") format("truetype");
 }
 
 @layer base {
@@ -30,8 +30,10 @@
     color: var(--color-coffee);
     font-family: var(--font-executive);
   }
-  
-  *, ::before, ::after {
+
+  *,
+  ::before,
+  ::after {
     border-radius: 0px;
   }
 }

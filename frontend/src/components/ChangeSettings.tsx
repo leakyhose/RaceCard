@@ -9,7 +9,10 @@ interface ChangeSettingsProps {
   currentSettings?: Settings;
 }
 
-export function ChangeSettings({ isLeader, currentSettings }: ChangeSettingsProps) {
+export function ChangeSettings({
+  isLeader,
+  currentSettings,
+}: ChangeSettingsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleChange = (settings: Settings) => {
@@ -17,13 +20,17 @@ export function ChangeSettings({ isLeader, currentSettings }: ChangeSettingsProp
   };
 
   // Default settings if undefined
-  const settingsToUse = currentSettings || { shuffle: true, fuzzyTolerance: true, answerByTerm: false };
+  const settingsToUse = currentSettings || {
+    shuffle: true,
+    fuzzyTolerance: true,
+    answerByTerm: false,
+  };
 
   return (
     <div>
       {isLeader && (
         <>
-          <button 
+          <button
             onClick={() => setIsModalOpen(true)}
             className="border-3 border-coffee bg-powder p-2 hover:bg-coffee hover:brightness-110 transition-all shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer flex items-center justify-center group"
             title="Game Settings"
@@ -41,7 +48,7 @@ export function ChangeSettings({ isLeader, currentSettings }: ChangeSettingsProp
             currentSettings={settingsToUse}
           />
         </>
-)}
+      )}
     </div>
   );
 }

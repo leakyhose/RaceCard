@@ -114,15 +114,17 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     const lobby = removePlayerFromLobby(socket.id);
 
-    if (!lobby) { // Lobby was deleted, as it became empty
+    if (!lobby) {
+      // Lobby was deleted, as it became empty
       return;
     }
 
     if (lobby?.leader === socket.id) {
       if (lobby.players.length > 0) {
-        if (!lobby.players[0]){
-          console.log("No players found when updating leader on disconnect"); 
-          return;}
+        if (!lobby.players[0]) {
+          console.log("No players found when updating leader on disconnect");
+          return;
+        }
         lobby.leader = lobby.players[0].id;
       }
     }
@@ -169,8 +171,8 @@ io.on("connection", (socket) => {
             const finalLobby = getLobbyByCode(lobbyCode);
             if (finalLobby) {
               finalLobby.status = "finished";
-              if (finalLobby.players[0]){
-                  finalLobby.players[0].wins += 1;
+              if (finalLobby.players[0]) {
+                finalLobby.players[0].wins += 1;
               }
               finalLobby.players = sortPlayersByMetric(finalLobby);
               io.to(lobbyCode).emit("lobbyUpdated", finalLobby);
@@ -210,17 +212,17 @@ io.on("connection", (socket) => {
                 runGameplayLoop(lobbyCode);
               } else {
                 // Game over
-                            const finalLobby = getLobbyByCode(lobbyCode);
-            if (finalLobby) {
-              finalLobby.status = "finished";
-              if (finalLobby.players[0]){
-                  finalLobby.players[0].wins += 1;
-              }
-              finalLobby.players = sortPlayersByMetric(finalLobby);
-              io.to(lobbyCode).emit("lobbyUpdated", finalLobby);
-              endGame(lobbyCode);
-            }
-            return;
+                const finalLobby = getLobbyByCode(lobbyCode);
+                if (finalLobby) {
+                  finalLobby.status = "finished";
+                  if (finalLobby.players[0]) {
+                    finalLobby.players[0].wins += 1;
+                  }
+                  finalLobby.players = sortPlayersByMetric(finalLobby);
+                  io.to(lobbyCode).emit("lobbyUpdated", finalLobby);
+                  endGame(lobbyCode);
+                }
+                return;
               }
             }, 3000);
           };
@@ -271,7 +273,7 @@ io.on("connection", (socket) => {
       console.log("Failed to continue game: lobby not found");
       return;
     }
-    
+
     if (lobby.leader !== socket.id) {
       console.log("Only leader can continue the game");
       return;
@@ -283,7 +285,7 @@ io.on("connection", (socket) => {
     lobby.players.forEach((player) => {
       player.score = 0;
     });
-    
+
     lobby.players = sortPlayersByMetric(lobby);
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });

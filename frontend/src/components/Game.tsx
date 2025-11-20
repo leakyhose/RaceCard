@@ -65,22 +65,24 @@ export function Game() {
   if (countdown !== null) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-9xl font-bold text-coffee animate-pulse">{countdown}</div>
+        <div className="text-9xl font-bold text-coffee">{countdown}</div>
       </div>
     );
   }
 
   if (lobby?.status === "finished") {
-    const leaderboardData = lobby.players.map(player => ({
+    const leaderboardData = lobby.players.map((player) => ({
       player: player.name,
-      value: player.score
+      value: player.score,
     }));
 
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 gap-8">
-        <h2 className="text-4xl font-bold text-coffee tracking-widest uppercase">Game Finished</h2>
-        <MiniLeaderboard 
-          leaderboardName="Final Scores" 
+        <h2 className="text-4xl font-bold text-coffee tracking-widest uppercase">
+          Game Finished
+        </h2>
+        <MiniLeaderboard
+          leaderboardName="Final Scores"
           playerList={leaderboardData}
         />
         <div>
@@ -136,7 +138,9 @@ export function Game() {
         <div className="p-8 flex items-center justify-center">
           <div className="text-center">
             <div className="text-6xl mb-4 text-coffee">✓</div>
-            <div className="text-2xl font-bold text-coffee uppercase tracking-widest">Correct</div>
+            <div className="text-2xl font-bold text-coffee uppercase tracking-widest">
+              Correct
+            </div>
             <div className="text-coffee/50 mt-2 font-bold uppercase">
               Waiting for round to end...
             </div>
@@ -151,7 +155,9 @@ export function Game() {
             style={{ height: "30%" }}
           >
             <div className="text-center w-full max-w-2xl ">
-              <h3 className="text-xl font-semibold mb-4 text-coffee uppercase tracking-wider">Correct Answer</h3>
+              <h3 className="text-xl font-semibold mb-4 text-coffee uppercase tracking-wider">
+                Correct Answer
+              </h3>
               <div className="text-4xl font-bold text-coffee p-6 bg-vanilla border-4 border-coffee max-h-48 overflow-auto shadow-[4px_4px_0px_0px_#644536] uppercase">
                 {results.Answer}
               </div>
@@ -160,19 +166,21 @@ export function Game() {
 
           <div className="flex gap-6 flex-1 p-8 pt-0 justify-center">
             {results && results.fastestPlayers.length > 0 && (
-              <MiniLeaderboard leaderboardName = "Fastest Answers" 
-              playerList={results.fastestPlayers.map(player => ({
-                player: player.player,
-                value: `${(Number(player.time) / 1000).toFixed(3)}s`
-              }))} />
+              <MiniLeaderboard
+                leaderboardName="Fastest Answers"
+                playerList={results.fastestPlayers.map((player) => ({
+                  player: player.player,
+                  value: `${(Number(player.time) / 1000).toFixed(3)}s`,
+                }))}
+              />
             )}
 
             {results.wrongAnswers.length > 0 && (
               <MiniLeaderboard
                 leaderboardName="Wrong Answers"
-                playerList={results.wrongAnswers.map(player => ({
+                playerList={results.wrongAnswers.map((player) => ({
                   player: player.player,
-                  value: player.answer
+                  value: player.answer,
                 }))}
               />
             )}

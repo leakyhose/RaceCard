@@ -29,7 +29,7 @@ export function createLobby(hostID: string, hostName: string): Lobby {
     ],
     flashcards: [],
     status: "waiting",
-    settings: { shuffle: true, fuzzyTolerance: true, answerByTerm: false },    // DEFAULT SETTINGS HERE WHEN CREATING LOBBY
+    settings: { shuffle: true, fuzzyTolerance: true, answerByTerm: false }, // DEFAULT SETTINGS HERE WHEN CREATING LOBBY
     leader: hostID,
   };
   lobbies.set(code, newLobby);
@@ -124,10 +124,11 @@ export function getAllLobbies() {
 
 // Sorts players in lobby with metric
 export function sortPlayersByMetric(lobby: Lobby): Player[] {
-  const players = [...lobby.players]; 
-  
+  const players = [...lobby.players];
+
   if (lobby.status === "waiting" || lobby.status === "finished") {
     return players.sort((a, b) => b.wins - a.wins);
   } else {
     return players.sort((a, b) => b.score - a.score);
-  }}
+  }
+}
