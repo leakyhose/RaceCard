@@ -73,7 +73,7 @@ export function Chat() {
                 <div className="font-bold uppercase">{msg.text}</div>
               ) : (
                 <div className="w-full min-w-0">
-                  <div className="text-sm font-bold text-coffee whitespace-normal break-words">
+                  <div className="text-sm font-bold text-coffee whitespace-normal wrap-break-words">
                     <span className="text-coffee/70">{msg.player}:</span>{" "}
                     {msg.text}
                   </div>
