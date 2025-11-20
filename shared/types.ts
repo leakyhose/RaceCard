@@ -8,7 +8,7 @@ export interface Player {
   id: string;
   name: string;
   wins: number;
-  score: number
+  score: number;
   miniStatus: number | string | null;
 }
 

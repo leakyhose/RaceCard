@@ -6,6 +6,7 @@ import { useLobbyData } from "../hooks/useLobbyData";
 import { Players } from "../components/Players";
 import { Chat } from "../components/Chat";
 import { UploadFlashcard } from "../components/UploadFlashcard";
+import { ChangeSettings } from "../components/ChangeSettings";
 import { LobbyHeader } from "../components/LobbyHeader";
 import { FlashcardPreview } from "../components/FlashcardPreview";
 import { Game } from "../components/Game";
@@ -74,7 +75,7 @@ export default function Lobby() {
         lobby={lobby}
       />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden ">
         <div className="w-64 flex flex-col">
           <Players
             players={lobby.players}
@@ -82,7 +83,13 @@ export default function Lobby() {
             isLeader={isLeader}
             leader={lobby.leader}
           />
-          <UploadFlashcard isLeader={isLeader} />
+
+          {isLeader && lobby.status === "waiting" && (
+            <div>
+            <ChangeSettings isLeader={isLeader} currentSettings={lobby.settings} />
+            <UploadFlashcard isLeader={isLeader} />
+          </div>)}
+          
         </div>
 
         <div className="flex-1 p-4 overflow-auto">

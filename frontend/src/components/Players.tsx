@@ -25,7 +25,7 @@ export function Players({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <ul className="flex-1 overflow-auto border border-grey-100">
+      <ul className="flex-1 overflow-auto">
         {players.map((player) => {
           const hasMiniStatus = isOngoing && player.miniStatus !== null;
 
@@ -61,7 +61,7 @@ export function Players({
                     <div className="truncate">
                       {player.id === leader ? (
                         <div className="truncate leading-tight">
-                          👑 {player.name}
+                          {player.name} 👑 
                         </div>
                       ) : (
                         <div className="truncate leading-tight">

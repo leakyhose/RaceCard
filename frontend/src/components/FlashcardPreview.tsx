@@ -4,7 +4,7 @@ interface FlashcardPreviewProps {
 
 export function FlashcardPreview({ flashcards }: FlashcardPreviewProps) {
   if (!flashcards.length) {
-    return <div className="text-sm italic">No flashcards uploaded yet.</div>;
+    return <div className="flex items-center h-full justify-center text-sm italic text-center">No flashcards uploaded yet.</div>;
   }
 
   return (

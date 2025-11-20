@@ -42,110 +42,138 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50"
+      className="fixed inset-0 flex items-center justify-center z-50 bg-black/20"
       onClick={onClose}
     >
       <div
-        className="border border-black bg-white p-4 max-w-2xl w-full max-h-[80vh] overflow-auto"
+        className="border border-black bg-white p-6 max-w-5xl w-full h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div>
-          <h2>Import flashcards</h2>
-          <button onClick={onClose}>✕</button>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6 border-b border-black pb-2">
+          <h2 className="text-2xl font-bold">Import Flashcards</h2>
+          <button onClick={onClose} className="text-xl font-bold px-2">
+            ✕
+          </button>
         </div>
 
-        <div>
-          <div>
-            <h3>Between term and definition</h3>
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  checked={termSeparator === "tab"}
-                  onChange={() => setTermSeparator("tab")}
-                />
-                Tab
-              </label>
-            </div>
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  checked={termSeparator === "comma"}
-                  onChange={() => setTermSeparator("comma")}
-                />
-                Comma
-              </label>
-            </div>
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  checked={termSeparator === "custom"}
-                  onChange={() => setTermSeparator("custom")}
-                />
-                <input
-                  type="text"
-                  placeholder="CUSTOM"
-                  value={customTermSep}
-                  onChange={(e) => setCustomTermSep(e.target.value)}
-                  disabled={termSeparator !== "custom"}
-                />
-              </label>
+        <div className="flex flex-1 gap-8 overflow-hidden">
+          {/* Left Column */}
+          <div className="w-3/7 border-r border-black pr-6 overflow-y-auto">
+            <h3 className="font-bold text-lg mb-4">How to Import</h3>
+            <div className="space-y-4 text-sm">
+              <p>
+                PLACEHOLDER PLACEHOLDER
+              </p>
+              <p>
+                1. PLACEHOLDER PLACEHOLDER
+                <br />
+                2. PLACEHOLDER PLACEHOLDER
+                <br />
+                3. PLACEHOLDER PLACEHOLDER
+                <br />
+                4. PLACEHOLDER PLACEHOLDER
+              </p>
             </div>
           </div>
 
-          <div>
-            <h3>Between rows</h3>
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  checked={rowSeparator === "newline"}
-                  onChange={() => setRowSeparator("newline")}
-                />
-                New line
-              </label>
+          {/* Right Column */}
+          <div className="w-4/7 flex flex-col overflow-hidden">
+            <div className="flex gap-8 mb-6 shrink-0">
+              <div>
+                <h3 className="font-bold mb-2">Between term and definition</h3>
+                <div className="space-y-1">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={termSeparator === "tab"}
+                      onChange={() => setTermSeparator("tab")}
+                    />
+                    Tab
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={termSeparator === "comma"}
+                      onChange={() => setTermSeparator("comma")}
+                    />
+                    Comma
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={termSeparator === "custom"}
+                      onChange={() => setTermSeparator("custom")}
+                    />
+                    <span className="mr-1">Custom:</span>
+                    <input
+                      type="text"
+                      className="border border-black px-1 w-16"
+                      value={customTermSep}
+                      onChange={(e) => setCustomTermSep(e.target.value)}
+                      disabled={termSeparator !== "custom"}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Row Separator */}
+              <div>
+                <h3 className="font-bold mb-2">Between rows</h3>
+                <div className="space-y-1">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={rowSeparator === "newline"}
+                      onChange={() => setRowSeparator("newline")}
+                    />
+                    New line
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={rowSeparator === "semicolon"}
+                      onChange={() => setRowSeparator("semicolon")}
+                    />
+                    Semicolon
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={rowSeparator === "custom"}
+                      onChange={() => setRowSeparator("custom")}
+                    />
+                    <span className="mr-1">Custom:</span>
+                    <input
+                      type="text"
+                      className="border border-black px-1 w-16"
+                      value={customRowSep}
+                      onChange={(e) => setCustomRowSep(e.target.value)}
+                      disabled={rowSeparator !== "custom"}
+                    />
+                  </label>
+                </div>
+              </div>
             </div>
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  checked={rowSeparator === "semicolon"}
-                  onChange={() => setRowSeparator("semicolon")}
-                />
-                Semicolon
-              </label>
+
+            <div className="flex-1 flex flex-col min-h-0">
+              <textarea
+                className="flex-1 border border-black p-3 resize-none font-mono text-sm focus:outline-none"
+                placeholder="Paste copied text here..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+              />
             </div>
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  checked={rowSeparator === "custom"}
-                  onChange={() => setRowSeparator("custom")}
-                />
-                <input
-                  type="text"
-                  placeholder="CUSTOM"
-                  value={customRowSep}
-                  onChange={(e) => setCustomRowSep(e.target.value)}
-                  disabled={rowSeparator !== "custom"}
-                />
-              </label>
+
+            <div className="mt-4 flex justify-end shrink-0">
+              <button
+                onClick={handleImport}
+                className="border border-black px-6 py-2 font-bold hover:bg-gray-100 active:bg-gray-200 transition-colors"
+              >
+                Import Flashcards
+              </button>
             </div>
           </div>
-        </div>
-
-        <div>
-          <textarea
-            placeholder="Paste copied text here!"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <button onClick={handleImport}>Import</button>
         </div>
       </div>
     </div>

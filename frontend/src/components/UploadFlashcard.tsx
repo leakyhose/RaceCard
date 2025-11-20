@@ -17,7 +17,7 @@ export function UploadFlashcard({ isLeader }: UploadFlashcardProps) {
 
   return (
     <div>
-      {isLeader ? (
+      {isLeader && (
         <>
           <button onClick={() => setIsModalOpen(true)}>
             <img
@@ -32,8 +32,6 @@ export function UploadFlashcard({ isLeader }: UploadFlashcardProps) {
             onImport={handleImport}
           />
         </>
-      ) : (
-        <div>Waiting for the leader to upload flashcards...</div>
       )}
     </div>
   );
