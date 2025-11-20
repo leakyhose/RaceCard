@@ -72,6 +72,11 @@ io.on("connection", (socket) => {
     socket.join(code);
     lobby.players = sortPlayersByMetric(lobby);
     io.to(code).emit("lobbyUpdated", lobby);
+    // Send join notification to chat
+    io.to(code).emit("chatMessage", {
+      player: "System",
+      text: `${nickname} joined the lobby`,
+    });
   });
 
   // Loads flashcards
@@ -112,6 +117,10 @@ io.on("connection", (socket) => {
 
   // Handles disconnection
   socket.on("disconnect", () => {
+    const lobbyBeforeRemoval = getLobbyBySocket(socket.id);
+    const playerName = lobbyBeforeRemoval?.players.find(
+      (p) => p.id === socket.id,
+    )?.name;
     const lobby = removePlayerFromLobby(socket.id);
 
     if (!lobby) {
@@ -131,6 +140,13 @@ io.on("connection", (socket) => {
     if (!lobby) return;
     lobby.players = sortPlayersByMetric(lobby);
     io.to(lobby.code).emit("lobbyUpdated", lobby);
+    // Send leave notification to chat
+    if (playerName) {
+      io.to(lobby.code).emit("chatMessage", {
+        player: "System",
+        text: `${playerName} left the lobby`,
+      });
+    }
   });
 
   // Starts game, and gameplay loop
@@ -265,6 +281,24 @@ io.on("connection", (socket) => {
 
       setTimeout(() => roundInfo.endRound(), delay);
     }
+  });
+
+  // Handle chat messages
+  socket.on("sendChat", (msg) => {
+    const lobby = getLobbyBySocket(socket.id);
+    if (!lobby) {
+      console.log("Failed to send chat: lobby not found");
+      return;
+    }
+    const player = lobby.players.find((p) => p.id === socket.id);
+    if (!player) {
+      console.log("Failed to send chat: player not found");
+      return;
+    }
+    io.to(lobby.code).emit("chatMessage", {
+      player: player.name,
+      text: msg,
+    });
   });
 
   socket.on("continueGame", () => {
