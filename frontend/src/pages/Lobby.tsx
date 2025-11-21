@@ -110,16 +110,18 @@ export default function Lobby() {
             </div>
           )}
 
-          {user && lobby.flashcards.length > 0 && lobby.status === "waiting" && (
-            <div className="p-4 border-t-4 border-coffee bg-vanilla">
-              <button
-                onClick={() => setShowSaveModal(true)}
-                className="w-full border-2 border-coffee bg-thistle text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors uppercase font-bold"
-              >
-                💾 Save Flashcards
-              </button>
-            </div>
-          )}
+          {user &&
+            lobby.flashcards.length > 0 &&
+            lobby.status === "waiting" && (
+              <div className="p-4 border-t-4 border-coffee bg-vanilla">
+                <button
+                  onClick={() => setShowSaveModal(true)}
+                  className="w-full border-2 border-coffee bg-thistle text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors uppercase font-bold"
+                >
+                  💾 Save Flashcards
+                </button>
+              </div>
+            )}
         </div>
 
         <div className="flex-1 p-0 overflow-y-auto overflow-x-hidden bg-light-vanilla relative">

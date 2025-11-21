@@ -1,18 +1,26 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useEffect, useState, type ReactNode } from 'react';
-import { supabase } from '../supabaseClient';
-import type { User, Session, AuthError } from '@supabase/supabase-js';
+import { createContext, useEffect, useState, type ReactNode } from "react";
+import { supabase } from "../supabaseClient";
+import type { User, Session, AuthError } from "@supabase/supabase-js";
 
 export interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signUp: (
+    email: string,
+    password: string,
+  ) => Promise<{ error: AuthError | null }>;
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -63,7 +71,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user, session, loading, signUp, signIn, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

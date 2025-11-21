@@ -126,7 +126,8 @@ export function SaveFlashcardsModal({
                 disabled={saving}
               />
               <div className="text-xs mt-2 text-coffee/70">
-                {flashcards.length} flashcard{flashcards.length !== 1 ? "s" : ""} will be saved
+                {flashcards.length} flashcard
+                {flashcards.length !== 1 ? "s" : ""} will be saved
               </div>
             </div>
 

@@ -89,7 +89,7 @@ export default function Home() {
           </button>
         </div>
       )}
-      
+
       {notFound && (
         <div className="mb-4 text-terracotta font-bold text-xl uppercase">
           That lobby doesnt exist!

@@ -54,7 +54,7 @@ export function LoadFlashcardsModal({
             ...set,
             flashcard_count: count || 0,
           };
-        })
+        }),
       );
 
       setSets(setsWithCounts);
@@ -178,7 +178,8 @@ export function LoadFlashcardsModal({
                       {set.name}
                     </div>
                     <div className="text-sm text-coffee/70">
-                      {set.flashcard_count} card{set.flashcard_count !== 1 ? "s" : ""} • Created{" "}
+                      {set.flashcard_count} card
+                      {set.flashcard_count !== 1 ? "s" : ""} • Created{" "}
                       {new Date(set.created_at).toLocaleDateString()}
                     </div>
                   </div>

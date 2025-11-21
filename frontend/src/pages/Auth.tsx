@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
@@ -15,14 +15,14 @@ export default function Auth() {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate("/");
     }
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
     setLoading(true);
 
     const { error } = isLogin
@@ -32,17 +32,17 @@ export default function Auth() {
     setLoading(false);
 
     if (error) {
-      if (error.message.includes('already registered')) {
-        setError('This email is already registered. Please login instead.');
-      } else if (error.message.includes('Invalid login credentials')) {
-        setError('Invalid email or password. Please try again.');
+      if (error.message.includes("already registered")) {
+        setError("This email is already registered. Please login instead.");
+      } else if (error.message.includes("Invalid login credentials")) {
+        setError("Invalid email or password. Please try again.");
       } else {
         setError(error.message);
       }
     } else if (!isLogin) {
-      setSuccess('✉️ Check your email to confirm your account!');
-      setEmail('');
-      setPassword('');
+      setSuccess("✉️ Check your email to confirm your account!");
+      setEmail("");
+      setPassword("");
     }
   };
 
@@ -50,7 +50,7 @@ export default function Auth() {
     <div className="min-h-screen bg-vanilla flex items-center justify-center p-4">
       <div className="w-full max-w-md border-4 border-coffee bg-vanilla p-8 shadow-[8px_8px_0px_0px_#644536]">
         <h1 className="text-4xl font-bold text-coffee mb-8 text-center uppercase tracking-widest">
-          {isLogin ? 'Login' : 'Sign Up'}
+          {isLogin ? "Login" : "Sign Up"}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -100,7 +100,7 @@ export default function Auth() {
             disabled={loading}
             className="w-full bg-terracotta text-vanilla px-6 py-3 font-bold hover:bg-coffee transition-colors uppercase tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Loading...' : isLogin ? 'Login' : 'Sign Up'}
+            {loading ? "Loading..." : isLogin ? "Login" : "Sign Up"}
           </button>
         </form>
 
@@ -108,18 +108,20 @@ export default function Auth() {
           <button
             onClick={() => {
               setIsLogin(!isLogin);
-              setError('');
-              setSuccess('');
+              setError("");
+              setSuccess("");
             }}
             className="text-coffee font-bold hover:text-terracotta transition-colors uppercase text-sm"
           >
-            {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Login'}
+            {isLogin
+              ? "Don't have an account? Sign Up"
+              : "Already have an account? Login"}
           </button>
         </div>
 
         <div className="mt-4 text-center">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             className="text-coffee/70 font-bold hover:text-coffee transition-colors uppercase text-sm"
           >
             Back to Home
