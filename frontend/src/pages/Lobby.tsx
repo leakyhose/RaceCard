@@ -140,7 +140,7 @@ export default function Lobby() {
           lobby.status === "finished" ? (
             <Game />
           ) : (
-            <div className="h-full p-8 bg-light-vanilla">
+            <div className="h-full p-8 bg-light-vanilla overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-light-vanilla [&::-webkit-scrollbar-thumb]:bg-coffee [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-light-vanilla">
               <FlashcardPreview
                 flashcards={lobby.flashcards}
                 answerByTerm={lobby.settings.answerByTerm}
