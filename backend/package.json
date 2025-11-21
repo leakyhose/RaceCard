@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "racecard-backend",
   "version": "1.0.0",
-  "description": "Flashcard game backend server",
+  "description": "RaceCard game backend server",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
