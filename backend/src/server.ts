@@ -42,13 +42,12 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
 
 // Testing
 app.use(express.json());
-app.get('/status', (req, res) => {
+app.get("/status", (req, res) => {
   res.json({
-    status: 'Running',
-    timestamp: new Date().toISOString()
+    status: "Running",
+    timestamp: new Date().toISOString(),
   });
 });
-
 
 // Store callbacks for active rounds to enable event-driven early ending
 const activeRounds = new Map<

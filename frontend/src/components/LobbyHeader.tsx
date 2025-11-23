@@ -10,11 +10,7 @@ interface LobbyHeaderProps {
   lobby: Lobby;
 }
 
-export function LobbyHeader({
-  code,
-  isLeader,
-  lobby,
-}: LobbyHeaderProps) {
+export function LobbyHeader({ code, isLeader, lobby }: LobbyHeaderProps) {
   const [showCopyMessage, setShowCopyMessage] = useState(false);
 
   const handleStartGame = () => {
@@ -33,7 +29,7 @@ export function LobbyHeader({
 
   return (
     <div className="flex justify-between relative p-3 items-center bg-vanilla text-coffee">
-      <div className = "flex flex-col gap-0">
+      <div className="flex flex-col gap-0">
         <div
           onClick={handleCopyCode}
           className="font-bold shrink-0 w-72 text-2xl tracking-widest uppercase group cursor-pointer inline-block relative"
