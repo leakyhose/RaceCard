@@ -127,7 +127,7 @@ export function Game() {
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder="TYPE YOUR ANSWER..."
-              className="w-full px-6 py-4 text-2xl bg-vanilla border-4 border-coffee text-coffee placeholder-coffee/30 focus:outline-none focus:bg-white/50 transition-colors text-center uppercase font-bold"
+              className="w-full px-6 py-4 text-2xl bg-vanilla border-4 border-coffee text-coffee placeholder-coffee/30 focus:outline-none focus:bg-white/50 transition-colors text-center font-bold"
               autoFocus
             />
           </form>
