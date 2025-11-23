@@ -32,7 +32,7 @@ export function LobbyHeader({
   };
 
   return (
-    <div className="flex p-3 items-center bg-vanilla text-coffee">
+    <div className="flex relative p-3 items-center bg-vanilla text-coffee">
       <div className="font-bold shrink-0 w-72 text-2xl tracking-widest uppercase relative group">
         <div
           onClick={handleCopyCode}
@@ -44,7 +44,7 @@ export function LobbyHeader({
           </div>
         </div>
       </div>
-      <div className="flex-1 flex justify-center text-coffee">
+      <div className="absolute left-1/2 -translate-x-1/2 text-coffee">
         {isLeader ? (
           lobby.flashcards.length == 0 ? (
             <div className="font-bold text-lg uppercase tracking-wide">
@@ -53,7 +53,7 @@ export function LobbyHeader({
           ) : lobby.status === "waiting" ? (
             <button
               onClick={handleStartGame}
-              className="bg-terracotta text-vanilla px-8 py-3 font-bold hover:bg-coffee hover:text-vanilla transition-colors uppercase tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+              className="bg-terracotta text-vanilla px-8 py-1 font-bold hover:bg-coffee hover:text-vanilla transition-colors uppercase tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
             >
               Start Game
             </button>
@@ -82,7 +82,7 @@ export function LobbyHeader({
           </div>
         )}
       </div>
-      <div className="font-bold shrink-0 w-80 text-right text-coffee uppercase">
+      <div className="font-bold flex-1 shrink-0 w-80 text-right text-coffee uppercase">
         <span className="text-coffee/70 mr-2">PLAYER:</span> {nickname}
       </div>
     </div>
