@@ -136,27 +136,8 @@ export function getCurrentQuestion(lobbyCode: string): { question: string; choic
 
   let choices: string[] | null = null;
   if (isMultipleChoice && currentFlashcard.distractors && currentFlashcard.distractors.length === 3) {
-    console.log(`Question: "${currentFlashcard.question}"`);
-    console.log(`Correct Answer: "${currentFlashcard.answer}"`);
-    console.log(`Distractors from flashcard:`, currentFlashcard.distractors);
-    
-    // Filter out any distractors that match the correct answer (case-insensitive)
-    const validDistractors = currentFlashcard.distractors.filter(
-      distractor => distractor.toLowerCase().trim() !== currentFlashcard.answer.toLowerCase().trim()
-    );
-    
-    console.log(`Valid Distractors after filtering:`, validDistractors);
-    
-    // If we don't have 3 valid distractors, log a warning
-    if (validDistractors.length < 3) {
-      console.warn(`Warning: Flashcard "${currentFlashcard.question}" has duplicate/invalid distractors. Using ${validDistractors.length} distractors.`);
-    }
-    
-    // Create array with correct answer and valid distractors, then shuffle
-    const choicesBeforeShuffle = [currentFlashcard.answer, ...validDistractors];
-    console.log(`Choices before shuffle:`, choicesBeforeShuffle);
-    choices = shuffle(choicesBeforeShuffle);
-    console.log(`Choices after shuffle:`, choices);
+    // Create array with correct answer and 3 distractors, then shuffle
+    choices = shuffle([currentFlashcard.answer, ...currentFlashcard.distractors]);
   }
 
   return { question: currentFlashcard.question, choices };
@@ -187,7 +168,6 @@ export function validateAnswer(socketId: string, answerText: string) {
       gs.correctAnswers.push({ player: player.name, time: timeTaken });
       player.score += 1;
       player.miniStatus = timeTaken;
-      player.isCorrect = true;
     }
 
     if (!gs.submittedPlayers.find((a) => a === player.id)) {
@@ -197,14 +177,12 @@ export function validateAnswer(socketId: string, answerText: string) {
   } 
   
   else if (lobby.settings.multipleChoice) {
-    player.miniStatus = timeTaken;
-    player.isCorrect = false;
+    player.miniStatus = answerText;
     gs.wrongAnswers.push({ player: player.name, answer: [answerText] });
     gs.submittedPlayers.push(player.id);
 
   } else {
     player.miniStatus = answerText;
-    player.isCorrect = false;
     const existing = gs.wrongAnswers.find((w) => w.player === player.name);
     if (existing) {
       existing.answer.push(answerText);
