@@ -162,7 +162,7 @@ export function validateAnswer(socketId: string, answerText: string) {
   } 
   
   else if (lobby.settings.multipleChoice) {
-    player.miniStatus = timeTaken;
+    player.miniStatus = answerText;
     gs.wrongAnswers.push({ player: player.name, answer: [answerText] });
     gs.submittedPlayers.push(player.id);
 

@@ -34,7 +34,13 @@ export function Players({
           return (
             <li
               key={player.id}
-              className={`border-b-3 border-coffee flex w-full group relative h-14 hover:bg-terracotta/20 transition-colors ${hasCorrectAnswer ? "bg-coffee/30" : "bg-vanilla"}`}
+              className={`border-b-3 border-coffee flex w-full group relative h-14 hover:bg-terracotta/20 transition-colors ${
+                hasCorrectAnswer 
+                  ? "bg-mint/50" 
+                  : hasMiniStatus 
+                    ? "bg-terracotta/30" 
+                    : "bg-vanilla"
+              }`}
             >
               <div
                 className={`flex w-full ${isLeader && player.id != socket.id ? "cursor-pointer" : ""}`}

@@ -29,14 +29,14 @@ export function MiniLeaderboard({
                 {player.value.map((item, idx) => (
                   <div
                     key={idx}
-                    className="text-sm text-coffee/70 italic wrap-break-word"
+                    className="text-sm text-coffee/70 wrap-break-word"
                   >
                     "{item}"
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-sm text-coffee/70 italic font-bold wrap-break-word">
+              <div className="text-sm text-coffee/70 font-bold wrap-break-word">
                 {player.value}
               </div>
             )}

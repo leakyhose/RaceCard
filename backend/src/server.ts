@@ -283,7 +283,7 @@ io.on("connection", (socket) => {
     if (!result) return;
 
     if (result.isCorrect || result.lobby.settings.multipleChoice) {
-      socket.emit("endGuess", result.timeTaken);
+      socket.emit("endGuess", result.timeTaken, result.isCorrect);
     }
     result.lobby.players = sortPlayersByMetric(result.lobby);
     io.to(result.lobby.code).emit("lobbyUpdated", result.lobby);

@@ -12,10 +12,11 @@ export function Game() {
   const [currentQuestion, setCurrentQuestion] = useState<string | null>(null);
   const [currentChoices, setCurrentChoices] = useState<string[] | null>(null);
   const [answer, setAnswer] = useState("");
-  const [hasAnsweredCorrectly, setHasAnsweredCorrectly] = useState(false);
+  const [hasAnswered, setHasAnswered] = useState(false);
   const [answerTime, setAnswerTime] = useState<number | null>(null);
   const [results, setResults] = useState<FlashcardEnd | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const isLeader = lobby?.leader === socket.id;
 
   useEffect(() => {
@@ -27,16 +28,18 @@ export function Game() {
       setCountdown(null); // Clear countdown when question arrives
       setCurrentQuestion(question);
       setAnswer("");
-      setHasAnsweredCorrectly(false);
+      setHasAnswered(false);
       setAnswerTime(null);
       setResults(null);
       setShowResults(false);
       setCurrentChoices(choices);
+      setIsCorrect(null);
     };
 
-    const handleEndGuess = (time: number) => {
-      setHasAnsweredCorrectly(true);
+    const handleEndGuess = (time: number, isCorrect: boolean) => {
+      setHasAnswered(true);
       setAnswerTime(time);
+      setIsCorrect(isCorrect);
     };
 
     const handleEndFlashcard = (flashcardEnd: FlashcardEnd) => {
@@ -59,14 +62,14 @@ export function Game() {
 
   const handleSubmitAnswer = (e: React.FormEvent) => {
     e.preventDefault();
-    if (answer.trim() && !hasAnsweredCorrectly) {
+    if (answer.trim() && !hasAnswered) {
       socket.emit("answer", answer.trim());
       setAnswer("");
     }
   };
 
   const handleChoiceClick = (choice: string) => {
-    if (!hasAnsweredCorrectly) {
+    if (!hasAnswered) {
       socket.emit("answer", choice);
     }
   };
@@ -130,7 +133,7 @@ export function Game() {
             </div>
           </div>
 
-          {!hasAnsweredCorrectly && (
+          {!hasAnswered && (
             <div className="shrink-0 p-8">
               {currentChoices ? (
                 <div className="grid grid-cols-2 gap-4 max-w-4xl mx-auto">
@@ -159,13 +162,27 @@ export function Game() {
             </div>
           )}
 
-          {hasAnsweredCorrectly && (
+          {hasAnswered && (
             <div className="shrink-0 p-8 flex items-center justify-center">
               <div className="text-center">
-                <div className="text-6xl mb-4 text-coffee">✓</div>
-                <div className="text-2xl font-bold text-coffee uppercase tracking-widest">
-                  Correct
-                </div>
+                
+                {isCorrect == true ? (
+                  <div>
+                    <div className="text-6xl mb-4 text-coffee drop-shadow-[0_4px_16px_rgba(184,230,184,1)]">✓</div>
+                    <div className="text-2xl font-bold text-coffee uppercase tracking-widest drop-shadow-[0_4px_16px_rgba(184,230,184,1)]">
+                      Correct
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="text-6xl mb-4 text-terracotta">✗</div>
+                    <div className="text-2xl font-bold text-terracotta uppercase tracking-widest drop-shadow-sm">
+                      Incorrect
+                    </div>
+                  </div>
+                )}
+
+                
                 {answerTime !== null && (
                   <div className="text-xl text-coffee mt-2 font-bold">
                     {(answerTime / 1000).toFixed(3)}s
