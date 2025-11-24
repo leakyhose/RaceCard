@@ -88,6 +88,17 @@ io.on("connection", (socket) => {
       player: "System",
       text: `${nickname} joined the lobby`,
     });
+
+    // If game is ongoing, send current question to the new player
+    if (lobby.status === "ongoing") {
+      const questionData = getCurrentQuestion(code);
+      if (questionData) {
+        socket.emit("newFlashcard", questionData.question, questionData.choices);
+      } else {
+        // If there's no current question (between rounds), show waiting message
+        socket.emit("startCountdown", "Waiting for current round to end");
+      }
+    }
   });
 
   // Loads flashcards
@@ -172,16 +183,17 @@ io.on("connection", (socket) => {
     lobby.players = sortPlayersByMetric(lobby);
     io.to(lobby.code).emit("lobbyUpdated", lobby);
 
+    shuffleGameCards(lobby.code);
+    if (lobby.settings.multipleChoice){
+      generateDistractors(lobby.code);
+    }
     // Start countdown
     let countdown = 3;
     io.to(lobby.code).emit("startCountdown", countdown);
     countdown--;
 
     // Shuffle cards asynchronously during countdown
-    shuffleGameCards(lobby.code);
-    if (lobby.settings.multipleChoice){
-      generateDistractors(lobby.code);
-    }
+
 
     const countdownInterval = setInterval(() => {
       if (countdown >= 2) {

@@ -8,7 +8,9 @@ import { useLobbyData } from "../hooks/useLobbyData";
 export function Game() {
   const { code } = useParams();
   const lobby = useLobbyData(code);
-  const [countdown, setCountdown] = useState<number | string | null>(3);
+  const [countdown, setCountdown] = useState<number | string | null>(
+    lobby?.status === "ongoing" ? "Waiting for current round to end..." : 3
+  );
   const [currentQuestion, setCurrentQuestion] = useState<string | null>(null);
   const [currentChoices, setCurrentChoices] = useState<string[] | null>(null);
   const [answer, setAnswer] = useState("");
@@ -18,6 +20,13 @@ export function Game() {
   const [showResults, setShowResults] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const isLeader = lobby?.leader === socket.id;
+
+  // Update countdown message when lobby status changes to ongoing (for hot joins)
+  useEffect(() => {
+    if (lobby?.status === "ongoing" && currentQuestion === null && countdown === 3) {
+      setCountdown("Waiting for current round to end");
+    }
+  }, [lobby?.status, currentQuestion, countdown]);
 
   useEffect(() => {
     const handleCountdown = (seconds: number | string) => {
@@ -76,8 +85,14 @@ export function Game() {
 
   if (countdown !== null) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-9xl font-bold text-coffee">{countdown}</div>
+      <div className="flex items-center justify-center h-full p-8">
+        {typeof countdown === "number" ? (
+          <div className="text-9xl font-bold text-coffee">{countdown}</div>
+        ) : (
+          <div className="text-3xl font-bold text-coffee uppercase tracking-wider text-center">
+            {countdown}
+          </div>
+        )}
       </div>
     );
   }
