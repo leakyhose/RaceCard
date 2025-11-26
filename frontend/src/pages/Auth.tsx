@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,6 +11,8 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const closeTab = searchParams.get("closeTab") === "true";
 
   // Set page title
   useEffect(() => {
@@ -48,19 +50,22 @@ export default function Auth() {
       setSuccess("Check your email to confirm your account!");
       setEmail("");
       setPassword("");
+    } else if (isLogin && closeTab) {
+      // Successful login with closeTab flag - close the window
+      window.close();
     }
   };
 
   return (
     <div className="min-h-screen bg-vanilla flex items-center justify-center p-4">
       <div className="w-full max-w-md border-3 border-coffee bg-vanilla p-8 shadow-[8px_8px_0px_0px_#644536]">
-        <h1 className="text-4xl font-bold text-coffee mb-8 text-center uppercase tracking-widest">
+        <h1 className="text-4xl font-bold text-coffee mb-8 text-center tracking-widest">
           {isLogin ? "Login" : "Sign Up"}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-coffee font-bold mb-2 uppercase text-sm">
+            <label className="block text-coffee font-bold mb-2 text-sm">
               Email
             </label>
             <input
@@ -74,7 +79,7 @@ export default function Auth() {
           </div>
 
           <div>
-            <label className="block text-coffee font-bold mb-2 uppercase text-sm">
+            <label className="block text-coffee font-bold mb-2 text-sm">
               Password
             </label>
             <input
@@ -103,7 +108,7 @@ export default function Auth() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-terracotta text-vanilla px-6 py-3 font-bold hover:bg-coffee transition-colors uppercase tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-terracotta text-vanilla px-6 py-3 font-bold hover:bg-coffee transition-colors tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Loading..." : isLogin ? "Login" : "Sign Up"}
           </button>
@@ -116,7 +121,7 @@ export default function Auth() {
               setError("");
               setSuccess("");
             }}
-            className="text-coffee font-bold hover:text-terracotta transition-colors uppercase text-sm"
+            className="text-coffee font-bold hover:text-terracotta transition-colors text-sm"
           >
             {isLogin
               ? "Don't have an account? Sign Up"
@@ -127,7 +132,7 @@ export default function Auth() {
         <div className="mt-4 text-center">
           <button
             onClick={() => navigate("/")}
-            className="text-coffee/70 font-bold hover:text-coffee transition-colors uppercase text-sm"
+            className="text-coffee/70 font-bold hover:text-coffee transition-colors text-sm"
           >
             Back to Home
           </button>

@@ -73,12 +73,12 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-light-vanilla text-coffee font-executive p-4">
       {user ? (
         <div className="absolute top-4 right-4 flex items-center gap-4 border-2 border-coffee bg-vanilla px-4 py-2">
-          <span className="text-sm uppercase">
+          <span className="text-sm">
             Signed in as: <span className="font-bold">{user.email}</span>
           </span>
           <button
             onClick={signOut}
-            className="border-2 border-coffee bg-terracotta text-vanilla px-3 py-1 hover:bg-coffee transition-colors uppercase text-xs font-bold"
+            className="border-2 border-coffee bg-terracotta text-vanilla px-3 py-1 hover:bg-coffee transition-colors text-xs font-bold"
           >
             Sign Out
           </button>
@@ -87,7 +87,7 @@ export default function Home() {
         <div className="absolute top-4 right-4">
           <button
             onClick={() => navigate("/auth")}
-            className="border-2 border-coffee bg-powder text-coffee px-4 py-2 hover:bg-coffee hover:text-vanilla transition-colors uppercase font-bold"
+            className="border-2 border-coffee bg-powder text-coffee px-4 py-2 hover:bg-coffee hover:text-vanilla transition-colors font-bold"
           >
             Sign In / Sign Up
           </button>
@@ -95,17 +95,17 @@ export default function Home() {
       )}
 
       {notFound && (
-        <div className="mb-4 text-terracotta font-bold text-xl uppercase">
+        <div className="mb-4 text-terracotta font-bold text-xl">
           That lobby doesnt exist!
         </div>
       )}
       <div className="w-full max-w-md border-3 border-coffee p-8 bg-vanilla shadow-[8px_8px_0px_0px_#644536]">
-        <h1 className="text-4xl mb-8 text-center uppercase tracking-widest border-b-3 border-coffee pb-4 font-bold">
-          RaceCard
+        <h1 className="text-4xl mb-8 text-center tracking-widest border-b-3 border-coffee pb-4 font-bold">
+          RaceCard.io
         </h1>
 
         <div className="mb-8 flex flex-col gap-4">
-          <label className="text-sm uppercase tracking-wide font-bold">
+          <label className="text-sm tracking-wide font-bold">
             Create New Lobby
           </label>
           <div className="flex gap-2">
@@ -117,7 +117,7 @@ export default function Home() {
               onChange={(name) => setNickname(name.target.value)}
             />
             <button
-              className="border-2 border-coffee bg-terracotta text-vanilla px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors uppercase font-bold cursor-pointer"
+              className="border-2 border-coffee bg-terracotta text-vanilla px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold cursor-pointer"
               onClick={handleCreateLobby}
             >
               Create
@@ -126,7 +126,7 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <label className="text-sm uppercase tracking-wide font-bold">
+          <label className="text-sm tracking-wide font-bold">
             Join Existing Lobby
           </label>
           <div className="flex gap-2">
@@ -138,7 +138,7 @@ export default function Home() {
               onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
             />
             <button
-              className="border-2 border-coffee bg-powder text-coffee px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors uppercase font-bold cursor-pointer"
+              className="border-2 border-coffee bg-powder text-coffee px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold cursor-pointer"
               onClick={handleJoinLobby}
             >
               Join

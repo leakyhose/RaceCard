@@ -125,7 +125,7 @@ export default function Lobby() {
                   }}
                   onMouseEnter={() => setLoadHovered(true)}
                   onMouseLeave={() => setLoadHovered(false)}
-                  className={`w-full border-2 border-coffee px-2 py-3 uppercase font-bold transition-colors ${
+                  className={`w-full border-2 border-coffee px-2 py-3 font-bold transition-colors ${
                     loadShake
                       ? "animate-shake bg-red-500 text-vanilla"
                       : "bg-powder text-coffee hover:bg-coffee hover:text-vanilla"
@@ -145,7 +145,7 @@ export default function Lobby() {
                     }}
                     onMouseEnter={() => setSaveHovered(true)}
                     onMouseLeave={() => setSaveHovered(false)}
-                    className={`w-full border-2 border-coffee px-4 py-3 uppercase font-bold transition-colors ${
+                    className={`w-full border-2 border-coffee px-4 py-3 font-bold transition-colors ${
                       saveShake
                         ? "animate-shake bg-red-500 text-vanilla"
                         : "bg-thistle text-coffee hover:bg-coffee hover:text-vanilla"

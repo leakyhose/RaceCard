@@ -61,7 +61,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
         {/* Header */}
         <div className="flex justify-between items-center mb-6 border-b-3 border-coffee pb-2">
           <div>
-            <h2 className="text-2xl font-bold uppercase tracking-wide text-coffee">
+            <h2 className="text-2xl font-bold tracking-wide text-coffee">
               Import Flashcards
             </h2>
             <p className="text-sm text-coffee/70 font-bold mt-1">
@@ -79,7 +79,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
         <div className="flex flex-1 gap-8 overflow-hidden text-coffee">
           {/* Left Column */}
           <div className="w-3/7 border-r-3 border-coffee pr-6 overflow-y-auto">
-            <h3 className="font-bold text-lg mb-4 uppercase">
+            <h3 className="font-bold text-lg mb-4">
               How to Import From Quizlet
             </h3>
             <div className="space-y-4 text-sm font-bold">
@@ -114,7 +114,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
           <div className="w-4/7 flex flex-col overflow-hidden">
             <div className="flex gap-8 mb-6 shrink-0">
               <div>
-                <h3 className="font-bold mb-2 uppercase">
+                <h3 className="font-bold mb-2">
                   Between term and definition
                 </h3>
                 <div className="space-y-1 font-bold">
@@ -157,7 +157,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
 
               {/* Row Separator */}
               <div>
-                <h3 className="font-bold mb-2 uppercase">Between rows</h3>
+                <h3 className="font-bold mb-2">Between rows</h3>
                 <div className="space-y-1 font-bold">
                   <label className="flex items-center gap-2 cursor-pointer hover:text-terracotta transition-colors">
                     <input
@@ -209,7 +209,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
             <div className="mt-4 flex justify-end shrink-0">
               <button
                 onClick={handleImport}
-                className="border-2 border-coffee bg-terracotta text-vanilla px-6 py-2 font-bold hover:bg-coffee hover:text-vanilla transition-colors uppercase shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+                className="border-2 border-coffee bg-terracotta text-vanilla px-6 py-2 font-bold hover:bg-coffee hover:text-vanilla transition-colors shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
               >
                 Import Flashcards
               </button>

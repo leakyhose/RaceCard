@@ -95,7 +95,7 @@ export function Players({
                 </div>
               </div>
               {isLeader && player.id != socket.id && (
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-coffee text-vanilla font-bold uppercase tracking-wider text-xs">
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-coffee text-vanilla font-bold tracking-wider text-xs">
                   Promote
                 </div>
               )}

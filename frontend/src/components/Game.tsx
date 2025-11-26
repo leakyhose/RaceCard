@@ -93,7 +93,7 @@ export function Game() {
         {typeof countdown === "number" ? (
           <div className="text-9xl font-bold text-coffee">{countdown}</div>
         ) : (
-          <div className="text-3xl font-bold text-coffee uppercase tracking-wider text-center">
+          <div className="text-3xl font-bold text-coffee tracking-wider text-center">
             {countdown}
           </div>
         )}
@@ -109,7 +109,7 @@ export function Game() {
 
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 gap-8">
-        <h2 className="text-4xl font-bold text-coffee tracking-widest uppercase">
+        <h2 className="text-4xl font-bold text-coffee tracking-widest">
           Game Finished
         </h2>
         <MiniLeaderboard
@@ -120,12 +120,12 @@ export function Game() {
           {isLeader ? (
             <button
               onClick={() => socket.emit("continueGame")}
-              className="px-8 py-4 bg-terracotta text-vanilla text-xl font-bold hover:bg-coffee hover:text-vanilla transition-all uppercase tracking-wider border-3 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+              className="px-8 py-4 bg-terracotta text-vanilla text-xl font-bold hover:bg-coffee hover:text-vanilla transition-all tracking-wider border-3 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
             >
               Continue
             </button>
           ) : (
-            <div className="text-xl text-coffee/50 font-bold uppercase">
+            <div className="text-xl text-coffee/50 font-bold">
               Waiting for leader to continue...
             </div>
           )}
@@ -136,7 +136,7 @@ export function Game() {
 
   if (!currentQuestion) {
     return (
-      <div className="flex items-center justify-center h-full text-coffee/50 font-bold uppercase">
+      <div className="flex items-center justify-center h-full text-coffee/50 font-bold">
         Waiting for game to start...
       </div>
     );
@@ -189,14 +189,14 @@ export function Game() {
                     <div className="text-6xl mb-4 text-coffee drop-shadow-[0_4px_16px_rgba(184,230,184,1)]">
                       ✓
                     </div>
-                    <div className="text-2xl font-bold text-coffee uppercase tracking-widest drop-shadow-[0_4px_16px_rgba(184,230,184,1)]">
+                    <div className="text-2xl font-bold text-coffee tracking-widest drop-shadow-[0_4px_16px_rgba(184,230,184,1)]">
                       Correct
                     </div>
                   </div>
                 ) : (
                   <div>
                     <div className="text-6xl mb-4 text-terracotta">✗</div>
-                    <div className="text-2xl font-bold text-terracotta uppercase tracking-widest drop-shadow-sm">
+                    <div className="text-2xl font-bold text-terracotta tracking-widest drop-shadow-sm">
                       Incorrect
                     </div>
                   </div>
@@ -207,7 +207,7 @@ export function Game() {
                     {(answerTime / 1000).toFixed(3)}s
                   </div>
                 )}
-                <div className="text-coffee/50 mt-2 font-bold uppercase">
+                <div className="text-coffee/50 mt-2 font-bold">
                   Waiting for round to end...
                 </div>
               </div>
@@ -228,7 +228,7 @@ export function Game() {
 
             {/* Correct Answer */}
             <div className="text-center">
-              <h3 className="text-xl font-semibold mb-4 text-coffee uppercase tracking-wider">
+              <h3 className="text-xl font-semibold mb-4 text-coffee tracking-wider">
                 Correct Answer
               </h3>
               <div className="text-3xl font-bold text-coffee p-4 bg-vanilla border-3 border-coffee shadow-[4px_4px_0px_0px_#644536] wrap-break-word max-w-3xl mx-auto">
@@ -264,7 +264,7 @@ export function Game() {
                     <>
                       <div className="flex flex-col items-center gap-4">
                         <div className="text-6xl text-coffee/50">✗</div>
-                        <div className="text-3xl font-bold text-coffee uppercase tracking-widest">
+                        <div className="text-3xl font-bold text-coffee tracking-widest">
                           No Correct Answers
                         </div>
                       </div>
@@ -279,7 +279,7 @@ export function Game() {
                   ) : (
                     <div className="flex flex-col items-center justify-center gap-4 min-h-[400px]">
                       <div className="text-6xl text-coffee/50">✗</div>
-                      <div className="text-3xl font-bold text-coffee uppercase tracking-widest">
+                      <div className="text-3xl font-bold text-coffee tracking-widest">
                         No Correct Answers
                       </div>
                     </div>

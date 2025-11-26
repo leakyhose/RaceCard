@@ -98,21 +98,21 @@ export function SaveFlashcardsModal({
         className="bg-vanilla border-3 border-coffee p-8 max-w-md w-full mx-4 shadow-[8px_8px_0px_0px_#644536]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-bold uppercase tracking-widest border-b-3 border-coffee pb-4 mb-6">
+        <h2 className="text-2xl font-bold tracking-widest border-b-3 border-coffee pb-4 mb-6">
           Save Flashcard Set
         </h2>
 
         {success ? (
           <div className="text-center py-8">
             <div className="text-4xl mb-4">✓</div>
-            <div className="text-xl uppercase text-coffee">
+            <div className="text-xl text-coffee">
               Flashcards Saved!
             </div>
           </div>
         ) : (
           <>
             <div className="mb-6">
-              <label className="block text-sm uppercase tracking-wide font-bold mb-2">
+              <label className="block text-sm tracking-wide font-bold mb-2">
                 Set Name
               </label>
               <input
@@ -141,14 +141,14 @@ export function SaveFlashcardsModal({
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex-1 border-2 border-coffee bg-powder text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors uppercase font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 border-2 border-coffee bg-powder text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? "Saving..." : "Save"}
               </button>
               <button
                 onClick={handleClose}
                 disabled={saving}
-                className="flex-1 border-2 border-coffee bg-vanilla text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors uppercase font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 border-2 border-coffee bg-vanilla text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>

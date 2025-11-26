@@ -77,7 +77,7 @@ export function SettingsModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6 border-b-3 border-coffee pb-2">
-          <h2 className="text-xl font-bold uppercase tracking-wide text-coffee">
+          <h2 className="text-xl font-bold tracking-wide text-coffee">
             Game Settings
           </h2>
           <button
@@ -91,7 +91,7 @@ export function SettingsModal({
         <div className="space-y-4 text-coffee">
           {SETTINGS_DEFINITIONS.map((def) => (
             <div key={def.key} className="flex items-center justify-between">
-              <label className="font-bold uppercase text-sm">{def.label}</label>
+              <label className="font-bold text-sm">{def.label}</label>
               {def.type === "boolean" && (
                 <input
                   type="checkbox"
@@ -113,7 +113,7 @@ export function SettingsModal({
                       <button
                         key={String(choice.value)}
                         onClick={() => handleChange(def.key, choice.value)}
-                        className={`px-3 py-2 font-bold uppercase text-sm border-3 border-coffee transition-all transform ${
+                        className={`px-3 py-2 font-bold text-sm border-3 border-coffee transition-all transform ${
                           isSelected
                             ? "bg-terracotta text-vanilla scale-105"
                             : "bg-vanilla text-coffee hover:bg-coffee/10"
