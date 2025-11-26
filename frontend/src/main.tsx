@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./pages/Home.tsx";
 import Lobby from "./pages/Lobby.tsx";
 import Auth from "./pages/Auth.tsx";
+import Confirm from "./pages/Confirm.tsx";
 import { AuthProvider } from "./contexts/AuthContext";
 
 const router = createBrowserRouter([
@@ -19,6 +20,11 @@ const router = createBrowserRouter([
   {
     path: "/auth",
     element: <Auth />,
+  },
+
+  {
+    path: "/confirm",
+    element: <Confirm />,
   },
 ]);
 
