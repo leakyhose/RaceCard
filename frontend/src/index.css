@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 @theme {
   --color-vanilla: #f3eaca;
   --color-coffee: #644536;
@@ -9,7 +10,7 @@
   --color-light-vanilla: #eee1b3;
   --color-mint: #b8e6b8;
 
-  --font-executive: "Courier New", Courier, monospace;
+  --font: "RobotoSlab", serif;
 
   --radius-sm: 0px;
   --radius-md: 0px;
@@ -20,11 +21,69 @@
   --radius-full: 0px;
 }
 
+
+
+@font-face {
+  font-family: "RobotoSlab";
+  src: url("/fonts/RobotoSlab-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  font-family: "RobotoSlab";
+  src: url("/fonts/RobotoSlab-ExtraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: "RobotoSlab";
+  src: url("/fonts/RobotoSlab-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: "RobotoSlab";
+  src: url("/fonts/RobotoSlab-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "RobotoSlab";
+  src: url("/fonts/RobotoSlab-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: "RobotoSlab";
+  src: url("/fonts/RobotoSlab-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: "RobotoSlab";
+  src: url("/fonts/RobotoSlab-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "RobotoSlab";
+  src: url("/fonts/RobotoSlab-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: "RobotoSlab";
+  src: url("/fonts/RobotoSlab-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+
 @layer base {
   body {
     background-color: var(--color-vanilla);
     color: var(--color-coffee);
-    font-family: var(--font-executive);
+    font-family: var(--font);
   }
 
   *,
@@ -34,21 +93,13 @@
   }
 
   @keyframes shake {
-    0%,
-    100% {
+    0%, 100% {
       transform: translateX(0);
     }
-    10%,
-    30%,
-    50%,
-    70%,
-    90% {
+    10%, 30%, 50%, 70%, 90% {
       transform: translateX(-3px);
     }
-    20%,
-    40%,
-    60%,
-    80% {
+    20%, 40%, 60%, 80% {
       transform: translateX(3px);
     }
   }
