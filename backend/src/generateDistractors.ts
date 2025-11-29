@@ -37,7 +37,7 @@ function getClient() {
   return client;
 }
 
-// Separate Zod schemas for term and definition distractors
+// Zod schemas for term and definition distractors
 const TermDistractorSet = z.object({
   distractors: z.array(z.array(z.string().min(1)).length(3)),
 });
@@ -135,6 +135,7 @@ async function generateTermDistractors(
 }
 
 // Generate definition distractors (match the "answer" field)
+// Basically previous code copied pasted
 async function generateDefinitionDistractors(
   apiClient: OpenAI,
   flashcards: Flashcard[],
