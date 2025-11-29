@@ -116,9 +116,6 @@ export function startGame(socketId: string) {
   if (!lobby) return null;
 
   let gameFlashcards = [...lobby.flashcards];
-  if (lobby.settings.answerByTerm) {
-    gameFlashcards = swap(gameFlashcards);
-  }
 
   codeToGamestate.set(lobby.code, {
     flashcards: gameFlashcards,
@@ -163,18 +160,24 @@ export function getCurrentQuestion(
 
   const lobby = getLobbyByCode(lobbyCode);
   const isMultipleChoice = lobby?.settings.multipleChoice ?? false;
+  const answerByTerm = lobby?.settings.answerByTerm ?? false;
+
+  // Dynamically determine what to show based on mode
+  const question = answerByTerm ? currentFlashcard.answer : currentFlashcard.question;
+  const correctAnswer = answerByTerm ? currentFlashcard.question : currentFlashcard.answer;
 
   let choices: string[] | null = null;
   if (isMultipleChoice && currentFlashcard.isGenerated) {
-    const correctAnswer = currentFlashcard.answer;
-    const distractors = currentFlashcard.trickDefinitions;
+    // answerByTerm: show term, need definition distractors (trickDefinitions)
+    // answerByDefinition: show definition, need term distractors (trickTerms)
+    const distractors = answerByTerm ? currentFlashcard.trickDefinitions : currentFlashcard.trickTerms;
 
     if (distractors && distractors.length === 3) {
       choices = shuffle([correctAnswer, ...distractors]);
     }
   }
 
-  return { question: currentFlashcard.question, choices };
+  return { question, choices };
 }
 
 // Validate an answer from a player
@@ -193,8 +196,12 @@ export function validateAnswer(socketId: string, answerText: string) {
 
   const timeTaken = Date.now() - gs.roundStart;
 
+  // Determine correct answer based on mode
+  const answerByTerm = lobby.settings.answerByTerm ?? false;
+  const correctAnswer = answerByTerm ? currentFlashcard.question : currentFlashcard.answer;
+
   const isCorrect =
-    currentFlashcard.answer.toLowerCase().trim() ===
+    correctAnswer.toLowerCase().trim() ===
     answerText.toLowerCase().trim();
 
   if (isCorrect) {

@@ -3,28 +3,20 @@ import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import * as z from "zod";
 import type { Flashcard } from "@shared/types.js";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+
+const MODEL_NAME = "gpt-4.1-mini";
+const BATCH_SIZE = 50;
 
 // Load environment variables
 config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Single prompt for both terms and definitions
+if (!process.env.DISTRACTOR_PROMPT) {
+  throw new Error("DISTRACTOR_PROMPT environment variable is required");
+}
 
-const termPromptFile = process.env.TERM_PROMPT_FILE || "termPrompt.txt";
-const definitionPromptFile =
-  process.env.DEFINITION_PROMPT_FILE || "definitionPrompt.txt";
-
-const termPrompt = fs.readFileSync(
-  path.join(__dirname, "..", termPromptFile),
-  "utf8",
-);
-const definitionPrompt = fs.readFileSync(
-  path.join(__dirname, "..", definitionPromptFile),
-  "utf8",
-);
+const distractorPrompt: string = process.env.DISTRACTOR_PROMPT;
+console.log(distractorPrompt)
 
 let client: OpenAI | null = null;
 
@@ -37,28 +29,26 @@ function getClient() {
   return client;
 }
 
-// Zod schemas for term and definition distractors
-const TermDistractorSet = z.object({
+// Zod schema for distractors
+const DistractorSet = z.object({
   distractors: z.array(z.array(z.string().min(1)).length(3)),
 });
 
-const DefinitionDistractorSet = z.object({
-  distractors: z.array(z.array(z.string().min(1)).length(3)),
-});
-
-// Generate term distractors (match the "question" field)
-async function generateTermDistractors(
+// Generic function to generate distractors for any field
+async function generateDistractors(
   apiClient: OpenAI,
-  flashcards: Flashcard[],
+  pairs: { question: string; answer: string }[],
   onProgress?: (completed: number, total: number) => void,
-): Promise<string[][]> {
-  const BATCH_SIZE = 50;
+): Promise<{ distractors: string[][], usage: { promptTokens: number, completionTokens: number, totalTokens: number } }> {
   const allDistractors: string[][] = [];
+  let totalPromptTokens = 0;
+  let totalCompletionTokens = 0;
+  let totalTokens = 0;
 
   // Split into batches and process in parallel
-  const batches: Flashcard[][] = [];
-  for (let i = 0; i < flashcards.length; i += BATCH_SIZE) {
-    batches.push(flashcards.slice(i, i + BATCH_SIZE));
+  const batches: { question: string; answer: string }[][] = [];
+  for (let i = 0; i < pairs.length; i += BATCH_SIZE) {
+    batches.push(pairs.slice(i, i + BATCH_SIZE));
   }
 
   let completedBatches = 0;
@@ -66,44 +56,47 @@ async function generateTermDistractors(
 
   // Process all batches in parallel
   const batchPromises = batches.map(async (batch, batchIndex) => {
-    const cleanedBatch = batch.map((card) => card.question);
     const MAX_RETRIES = 3;
 
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
         const response = await apiClient.chat.completions.parse({
-          model: "gpt-4.1-mini",
+          model: MODEL_NAME,
+          reasoning: { effort: "none" },
+
           messages: [
             {
               role: "system",
-              content: termPrompt,
+              content: distractorPrompt,
             },
             {
               role: "user",
-              content: JSON.stringify(cleanedBatch),
+              content: JSON.stringify(batch),
             },
           ],
-          response_format: zodResponseFormat(
-            TermDistractorSet,
-            "term_distractor_set",
-          ),
+          response_format: zodResponseFormat(DistractorSet, "distractor_set"),
         });
 
         const parsed = response.choices[0]!.message.parsed;
-
+        
+        // Track token usage
+        if (response.usage) {
+          totalPromptTokens += response.usage.prompt_tokens;
+          totalCompletionTokens += response.usage.completion_tokens;
+          totalTokens += response.usage.total_tokens;
+        }
+        
         if (!parsed) {
-          throw new Error(
-            `Failed to parse term distractors response for batch ${batchIndex + 1}`,
-          );
+          throw new Error(`Failed to parse distractors response for batch ${batchIndex + 1}`);
         }
 
         if (parsed.distractors.length !== batch.length) {
           console.warn(
-            `Batch ${batchIndex + 1} attempt ${attempt + 1}: Expected ${batch.length} term distractors, got ${parsed.distractors.length}. Retrying...`,
+            `Batch ${batchIndex + 1} attempt ${attempt + 1}: Expected ${batch.length} distractors, got ${parsed.distractors.length}. Retrying...`,
           );
           if (attempt === MAX_RETRIES - 1) {
             throw new Error(
-              `Expected ${batch.length} term distractor sets, got ${parsed.distractors.length} after ${MAX_RETRIES} attempts`,
+              `Expected ${batch.length} distractor sets, got ${parsed.distractors.length} after ${MAX_RETRIES} attempts`,
             );
           }
           continue;
@@ -111,116 +104,25 @@ async function generateTermDistractors(
 
         completedBatches++;
         onProgress?.(completedBatches, totalBatches);
-        return parsed.distractors;
+        return { distractors: parsed.distractors, usage: { promptTokens: totalPromptTokens, completionTokens: totalCompletionTokens, totalTokens } };
       } catch (error) {
         if (attempt === MAX_RETRIES - 1) throw error;
-        console.warn(
-          `Batch ${batchIndex + 1} attempt ${attempt + 1} failed:`,
-          error,
-        );
+        console.warn(`Batch ${batchIndex + 1} attempt ${attempt + 1} failed:`, error);
       }
     }
 
-    throw new Error(
-      `Failed to generate term distractors for batch ${batchIndex + 1} after ${MAX_RETRIES} attempts`,
-    );
+    throw new Error(`Failed to generate distractors for batch ${batchIndex + 1} after ${MAX_RETRIES} attempts`);
   });
 
   const results = await Promise.all(batchPromises);
-  results.forEach((batchDistractors) => {
-    allDistractors.push(...batchDistractors);
+  results.forEach((result) => {
+    allDistractors.push(...result.distractors);
+    totalPromptTokens += result.usage.promptTokens;
+    totalCompletionTokens += result.usage.completionTokens;
+    totalTokens += result.usage.totalTokens;
   });
 
-  return allDistractors;
-}
-
-// Generate definition distractors (match the "answer" field)
-// Basically previous code copied pasted
-async function generateDefinitionDistractors(
-  apiClient: OpenAI,
-  flashcards: Flashcard[],
-  onProgress?: (completed: number, total: number) => void,
-): Promise<string[][]> {
-  const BATCH_SIZE = 50;
-  const allDistractors: string[][] = [];
-
-  // Split into batches and process in parallel
-  const batches: Flashcard[][] = [];
-  for (let i = 0; i < flashcards.length; i += BATCH_SIZE) {
-    batches.push(flashcards.slice(i, i + BATCH_SIZE));
-  }
-
-  let completedBatches = 0;
-  const totalBatches = batches.length;
-
-  // Process all batches in parallel
-  const batchPromises = batches.map(async (batch, batchIndex) => {
-    const cleanedBatch = batch.map((card) => card.answer);
-    const MAX_RETRIES = 3;
-
-    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-      try {
-        const response = await apiClient.chat.completions.parse({
-          model: "gpt-4.1-mini",
-          messages: [
-            {
-              role: "system",
-              content: definitionPrompt,
-            },
-            {
-              role: "user",
-              content: JSON.stringify(cleanedBatch),
-            },
-          ],
-          response_format: zodResponseFormat(
-            DefinitionDistractorSet,
-            "definition_distractor_set",
-          ),
-        });
-
-        const parsed = response.choices[0]!.message.parsed;
-
-        if (!parsed) {
-          throw new Error(
-            `Failed to parse definition distractors response for batch ${batchIndex + 1}`,
-          );
-        }
-
-        if (parsed.distractors.length !== batch.length) {
-          console.warn(
-            `Batch ${batchIndex + 1} attempt ${attempt + 1}: Expected ${batch.length} definition distractors, got ${parsed.distractors.length}. Retrying...`,
-          );
-          if (attempt === MAX_RETRIES - 1) {
-            throw new Error(
-              `Expected ${batch.length} definition distractor sets, got ${parsed.distractors.length} after ${MAX_RETRIES} attempts`,
-            );
-          }
-          continue;
-        }
-
-        completedBatches++;
-        onProgress?.(completedBatches, totalBatches);
-        return parsed.distractors;
-      } catch (error) {
-        if (attempt === MAX_RETRIES - 1) throw error;
-        console.warn(
-          `Batch ${batchIndex + 1} attempt ${attempt + 1} failed:`,
-          error,
-        );
-      }
-    }
-
-    throw new Error(
-      `Failed to generate definition distractors for batch ${batchIndex + 1} after ${MAX_RETRIES} attempts`,
-    );
-  });
-
-  const results = await Promise.all(batchPromises);
-  results.forEach((batchDistractors) => {
-    allDistractors.push(...batchDistractors);
-  });
-
-  return allDistractors;
+  return { distractors: allDistractors, usage: { promptTokens: totalPromptTokens, completionTokens: totalCompletionTokens, totalTokens } };
 }
 
 export async function generateResponse(
@@ -232,7 +134,6 @@ export async function generateResponse(
     throw new Error("OpenAI API key not configured");
   }
 
-  const BATCH_SIZE = 50;
   const totalTermBatches = Math.ceil(flashcards.length / BATCH_SIZE);
   const totalDefinitionBatches = Math.ceil(flashcards.length / BATCH_SIZE);
   const totalBatches = totalTermBatches + totalDefinitionBatches;
@@ -244,17 +145,39 @@ export async function generateResponse(
     onProgress?.(`${completedBatches}/${totalBatches} batches complete`);
   };
 
-  // Generate term and definition distractors in parallel
-  const [termDistractors, definitionDistractors] = await Promise.all([
-    generateTermDistractors(apiClient, flashcards, () => updateProgress()),
-    generateDefinitionDistractors(apiClient, flashcards, () =>
-      updateProgress(),
-    ),
+  // Create pairs for both term and definition generation
+  const termPairs = flashcards.map((card) => ({
+    question: card.question,  // Question provides context
+    answer: card.answer,      // AI matches answer (term) format
+  }));
+
+  const definitionPairs = flashcards.map((card) => ({
+    question: card.answer,    
+    answer: card.question,   
+  }));
+
+  // Generate distractors for both in parallel
+  const [termResult, definitionResult] = await Promise.all([
+    generateDistractors(apiClient, termPairs, () => updateProgress()),      // First call
+    generateDistractors(apiClient, definitionPairs, () => updateProgress()), // Second call
   ]);
 
-  // Return as JSON string with both sets
+  // Calculate total usage
+  const totalUsage = {
+    promptTokens: termResult.usage.promptTokens + definitionResult.usage.promptTokens,
+    completionTokens: termResult.usage.completionTokens + definitionResult.usage.completionTokens,
+    totalTokens: termResult.usage.totalTokens + definitionResult.usage.totalTokens,
+  };
+
+  console.log('\n=== Token Usage ===');
+  console.log(`Prompt tokens: ${totalUsage.promptTokens.toLocaleString()}`);
+  console.log(`Completion tokens: ${totalUsage.completionTokens.toLocaleString()}`);
+  console.log(`Total tokens: ${totalUsage.totalTokens.toLocaleString()}`);
+  console.log('===================\n');
+
   return JSON.stringify({
-    termDistractors,
-    definitionDistractors,
+    termDistractors: termResult.distractors,
+    definitionDistractors: definitionResult.distractors,
   });
 }
+
