@@ -21,6 +21,8 @@ export function swap(array: Flashcard[]): Flashcard[] {
     id: flashcard.id,
     question: flashcard.answer,
     answer: flashcard.question,
-    distractors: flashcard.distractors,
+    trickTerms: flashcard.trickDefinitions || [],
+    trickDefinitions: flashcard.trickTerms || [],
+    isGenerated: flashcard.isGenerated || false,
   }));
 }

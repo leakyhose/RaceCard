@@ -114,31 +114,7 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // If multiple choice is enabled and flashcards were uploaded, generate distractors
-    if (lobby.settings.multipleChoice && cards.length > 0) {
-      // Check if already generating
-      if (areDistractorsGenerating(lobby.code)) {
-        console.log(
-          `Distractors already generating for ${lobby.code}, skipping...`,
-        );
-        io.to(lobby.code).emit("lobbyUpdated", lobby);
-        return;
-      }
-
-      lobby.distractorStatus = "generating";
-      io.to(lobby.code).emit("lobbyUpdated", lobby);
-
-      try {
-        await generateDistractors(lobby.code);
-        lobby.distractorStatus = "ready";
-      } catch (error) {
-        console.error("Error generating distractors:", error);
-        lobby.distractorStatus = "error";
-      }
-    } else {
-      lobby.distractorStatus = "idle";
-    }
-
+    lobby.distractorStatus = "idle";
     io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
 
@@ -150,40 +126,50 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // If multiple choice was enabled and flashcards exist, generate distractors
-    if (settings.multipleChoice && lobby.flashcards.length > 0) {
-      // Check if already generating
-      if (areDistractorsGenerating(lobby.code)) {
-        console.log(
-          `Distractors already generating for ${lobby.code}, skipping...`,
-        );
+    io.to(lobby.code).emit("lobbyUpdated", lobby);
+  });
+
+  // Manual generation of multiple choice options
+  socket.on("generateMultipleChoice", async () => {
+    const lobby = getLobbyBySocket(socket.id);
+    if (!lobby) {
+      console.log("Failed to generate: lobby not found");
+      return;
+    }
+
+    if (lobby.hostID !== socket.id) {
+      console.log("Only host can generate multiple choice options");
+      return;
+    }
+
+    if (lobby.flashcards.length === 0) {
+      console.log("No flashcards to generate for");
+      return;
+    }
+
+    // Check if already generating
+    if (areDistractorsGenerating(lobby.code)) {
+      console.log(
+        `Distractors already generating for ${lobby.code}, skipping...`,
+      );
+      return;
+    }
+
+    lobby.distractorStatus = "generating";
+    lobby.generationProgress = "Starting generation...";
+    io.to(lobby.code).emit("lobbyUpdated", lobby);
+
+    try {
+      await generateDistractors(lobby.code, (progress) => {
+        lobby.generationProgress = progress;
         io.to(lobby.code).emit("lobbyUpdated", lobby);
-        return;
-      }
-
-      // Check if distractors are already ready (have been generated for current flashcards)
-      const alreadyReady =
-        areDistractorsReady(lobby.code) &&
-        lobby.flashcards.every(
-          (card) => card.distractors && card.distractors.length === 3,
-        );
-
-      if (!alreadyReady) {
-        lobby.distractorStatus = "generating";
-        io.to(lobby.code).emit("lobbyUpdated", lobby);
-
-        try {
-          await generateDistractors(lobby.code);
-          lobby.distractorStatus = "ready";
-        } catch (error) {
-          console.error("Error generating distractors:", error);
-          lobby.distractorStatus = "error";
-        }
-      } else {
-        lobby.distractorStatus = "ready";
-      }
-    } else if (!settings.multipleChoice) {
-      lobby.distractorStatus = "idle";
+      });
+      lobby.distractorStatus = "ready";
+      lobby.generationProgress = undefined;
+    } catch (error) {
+      console.error("Error generating distractors:", error);
+      lobby.distractorStatus = "error";
+      lobby.generationProgress = undefined;
     }
 
     io.to(lobby.code).emit("lobbyUpdated", lobby);

@@ -17,6 +17,22 @@ export function LobbyHeader({ code, isLeader, lobby }: LobbyHeaderProps) {
     socket.emit("startGame");
   };
 
+  const handleGenerateMultipleChoice = () => {
+    socket.emit("generateMultipleChoice");
+  };
+
+  // Check if all flashcards have generated MC options
+  const allCardsGenerated =
+    lobby.flashcards.length > 0 &&
+    lobby.flashcards.every((card) => card.isGenerated);
+
+  const needsGeneration =
+    lobby.settings.multipleChoice &&
+    lobby.flashcards.length > 0 &&
+    !allCardsGenerated;
+
+  const isGenerating = lobby.distractorStatus === "generating";
+
   const handleCopyCode = async () => {
     try {
       await navigator.clipboard.writeText(`RaceCard.io/${code}`);
@@ -42,26 +58,51 @@ export function LobbyHeader({ code, isLeader, lobby }: LobbyHeaderProps) {
       </div>
 
       <div className="absolute left-1/2 -translate-x-1/2 text-coffee">
-        {isLeader ? (
+        {isGenerating ? (
+          <div className="font-bold text-lg tracking-wide text-terracotta flex flex-col items-center">
+            <div>Generating multiple choices...</div>
+            {lobby.generationProgress && (
+              <div className="text-sm mt-0">{lobby.generationProgress}</div>
+            )}
+          </div>
+        ) : isLeader ? (
           lobby.flashcards.length == 0 ? (
             <div className="font-bold text-lg tracking-wide">
               Upload or create Flashcards to start
             </div>
-          ) : lobby.distractorStatus === "generating" ? (
-            <div className="font-bold text-lg tracking-wide text-terracotta">
-              Generating multiple choices...
+          ) : needsGeneration && lobby.status === "waiting" ? (
+            <div className="flex flex-col items-center gap-2">
+              <button
+                onClick={handleGenerateMultipleChoice}
+                disabled={isGenerating}
+                className="bg-powder text-coffee px-6 py-1 font-bold hover:bg-coffee hover:text-vanilla transition-colors tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Generate Multiple Choice
+              </button>
             </div>
           ) : lobby.distractorStatus === "error" ? (
             <div className="font-bold text-lg tracking-wide text-terracotta">
               Error occurred while generating choices
             </div>
           ) : lobby.status === "waiting" ? (
-            <button
-              onClick={handleStartGame}
-              className="bg-terracotta text-vanilla px-8 py-1 font-bold hover:bg-coffee hover:text-vanilla transition-colors tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
-            >
-              Start Game
-            </button>
+            <div className="flex gap-4">
+              <button
+                onClick={handleStartGame}
+                disabled={isGenerating}
+                className="bg-terracotta text-vanilla px-8 py-1 font-bold hover:bg-coffee hover:text-vanilla transition-colors tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Start Game
+              </button>
+              {lobby.settings.multipleChoice && (
+                <button
+                  onClick={handleGenerateMultipleChoice}
+                  disabled={isGenerating}
+                  className="bg-powder text-coffee px-6 py-1 font-bold hover:bg-coffee hover:text-vanilla transition-colors tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Generate Again
+                </button>
+              )}
+            </div>
           ) : lobby.status === "finished" ? (
             <div className="font-bold text-lg">Game Finished</div>
           ) : (
@@ -70,10 +111,6 @@ export function LobbyHeader({ code, isLeader, lobby }: LobbyHeaderProps) {
         ) : lobby.flashcards.length == 0 ? (
           <div className="font-bold text-lg">
             Waiting for leader to upload...
-          </div>
-        ) : lobby.distractorStatus === "generating" ? (
-          <div className="font-bold text-lg tracking-wide text-terracotta">
-            Generating multiple choices (May take a minute for large sets)
           </div>
         ) : lobby.distractorStatus === "error" ? (
           <div className="font-bold text-lg tracking-wide text-terracotta">

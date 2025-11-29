@@ -59,6 +59,9 @@ export function SaveFlashcardsModal({
         set_id: setData.id,
         term: card.question,
         definition: card.answer,
+        trick_terms: card.trickTerms || [],
+        trick_definitions: card.trickDefinitions || [],
+        is_generated: card.isGenerated || false,
       }));
 
       const { error: cardsError } = await supabase

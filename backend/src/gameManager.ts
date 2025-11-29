@@ -13,7 +13,10 @@ const distractorStatus = new Map<
 >();
 
 // Generate distractors for flashcards using OpenAI
-export async function generateDistractors(lobbyCode: string) {
+export async function generateDistractors(
+  lobbyCode: string,
+  onProgress?: (message: string) => void,
+) {
   const lobby = getLobbyByCode(lobbyCode);
   if (!lobby) return;
 
@@ -33,7 +36,7 @@ export async function generateDistractors(lobbyCode: string) {
   distractorStatus.set(lobbyCode, { ready: false, generating: true });
 
   try {
-    const response = await generateResponse(flashcardsToGenerate);
+    const response = await generateResponse(flashcardsToGenerate, onProgress);
 
     if (!response) {
       console.error("Failed to generate distractors: empty response");
@@ -41,12 +44,18 @@ export async function generateDistractors(lobbyCode: string) {
       throw new Error("Failed to generate distractors");
     }
 
-    const distractorsArray: string[][] = JSON.parse(response);
+    const parsedResponse: {
+      termDistractors: string[][];
+      definitionDistractors: string[][];
+    } = JSON.parse(response);
 
-    // Validate the response, should never fire if AI prompting is correct
+    // Validate the response
     if (
-      !Array.isArray(distractorsArray) ||
-      distractorsArray.length !== flashcardsToGenerate.length
+      !Array.isArray(parsedResponse.termDistractors) ||
+      !Array.isArray(parsedResponse.definitionDistractors) ||
+      parsedResponse.termDistractors.length !== flashcardsToGenerate.length ||
+      parsedResponse.definitionDistractors.length !==
+        flashcardsToGenerate.length
     ) {
       console.error("Invalid distractors format: array length mismatch");
       distractorStatus.set(lobbyCode, { ready: false, generating: false });
@@ -55,12 +64,23 @@ export async function generateDistractors(lobbyCode: string) {
 
     // Assign distractors to each flashcard in the lobby
     flashcardsToGenerate.forEach((flashcard, index) => {
-      const distractors = distractorsArray[index];
-      if (Array.isArray(distractors) && distractors.length === 3) {
-        flashcard.distractors = distractors;
+      const termDistractors = parsedResponse.termDistractors[index];
+      const definitionDistractors = parsedResponse.definitionDistractors[index];
+
+      if (
+        Array.isArray(termDistractors) &&
+        termDistractors.length === 3 &&
+        Array.isArray(definitionDistractors) &&
+        definitionDistractors.length === 3
+      ) {
+        flashcard.trickTerms = termDistractors;
+        flashcard.trickDefinitions = definitionDistractors;
+        flashcard.isGenerated = true;
       } else {
         console.error(`Invalid distractors for flashcard ${index}`);
-        flashcard.distractors = [];
+        flashcard.trickTerms = [];
+        flashcard.trickDefinitions = [];
+        flashcard.isGenerated = false;
       }
     });
 
@@ -145,16 +165,13 @@ export function getCurrentQuestion(
   const isMultipleChoice = lobby?.settings.multipleChoice ?? false;
 
   let choices: string[] | null = null;
-  if (
-    isMultipleChoice &&
-    currentFlashcard.distractors &&
-    currentFlashcard.distractors.length === 3
-  ) {
-    // Create array with correct answer and 3 distractors, then shuffle
-    choices = shuffle([
-      currentFlashcard.answer,
-      ...currentFlashcard.distractors,
-    ]);
+  if (isMultipleChoice && currentFlashcard.isGenerated) {
+    const correctAnswer = currentFlashcard.answer;
+    const distractors = currentFlashcard.trickDefinitions;
+
+    if (distractors && distractors.length === 3) {
+      choices = shuffle([correctAnswer, ...distractors]);
+    }
   }
 
   return { question: currentFlashcard.question, choices };

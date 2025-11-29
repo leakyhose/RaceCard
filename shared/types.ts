@@ -2,7 +2,9 @@ export interface Flashcard {
   id: string;
   question: string;
   answer: string;
-  distractors: string[];
+  trickTerms?: string[]; // 3 fake questions
+  trickDefinitions?: string[]; // 3 fake answers
+  isGenerated?: boolean; // Whether MC options have been generated
 }
 
 export interface Player {
@@ -32,6 +34,7 @@ export interface Lobby {
   settings: Settings;
   leader: string; // ID of leader
   distractorStatus?: "idle" | "generating" | "ready" | "error";
+  generationProgress?: string | undefined; // Progress message
 }
 
 export interface FlashcardEnd {
@@ -54,6 +57,7 @@ export interface ServerToClientEvents {
   chatMessage: (msg: { player: string; text: string }) => void;
   lobbyData: (lobby: Lobby | null) => void;
   startCountdown: (secondsRemaining: number | string) => void;
+  generationProgress: (progress: string) => void;
 
   newFlashcard: (question: string, choices: string[] | null) => void;
   endGuess: (answer: number, isCorrect: boolean) => void; // Time it took took for guess
@@ -71,6 +75,7 @@ export interface ClientToServerEvents {
   sendChat: (msg: string) => void;
   getLobby: (code: string) => void;
   requestCurrentQuestion: () => void;
+  generateMultipleChoice: () => void;
 
   answer: (text: string) => void;
 }

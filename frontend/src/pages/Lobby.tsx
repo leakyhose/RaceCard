@@ -171,6 +171,7 @@ export default function Lobby() {
               <FlashcardPreview
                 flashcards={lobby.flashcards}
                 answerByTerm={lobby.settings.answerByTerm}
+                multipleChoice={lobby.settings.multipleChoice}
               />
             </div>
           )}

@@ -14,6 +14,7 @@ interface FlashcardSet {
   name: string;
   created_at: string;
   flashcard_count: number;
+  has_generated: boolean; // Whether at least one card has MC options
 }
 
 export function LoadFlashcardsModal({
@@ -50,9 +51,19 @@ export function LoadFlashcardsModal({
             .select("*", { count: "exact", head: true })
             .eq("set_id", set.id);
 
+          // Check if any flashcards have generated MC options
+          const { data: generatedCards } = await supabase
+            .from("flashcards")
+            .select("is_generated")
+            .eq("set_id", set.id)
+            .eq("is_generated", true)
+            .limit(1);
+
           return {
             ...set,
             flashcard_count: count || 0,
+            has_generated:
+              (generatedCards && generatedCards.length > 0) || false,
           };
         }),
       );
@@ -80,7 +91,9 @@ export function LoadFlashcardsModal({
       // Fetch flashcards for this set
       const { data, error: fetchError } = await supabase
         .from("flashcards")
-        .select("term, definition")
+        .select(
+          "term, definition, trick_terms, trick_definitions, is_generated",
+        )
         .eq("set_id", setId);
 
       if (fetchError) throw fetchError;
@@ -95,7 +108,9 @@ export function LoadFlashcardsModal({
         id: index.toString(),
         question: card.term,
         answer: card.definition,
-        distractors: [],
+        trickTerms: card.trick_terms || [],
+        trickDefinitions: card.trick_definitions || [],
+        isGenerated: card.is_generated || false,
       }));
 
       socket.emit("updateFlashcard", flashcards);
@@ -183,6 +198,15 @@ export function LoadFlashcardsModal({
                       {set.flashcard_count !== 1 ? "s" : ""} • Created{" "}
                       {new Date(set.created_at).toLocaleDateString()}
                     </div>
+                    {set.has_generated ? (
+                      <div className="text-xs text-coffee font-bold mt-1">
+                        ✓ Multiple Choice Ready
+                      </div>
+                    ) : (
+                      <div className="text-xs text-terracotta font-bold mt-1">
+                        ✗ No Multiple Choice Generated
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2 shrink-0">
                     <button
