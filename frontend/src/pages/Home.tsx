@@ -46,9 +46,10 @@ export default function Home() {
       });
     };
 
-
     timer = setTimeout(() => {
-      alert("Server is offline, or is currently booting. Please try again in a few seconds.");
+      alert(
+        "Server is offline, or is currently booting. Please try again in a few seconds.",
+      );
       socket.off("lobbyUpdated", handleLobbyUpdated);
       setCreatingLobby(false);
     }, 3000);
@@ -58,12 +59,11 @@ export default function Home() {
   };
 
   const handleJoinLobby = () => {
-
     setJoiningLobby(true);
 
     if (!nickname.trim() || !codeInput.trim()) {
       alert("Missing nickname or lobby code");
-      setJoiningLobby(false)
+      setJoiningLobby(false);
       return;
     }
 
@@ -72,11 +72,10 @@ export default function Home() {
     const handleLobbyData = (lobby: Lobby | null) => {
       if (timer) {
         clearTimeout(timer);
-      } 
+      }
       if (lobby === null) {
         alert("Lobby invalid");
         setJoiningLobby(false);
-        return;
       } else {
         socket.emit("joinLobby", lobby.code, nickname);
       }
@@ -92,11 +91,13 @@ export default function Home() {
     };
 
     timer = setTimeout(() => {
-      alert("Server is offline, or is currently booting. Please try again in a few seconds.");
+      alert(
+        "Server is offline, or is currently booting. Please try again in a few seconds.",
+      );
       socket.off("lobbyData", handleLobbyData);
       socket.off("lobbyUpdated", handleLobbyUpdated);
       setJoiningLobby(false);
-    }, 3000)
+    }, 3000);
 
     socket.on("lobbyData", handleLobbyData);
     socket.on("lobbyUpdated", handleLobbyUpdated);
@@ -153,9 +154,11 @@ export default function Home() {
 
             <button
               disabled={creatingLobby}
-              className={creatingLobby
-                    ? "border-2 border-coffee bg-coffee text-vanilla px-6 py-3 font-bold cursor-not-allowed opacity-70"
-                    : "border-2 border-coffee bg-terracotta text-vanilla px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold cursor-pointer"}
+              className={
+                creatingLobby
+                  ? "border-2 border-coffee bg-coffee text-vanilla px-6 py-3 font-bold cursor-not-allowed opacity-70"
+                  : "border-2 border-coffee bg-terracotta text-vanilla px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold cursor-pointer"
+              }
               onClick={handleCreateLobby}
             >
               {creatingLobby ? "Joining..." : "Create"}
@@ -177,9 +180,11 @@ export default function Home() {
             />
             <button
               disabled={joiningLobby}
-              className={joiningLobby
-                ? "border-2 border-coffee bg-coffee text-vanilla px-6 py-3 font-bold cursor-not-allowed opacity-70"
-                : "border-2 border-coffee bg-powder text-coffee px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold cursor-pointer"}
+              className={
+                joiningLobby
+                  ? "border-2 border-coffee bg-coffee text-vanilla px-6 py-3 font-bold cursor-not-allowed opacity-70"
+                  : "border-2 border-coffee bg-powder text-coffee px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold cursor-pointer"
+              }
               onClick={handleJoinLobby}
             >
               {joiningLobby ? "Joining..." : "Join"}

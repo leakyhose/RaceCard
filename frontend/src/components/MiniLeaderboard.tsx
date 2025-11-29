@@ -21,9 +21,7 @@ export function MiniLeaderboard({
             key={index}
             className={`p-2 bg-white/50 border-2 border-coffee ${Array.isArray(player.value) && player.value.length > 1 ? "" : "flex justify-between items-center"}`}
           >
-            <div className="font-bold text-coffee">
-              {player.player}
-            </div>
+            <div className="font-bold text-coffee">{player.player}</div>
             {Array.isArray(player.value) && player.value.length > 1 ? (
               <div className="space-y-1">
                 {player.value.map((item, idx) => (

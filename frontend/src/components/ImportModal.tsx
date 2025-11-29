@@ -114,9 +114,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
           <div className="w-4/7 flex flex-col overflow-hidden">
             <div className="flex gap-8 mb-6 shrink-0">
               <div>
-                <h3 className="font-bold mb-2">
-                  Between term and definition
-                </h3>
+                <h3 className="font-bold mb-2">Between term and definition</h3>
                 <div className="space-y-1 font-bold">
                   <label className="flex items-center gap-2 cursor-pointer hover:text-terracotta transition-colors">
                     <input

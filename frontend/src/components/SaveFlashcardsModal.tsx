@@ -105,9 +105,7 @@ export function SaveFlashcardsModal({
         {success ? (
           <div className="text-center py-8">
             <div className="text-4xl mb-4">✓</div>
-            <div className="text-xl text-coffee">
-              Flashcards Saved!
-            </div>
+            <div className="text-xl text-coffee">Flashcards Saved!</div>
           </div>
         ) : (
           <>

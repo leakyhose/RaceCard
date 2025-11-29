@@ -65,9 +65,7 @@ export function LobbyHeader({ code, isLeader, lobby }: LobbyHeaderProps) {
           ) : lobby.status === "finished" ? (
             <div className="font-bold text-lg">Game Finished</div>
           ) : (
-            <div className="text-terracotta font-bold">
-              Game in Progress
-            </div>
+            <div className="text-terracotta font-bold">Game in Progress</div>
           )
         ) : lobby.flashcards.length == 0 ? (
           <div className="font-bold text-lg">
@@ -82,9 +80,7 @@ export function LobbyHeader({ code, isLeader, lobby }: LobbyHeaderProps) {
             Error occurred while generating choices
           </div>
         ) : lobby.status === "ongoing" ? (
-          <div className="text-terracotta font-bold">
-            Game in progress...
-          </div>
+          <div className="text-terracotta font-bold">Game in progress...</div>
         ) : lobby.status === "finished" ? (
           <div className="font-bold text-lg">
             Waiting for leader to continue...

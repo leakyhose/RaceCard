@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 @theme {
   --color-vanilla: #f3eaca;
   --color-coffee: #644536;
@@ -20,8 +19,6 @@
   --radius-3xl: 0px;
   --radius-full: 0px;
 }
-
-
 
 @font-face {
   font-family: "RobotoSlab";
@@ -78,7 +75,6 @@
   font-style: normal;
 }
 
-
 @layer base {
   body {
     background-color: var(--color-vanilla);
@@ -93,13 +89,21 @@
   }
 
   @keyframes shake {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateX(0);
     }
-    10%, 30%, 50%, 70%, 90% {
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
       transform: translateX(-3px);
     }
-    20%, 40%, 60%, 80% {
+    20%,
+    40%,
+    60%,
+    80% {
       transform: translateX(3px);
     }
   }
