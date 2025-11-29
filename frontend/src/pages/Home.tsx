@@ -11,6 +11,8 @@ export default function Home() {
   const [notFound, setNotFound] = useState(false);
   const [nickname, setNickname] = useState("");
   const [codeInput, setCodeInput] = useState("");
+  const [creatingLobby, setCreatingLobby] = useState(false);
+  const [joiningLobby, setJoiningLobby] = useState(false);
 
   useEffect(() => {
     document.title = "RaceCard";
@@ -24,12 +26,19 @@ export default function Home() {
   }, [location]);
 
   const handleCreateLobby = () => {
+    setCreatingLobby(true);
     if (!nickname.trim()) {
       alert("Missing nickname");
+      setCreatingLobby(false);
       return;
     }
 
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
     const handleLobbyUpdated = (lobby: Lobby) => {
+      if (timer) {
+        clearTimeout(timer);
+      }
       socket.off("lobbyUpdated", handleLobbyUpdated);
       navigate(`/${lobby.code}`, {
         replace: true,
@@ -37,19 +46,37 @@ export default function Home() {
       });
     };
 
+
+    timer = setTimeout(() => {
+      alert("Server is offline, or is currently booting. Please try again in a few seconds.");
+      socket.off("lobbyUpdated", handleLobbyUpdated);
+      setCreatingLobby(false);
+    }, 3000);
+
     socket.on("lobbyUpdated", handleLobbyUpdated);
     socket.emit("createLobby", nickname);
   };
 
   const handleJoinLobby = () => {
+
+    setJoiningLobby(true);
+
     if (!nickname.trim() || !codeInput.trim()) {
       alert("Missing nickname or lobby code");
+      setJoiningLobby(false)
       return;
     }
 
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
     const handleLobbyData = (lobby: Lobby | null) => {
+      if (timer) {
+        clearTimeout(timer);
+      } 
       if (lobby === null) {
         alert("Lobby invalid");
+        setJoiningLobby(false);
+        return;
       } else {
         socket.emit("joinLobby", lobby.code, nickname);
       }
@@ -63,6 +90,13 @@ export default function Home() {
         state: { nickname },
       });
     };
+
+    timer = setTimeout(() => {
+      alert("Server is offline, or is currently booting. Please try again in a few seconds.");
+      socket.off("lobbyData", handleLobbyData);
+      socket.off("lobbyUpdated", handleLobbyUpdated);
+      setJoiningLobby(false);
+    }, 3000)
 
     socket.on("lobbyData", handleLobbyData);
     socket.on("lobbyUpdated", handleLobbyUpdated);
@@ -116,11 +150,15 @@ export default function Home() {
               value={nickname}
               onChange={(name) => setNickname(name.target.value)}
             />
+
             <button
-              className="border-2 border-coffee bg-terracotta text-vanilla px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold cursor-pointer"
+              disabled={creatingLobby}
+              className={creatingLobby
+                    ? "border-2 border-coffee bg-coffee text-vanilla px-6 py-3 font-bold cursor-not-allowed opacity-70"
+                    : "border-2 border-coffee bg-terracotta text-vanilla px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold cursor-pointer"}
               onClick={handleCreateLobby}
             >
-              Create
+              {creatingLobby ? "Joining..." : "Create"}
             </button>
           </div>
         </div>
@@ -138,10 +176,13 @@ export default function Home() {
               onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
             />
             <button
-              className="border-2 border-coffee bg-powder text-coffee px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold cursor-pointer"
+              disabled={joiningLobby}
+              className={joiningLobby
+                ? "border-2 border-coffee bg-coffee text-vanilla px-6 py-3 font-bold cursor-not-allowed opacity-70"
+                : "border-2 border-coffee bg-powder text-coffee px-6 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold cursor-pointer"}
               onClick={handleJoinLobby}
             >
-              Join
+              {joiningLobby ? "Joining..." : "Join"}
             </button>
           </div>
         </div>
