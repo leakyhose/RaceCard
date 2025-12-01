@@ -137,7 +137,8 @@ io.on("connection", (socket) => {
       return;
     }
 
-    if (lobby.hostID !== socket.id) {
+    if (lobby.leader !== socket.id) {
+      console.log(lobby.leader, socket.id);
       console.log("Only host can generate multiple choice options");
       return;
     }

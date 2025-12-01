@@ -23,7 +23,6 @@ export function createLobby(hostID: string, hostName: string): Lobby {
   const code = generateCode();
   const newLobby: Lobby = {
     code,
-    hostID,
     players: [
       { id: hostID, name: hostName, score: 0, wins: 0, miniStatus: null },
     ],

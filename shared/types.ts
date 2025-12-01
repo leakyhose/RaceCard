@@ -28,7 +28,6 @@ export type GameStatus = "waiting" | "ongoing" | "finished" | "starting";
 
 export interface Lobby {
   code: string;
-  hostID: string;
   players: Player[];
   flashcards: Flashcard[];
   status: GameStatus;
