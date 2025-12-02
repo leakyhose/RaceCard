@@ -34,7 +34,7 @@ export function ChangeSettings({
         <>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="border-3 border-coffee bg-powder p-2 hover:bg-coffee hover:brightness-110 transition-all shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer flex items-center justify-center group"
+            className="border-2 border-coffee bg-powder p-2 hover:bg-coffee hover:brightness-110 transition-all shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer flex items-center justify-center group"
             title="Game Settings"
           >
             <img

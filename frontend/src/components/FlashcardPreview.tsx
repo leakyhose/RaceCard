@@ -22,11 +22,11 @@ export function FlashcardPreview({
   const showMCPreview = multipleChoice && flashcards[0]?.isGenerated;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {flashcards.map((flashcard) => (
         <div
           key={flashcard.id}
-          className="group relative border-2 border-coffee p-4 flex items-stretch transition-transform duration-50 ease-out hover:scale-[1.005] bg-vanilla shadow-[4px_4px_0px_0px_#644536]"
+          className="group relative border-2 border-coffee p-8 flex items-stretch transition-transform duration-50 ease-out hover:scale-[1.005] bg-vanilla shadow-[4px_4px_0px_0px_#644536]"
         >
           {showMCPreview ? (
             <div className="w-full space-y-3">

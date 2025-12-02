@@ -77,7 +77,7 @@ export function Chat() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="border-t-3 border-coffee p-4 bg-vanilla">
+      <div className="border-t-2 border-coffee p-4 bg-vanilla">
         <form onSubmit={handleSubmit}>
           <input
             type="text"
