@@ -25,7 +25,7 @@ export function Players({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-vanilla">
-      <ul className="flex-1 overflow-y-auto overflow-x-hidden ">
+      <ul className="flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:absolute [&::-webkit-scrollbar-track]:bg-vanilla [&::-webkit-scrollbar-thumb]:bg-coffee [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-vanilla">
         {players.map((player) => {
           const hasMiniStatus = isOngoing && player.miniStatus !== null;
 
@@ -50,16 +50,16 @@ export function Players({
                   {hasMiniStatus ? (
                     <>
                       {player.id === leader ? (
-                        <div className="truncate leading-tight text-coffee font-bold">
+                        <div className="truncate leading-tight text-coffee">
                           👑 {player.name}
                         </div>
                       ) : (
-                        <div className="truncate leading-tight text-coffee font-bold">
+                        <div className="truncate leading-tight text-coffee">
                           {player.name}
                         </div>
                       )}
 
-                      <div className="text-sm truncate leading-tight text-coffee/70 font-bold">
+                      <div className="text-sm truncate leading-tight text-coffee/70">
                         {typeof player.miniStatus === "number"
                           ? `${(Number(player.miniStatus) / 1000).toFixed(3)}s`
                           : player.miniStatus}
@@ -68,11 +68,11 @@ export function Players({
                   ) : (
                     <div className="truncate">
                       {player.id === leader ? (
-                        <div className="truncate leading-tight text-coffee font-bold">
+                        <div className="truncate leading-tight text-coffee ">
                           👑 {player.name}
                         </div>
                       ) : (
-                        <div className="truncate leading-tight text-coffee font-bold">
+                        <div className="truncate leading-tight text-coffee">
                           {player.name}
                         </div>
                       )}

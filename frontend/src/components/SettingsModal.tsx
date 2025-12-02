@@ -11,8 +11,12 @@ interface SettingsModalProps {
 interface SettingDefinition {
   key: keyof Settings;
   label: string;
-  type: "boolean" | "choice"; // Extended to support choice between two options
+  type: "boolean" | "choice" | "slider"; // Extended to support choice between two options and slider
   choices?: { value: boolean; label: string }[]; // For choice type
+  min?: number;
+  max?: number; 
+  step?: number; 
+  unit?: string; 
 }
 
 const SETTINGS_DEFINITIONS: SettingDefinition[] = [
@@ -35,6 +39,15 @@ const SETTINGS_DEFINITIONS: SettingDefinition[] = [
       { value: true, label: "Multiple Choice" },
       { value: false, label: "Written" },
     ],
+  },
+  {
+    key: "roundTime",
+    label: "Round Time:",
+    type: "slider",
+    min: 3,
+    max: 20,
+    step: 1,
+    unit: "s",
   },
 ];
 
@@ -123,6 +136,22 @@ export function SettingsModal({
                       </button>
                     );
                   })}
+                </div>
+              )}
+              {def.type === "slider" && (
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={def.min}
+                    max={def.max}
+                    step={def.step}
+                    value={Number(settings[def.key]) || 10}
+                    onChange={(e) => handleChange(def.key, Number(e.target.value))}
+                    className="w-32 h-2 bg-coffee/20 appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-terracotta [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-coffee [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-terracotta [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-coffee [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-none"
+                  />
+                  <span className="font-bold text-coffee min-w-12 text-right">
+                    {Number(settings[def.key]) || 10}{def.unit}
+                  </span>
                 </div>
               )}
             </div>

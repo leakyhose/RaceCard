@@ -22,6 +22,7 @@ export interface Settings {
   fuzzyTolerance: boolean;
   answerByTerm: boolean;
   multipleChoice: boolean;
+  roundTime: number; // Round duration in seconds (3-20)
 }
 
 export type GameStatus = "waiting" | "ongoing" | "finished" | "starting";

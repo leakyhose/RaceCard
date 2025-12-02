@@ -33,6 +33,7 @@ export function createLobby(hostID: string, hostName: string): Lobby {
       fuzzyTolerance: true,
       answerByTerm: false,
       multipleChoice: true,
+      roundTime: 10,
     }, // DEFAULT SETTINGS HERE WHEN CREATING LOBBY
     leader: hostID,
   };

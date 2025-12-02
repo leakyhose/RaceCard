@@ -25,6 +25,7 @@ export function ChangeSettings({
     fuzzyTolerance: true,
     answerByTerm: false,
     multipleChoice: false,
+    roundTime: 10,
   };
 
   return (

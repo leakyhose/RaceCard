@@ -258,6 +258,9 @@ io.on("connection", (socket) => {
         io.to(lobby.code).emit("lobbyUpdated", lobby);
 
         const runGameplayLoop = (lobbyCode: string) => {
+          const currentLobby = getLobbyByCode(lobbyCode);
+          if (!currentLobby) return;
+          
           const questionData = getCurrentQuestion(lobbyCode);
           if (!questionData) {
             const finalLobby = getLobbyByCode(lobbyCode);
@@ -282,7 +285,7 @@ io.on("connection", (socket) => {
           );
 
           const roundStartTime = Date.now();
-          const ROUND_DURATION = 10000;
+          const ROUND_DURATION = (currentLobby.settings.roundTime || 10) * 1000;
           let roundEnded = false;
 
           // Ends round, is also called when everyone answers correctly
