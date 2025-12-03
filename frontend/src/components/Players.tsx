@@ -24,17 +24,7 @@ export function Players({
   const isOngoing = gameStatus === "ongoing";
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-light-vanilla pt-5 pl-2 pr-6 relative">
-      {players.findIndex(p => p.id === leader) !== -1 && (
-        <div 
-          className="absolute -right-0.5 text-xs z-10"
-          style={{
-            top: `${(players.findIndex(p => p.id === leader) * 56) + (players.findIndex(p => p.id === leader) * 8) + 20 + 20}px`
-          }}
-        >
-          👑
-        </div>
-      )}
+    <div className="flex-1 flex flex-col overflow-hidden bg-light-vanilla pt-5 px-2">
       <ul className="flex-1 overflow-y-auto overflow-x-hidden space-y-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:absolute [&::-webkit-scrollbar-track]:bg-vanilla [&::-webkit-scrollbar-thumb]:bg-coffee [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-vanilla">
         {players.map((player) => {
           const hasMiniStatus = isOngoing && player.miniStatus !== null;
@@ -56,11 +46,11 @@ export function Players({
                 className={`flex w-full overflow-hidden rounded-lg ${isLeader && player.id != socket.id ? "cursor-pointer" : ""}`}
                 onClick={() => isLeader && handleUpdateLeader(player.id)}
               >
-                <div className="flex-1 flex flex-col justify-center overflow-hidden px-3 py-1">
+                <div className="flex-1 flex flex-col justify-center overflow-visible px-3 py-1 relative">
                   {hasMiniStatus ? (
                     <>
                       <div className="truncate leading-tight text-coffee">
-                        {player.name}
+                        {player.name}{player.id === leader && <span className="text-[10px] align-middle"> 👑</span>}
                       </div>
 
                       <div className="text-sm truncate leading-tight text-coffee font-bold">
@@ -70,10 +60,8 @@ export function Players({
                       </div>
                     </>
                   ) : (
-                    <div className="truncate">
-                      <div className="truncate leading-tight text-coffee">
-                        {player.name}
-                      </div>
+                    <div className="truncate leading-tight text-coffee">
+                      {player.name}{player.id === leader && <span className="text-[10px] align-middle"> 👑</span>}
                     </div>
                   )}
                 </div>
