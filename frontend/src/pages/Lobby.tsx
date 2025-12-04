@@ -1,5 +1,6 @@
 import { useParams, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { flushSync } from "react-dom";
 import { socket } from "../socket";
 import { useCodeValidation } from "../hooks/useCodeValidation";
 import { useLobbyData } from "../hooks/useLobbyData";
@@ -10,6 +11,7 @@ import { UploadFlashcard } from "../components/UploadFlashcard";
 import { ChangeSettings } from "../components/ChangeSettings";
 import { LobbyHeader } from "../components/LobbyHeader";
 import { FlashcardPreview } from "../components/FlashcardPreview";
+import { FlashcardStudy } from "../components/FlashcardStudy";
 import { Game } from "../components/Game";
 import { SaveFlashcardsModal } from "../components/SaveFlashcardsModal";
 import { LoadFlashcardsModal } from "../components/LoadFlashcardsModal";
@@ -29,6 +31,11 @@ export default function Lobby() {
   const [saveHovered, setSaveHovered] = useState(false);
   const [loadShake, setLoadShake] = useState(false);
   const [saveShake, setSaveShake] = useState(false);
+  const [currentSection, setCurrentSection] = useState<"study" | "all">("study");
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const allCardsRef = useRef<HTMLDivElement>(null);
+  const studyRef = useRef<HTMLDivElement>(null);
 
   useCodeValidation(code);
 
@@ -48,6 +55,69 @@ export default function Lobby() {
   useEffect(() => {
     setIsLeader(lobby?.leader === socket.id);
   }, [lobby]);
+
+  const smoothScroll = (target: number, duration: number) => {
+    const element = scrollContainerRef.current;
+    if (!element) return Promise.resolve();
+
+    return new Promise<void>((resolve) => {
+      const start = element.scrollTop;
+      const change = target - start;
+      const startTime = performance.now();
+
+      const animateScroll = (currentTime: number) => {
+        const timeElapsed = currentTime - startTime;
+        if (timeElapsed < duration) {
+          // easeInOutQuad
+          let val = timeElapsed / (duration / 2);
+          const progress = val < 1 
+            ? change / 2 * val * val + start 
+            : -change / 2 * ((--val) * (val - 2) - 1) + start;
+          
+          element.scrollTop = progress;
+          requestAnimationFrame(animateScroll);
+        } else {
+          element.scrollTop = target;
+          resolve();
+        }
+      };
+      requestAnimationFrame(animateScroll);
+    });
+  };
+
+  const scrollToAllCards = () => {
+    flushSync(() => {
+      setIsTransitioning(true);
+    });
+    
+    if (allCardsRef.current && scrollContainerRef.current) {
+      smoothScroll(allCardsRef.current.offsetTop, 1000).then(() => {
+        flushSync(() => {
+          setCurrentSection("all");
+          setIsTransitioning(false);
+        });
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = 0;
+        }
+      });
+    }
+  };
+
+  const scrollToStudy = () => {
+    flushSync(() => {
+      setIsTransitioning(true);
+    });
+
+    if (studyRef.current && scrollContainerRef.current) {
+      const studyHeight = studyRef.current.offsetHeight;
+      scrollContainerRef.current.scrollTop = studyHeight;
+      
+      smoothScroll(0, 1000).then(() => {
+        setCurrentSection("study");
+        setIsTransitioning(false);
+      });
+    }
+  };
 
   const handleJoinLobby = () => {
     if (!nicknameInput.trim()) return;
@@ -161,19 +231,60 @@ export default function Lobby() {
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-light-vanilla relative">
+        <div 
+          ref={scrollContainerRef}
+          className={`flex-1 bg-light-vanilla relative ${currentSection === "all" && !isTransitioning ? "overflow-y-auto [&::-webkit-scrollbar]:hidden" : "overflow-hidden"}`}
+        >
           {lobby.status === "starting" ||
           lobby.status === "ongoing" ||
           lobby.status === "finished" ? (
             <Game />
           ) : (
-            <div className="h-full p-4 bg-light-vanilla overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-light-vanilla [&::-webkit-scrollbar-thumb]:bg-coffee [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-light-vanilla">
-              <FlashcardPreview
-                flashcards={lobby.flashcards}
-                answerByTerm={lobby.settings.answerByTerm}
-                multipleChoice={lobby.settings.multipleChoice}
-              />
-            </div>
+            <>
+              {/* Study section - render when in study mode or transitioning */}
+              {(currentSection === "study" || isTransitioning) && (
+                <div ref={studyRef} className="h-screen bg-light-vanilla flex flex-col items-center justify-center">
+                  <FlashcardStudy
+                    flashcards={lobby.flashcards}
+                    answerByTerm={lobby.settings.answerByTerm}
+                    multipleChoice={lobby.settings.multipleChoice}
+                  />
+                  <button
+                    onClick={scrollToAllCards}
+                    disabled={isTransitioning}
+                    className="mt-8 px-6 py-3 border-2 border-coffee bg-vanilla hover:bg-coffee hover:text-vanilla transition-colors font-bold disabled:opacity-50"
+                  >
+                    View All Flashcards ↓
+                  </button>
+                </div>
+              )}
+              
+              {/* All flashcards section - render when in all mode or transitioning */}
+              {(currentSection === "all" || isTransitioning) && (
+                <div 
+                  ref={allCardsRef}
+                  className="min-h-screen p-4 bg-light-vanilla"
+                >
+                  <button
+                    onClick={scrollToStudy}
+                    disabled={isTransitioning}
+                    className="mb-6 px-6 py-3 border-2 border-coffee bg-vanilla hover:bg-coffee hover:text-vanilla transition-colors font-bold block mx-auto disabled:opacity-50"
+                  >
+                    ↑ Back to Study Mode
+                  </button>
+                  <div className="border-t-2 border-coffee pt-8 mb-4">
+                    <h2 className="text-2xl font-bold text-coffee mb-6 text-center">
+                      All Flashcards
+                    </h2>
+                  </div>
+                  <FlashcardPreview
+                    flashcards={lobby.flashcards}
+                    answerByTerm={lobby.settings.answerByTerm}
+                    multipleChoice={lobby.settings.multipleChoice}
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
 

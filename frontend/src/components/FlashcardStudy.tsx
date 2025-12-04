@@ -1,0 +1,152 @@
+import { useState } from "react";
+import type { Flashcard } from "@shared/types";
+
+interface FlashcardStudyProps {
+  flashcards: Flashcard[];
+  answerByTerm?: boolean;
+  multipleChoice?: boolean;
+}
+
+export function FlashcardStudy({
+  flashcards,
+  answerByTerm,
+  multipleChoice,
+}: FlashcardStudyProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [isSwitching, setIsSwitching] = useState(false);
+
+  if (!flashcards.length) {
+    return (
+      <div className="flex items-center h-full justify-center text-sm italic text-center">
+        No flashcards uploaded yet.
+      </div>
+    );
+  }
+
+  const currentCard = flashcards[currentIndex];
+  const showMC = multipleChoice && currentCard?.isGenerated;
+
+  const handlePrevious = () => {
+    setIsSwitching(true);
+    setCurrentIndex((prev) => (prev === 0 ? flashcards.length - 1 : prev - 1));
+    setIsFlipped(false);
+    setTimeout(() => setIsSwitching(false), 50);
+  };
+
+  const handleNext = () => {
+    setIsSwitching(true);
+    setCurrentIndex((prev) => (prev === flashcards.length - 1 ? 0 : prev + 1));
+    setIsFlipped(false);
+    setTimeout(() => setIsSwitching(false), 50);
+  };
+
+  const handleFlip = () => {
+    setIsFlipped(!isFlipped);
+  };
+
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsSwitching(true);
+    setCurrentIndex(parseInt(e.target.value));
+    setIsFlipped(false);
+    setTimeout(() => setIsSwitching(false), 50);
+  };
+
+  const question = answerByTerm ? currentCard.answer : currentCard.question;
+  const answer = answerByTerm ? currentCard.question : currentCard.answer;
+
+  return (
+    <div className="flex items-center justify-center w-full p-8">
+      <div className="flex flex-col items-center justify-center w-full max-w-3xl gap-6">
+        {/* Flashcard */}
+        <div className="group relative w-full max-w-3xl min-h-[60vh] flex justify-center rounded-[20px] bg-vanilla">
+          <div className=" text-center absolute bottom-1 text-coffee/80 text-[0.69rem] font-bold tracking-[0.2em]">
+            click to flip
+          </div>
+          <div className="w-full min-h-full perspective-[1000px] z-10 transition-transform duration-400 group-hover:-translate-y-[23px]">
+            <div
+              onClick={handleFlip}
+              className={`
+                grid grid-cols-1 w-full h-full transition-transform transform-3d cursor-pointer
+                ${isSwitching ? "duration-0" : "duration-1000"}
+                ${isFlipped ? "transform-[rotateY(180deg)]" : ""}
+              `}
+            >
+              {/* Front of card - show question */}
+              <div className="col-start-1 row-start-1 backface-hidden border-2 border-coffee bg-vanilla p-8 rounded-[20px] shadow-[inset_0_0_0_2px_var(--color-powder),0_0_10px_rgba(0,0,0,0.212)] flex flex-col items-center justify-center gap-4">
+                <div className="text-center">
+                  <div className="text-sm text-coffee/60 mb-4 font-bold">
+                    {currentIndex + 1} of {flashcards.length}
+                  </div>
+                  <div className="text-2xl font-bold text-coffee whitespace-pre-wrap wrap-break-word">
+                    {question}
+                  </div>
+                </div>
+              </div>
+
+              {/* Back of card */}
+              <div className="col-start-1 row-start-1 backface-hidden transform-[rotateY(180deg)] border-2 border-coffee bg-vanilla p-8 rounded-[20px] shadow-[inset_0_0_0_2px_var(--color-terracotta),0_0_10px_rgba(0,0,0,0.212)] flex flex-col items-center justify-center gap-4">
+                <div className="w-full">
+                  <div className="text-sm text-coffee/60 mb-4 font-bold text-center">
+                    Answer
+                  </div>
+                  {showMC ? (
+                    // Multiple choice view
+                    <div className="space-y-2">
+                      <div className="p-3 border-2 border-coffee bg-mint/30 text-center font-bold">
+                        ✓ {answer}
+                      </div>
+                      {(answerByTerm
+                        ? currentCard.trickDefinitions
+                        : currentCard.trickTerms
+                      )?.map((trick, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3 border border-coffee bg-vanilla/50 text-center"
+                        >
+                          {trick}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    // Simple answer view
+                    <div className="text-xl font-bold text-coffee text-center whitespace-pre-wrap wrap-break-word">
+                      {answer}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 w-full">
+          <button
+            onClick={handlePrevious}
+            className="shrink-0 w-12 h-12 border-2 border-coffee bg-vanilla hover:bg-coffee hover:text-vanilla transition-colors font-bold text-2xl"
+            aria-label="Previous card"
+          >
+            ←
+          </button>
+
+          <input
+            type="range"
+            min="0"
+            max={flashcards.length - 1}
+            value={currentIndex}
+            onChange={handleSliderChange}
+            className="flex-1 h-2 bg-vanilla border-2 border-coffee appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-coffee [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-coffee [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+          />
+
+          <button
+            onClick={handleNext}
+            className="shrink-0 w-12 h-12 border-2 border-coffee bg-vanilla hover:bg-coffee hover:text-vanilla transition-colors font-bold text-2xl"
+            aria-label="Next card"
+          >
+            →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
