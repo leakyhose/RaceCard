@@ -59,61 +59,80 @@ export function FlashcardStudy({
     <div className="flex items-center justify-center w-full p-8">
       <div className="flex flex-col items-center justify-center w-full max-w-3xl gap-6">
         {/* Flashcard */}
-        <div className="group relative w-full max-w-3xl min-h-[60vh] flex justify-center rounded-[20px] bg-vanilla">
-          <div className=" text-center absolute bottom-1 text-coffee/80 text-[0.69rem] font-bold tracking-[0.2em]">
-            click to flip
-          </div>
-          <div className="w-full min-h-full perspective-[1000px] z-10 transition-transform duration-400 group-hover:-translate-y-[23px]">
-            <div
-              onClick={handleFlip}
-              className={`
-                grid grid-cols-1 w-full h-full transition-transform transform-3d cursor-pointer
-                ${isSwitching ? "duration-0" : "duration-1000"}
-                ${isFlipped ? "transform-[rotateY(180deg)]" : ""}
-              `}
-            >
-              {/* Front of card - show question */}
-              <div className="col-start-1 row-start-1 backface-hidden border-2 border-coffee bg-vanilla p-8 rounded-[20px] shadow-[inset_0_0_0_2px_var(--color-powder),0_0_10px_rgba(0,0,0,0.212)] flex flex-col items-center justify-center gap-4">
-                <div className="text-center">
-                  <div className="text-sm text-coffee/60 mb-4 font-bold">
-                    {currentIndex + 1} of {flashcards.length}
-                  </div>
-                  <div className="text-2xl font-bold text-coffee whitespace-pre-wrap wrap-break-word">
-                    {question}
-                  </div>
+        <div className="group relative w-full max-w-3xl min-h-[60vh] flex flex-col perspective-[1000px]">
+          <div
+            onClick={handleFlip}
+            className={`
+              grid grid-cols-1 w-full flex-1 transition-transform transform-3d cursor-pointer
+              ${isSwitching ? "duration-0" : "duration-1000"}
+              ${isFlipped ? "transform-[rotateY(180deg)]" : ""}
+            `}
+          >
+            {/* Front Face */}
+            <div className="col-start-1 row-start-1 backface-hidden relative w-full h-full">
+              {/* Under Card (Front) */}
+              <div className="absolute inset-0 rounded-[20px] bg-vanilla flex items-end justify-center pb-1 -z-10">
+                <div className="text-center text-coffee/80 text-[0.69rem] font-bold tracking-[0.2em]">
+                  click to flip
                 </div>
               </div>
 
-              {/* Back of card */}
-              <div className="col-start-1 row-start-1 backface-hidden transform-[rotateY(180deg)] border-2 border-coffee bg-vanilla p-8 rounded-[20px] shadow-[inset_0_0_0_2px_var(--color-terracotta),0_0_10px_rgba(0,0,0,0.212)] flex flex-col items-center justify-center gap-4">
-                <div className="w-full">
-                  <div className="text-sm text-coffee/60 mb-4 font-bold text-center">
-                    Answer
+              {/* Top Card (Front) */}
+              <div className="w-full h-full transition-transform duration-400 group-hover:-translate-y-[23px]">
+                <div className="w-full h-full border-2 border-coffee bg-vanilla p-8 rounded-[20px] shadow-[inset_0_0_0_1px_var(--color-powder),0_0_10px_rgba(0,0,0,0.212)] flex flex-col items-center justify-center gap-4">
+                  <div className="text-center">
+                    <div className="text-sm text-coffee/60 mb-4 font-bold">
+                      {currentIndex + 1} of {flashcards.length}
+                    </div>
+                    <div className="text-2xl font-bold text-coffee whitespace-pre-wrap wrap-break-word">
+                      {question}
+                    </div>
                   </div>
-                  {showMC ? (
-                    // Multiple choice view
-                    <div className="space-y-2">
-                      <div className="p-3 border-2 border-coffee bg-mint/30 text-center font-bold">
-                        ✓ {answer}
-                      </div>
-                      {(answerByTerm
-                        ? currentCard.trickDefinitions
-                        : currentCard.trickTerms
-                      )?.map((trick, idx) => (
-                        <div
-                          key={idx}
-                          className="p-3 border border-coffee bg-vanilla/50 text-center"
-                        >
-                          {trick}
+                </div>
+              </div>
+            </div>
+
+            {/* Back Face */}
+            <div className="col-start-1 row-start-1 backface-hidden transform-[rotateY(180deg)] relative w-full h-full">
+              {/* Under Card (Back) */}
+              <div className="absolute inset-0 rounded-[20px] bg-vanilla flex items-end justify-center pb-1 -z-10">
+                <div className="text-center text-coffee/80 text-[0.69rem] font-bold tracking-[0.2em]">
+                  click to flip
+                </div>
+              </div>
+
+              {/* Top Card (Back) */}
+              <div className="w-full h-full transition-transform duration-400 group-hover:-translate-y-[23px]">
+                <div className="w-full h-full border-2 border-coffee bg-vanilla p-8 rounded-[20px] shadow-[inset_0_0_0_1px_var(--color-terracotta),0_0_10px_rgba(0,0,0,0.212)] flex flex-col items-center justify-center gap-4">
+                  <div className="w-full">
+                    <div className="text-sm text-coffee/60 mb-4 font-bold text-center">
+                      Answer
+                    </div>
+                    {showMC ? (
+                      // Multiple choice view
+                      <div className="space-y-2">
+                        <div className="p-3 border-2 border-coffee bg-mint/30 text-center font-bold">
+                          ✓ {answer}
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    // Simple answer view
-                    <div className="text-xl font-bold text-coffee text-center whitespace-pre-wrap wrap-break-word">
-                      {answer}
-                    </div>
-                  )}
+                        {(answerByTerm
+                          ? currentCard.trickDefinitions
+                          : currentCard.trickTerms
+                        )?.map((trick, idx) => (
+                          <div
+                            key={idx}
+                            className="p-3 border border-coffee bg-vanilla/50 text-center"
+                          >
+                            {trick}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      // Simple answer view
+                      <div className="text-xl font-bold text-coffee text-center whitespace-pre-wrap wrap-break-word">
+                        {answer}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
