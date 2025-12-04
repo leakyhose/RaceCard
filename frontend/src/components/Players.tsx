@@ -24,7 +24,7 @@ export function Players({
   const isOngoing = gameStatus === "ongoing";
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-light-vanilla pt-5 px-2">
+    <div className="flex-1 flex flex-col overflow-hidden bg-light-vanilla">
       <ul className="flex-1 overflow-y-auto overflow-x-hidden space-y-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:absolute [&::-webkit-scrollbar-track]:bg-vanilla [&::-webkit-scrollbar-thumb]:bg-coffee [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-vanilla">
         {players.map((player) => {
           const hasMiniStatus = isOngoing && player.miniStatus !== null;

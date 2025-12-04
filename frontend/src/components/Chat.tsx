@@ -45,8 +45,8 @@ export function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-vanilla">
-      <div className="flex-1 overflow-y-auto p-2 space-y-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-vanilla [&::-webkit-scrollbar-thumb]:bg-coffee [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-vanilla">
+    <div className="flex flex-col h-full bg-vanilla overflow-hidden">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-vanilla [&::-webkit-scrollbar-thumb]:bg-coffee [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-vanilla">
         {messages.length === 0 ? (
           <div className="text-coffee/50 text-sm font-bold text-center mt-4">
             No messages yet
@@ -62,10 +62,10 @@ export function Chat() {
               }`}
             >
               {msg.player === "System" ? (
-                <div className="font-bold">{msg.text}</div>
+                <div className="font-bold wrap-break-word">{msg.text}</div>
               ) : (
-                <div className="w-full min-w-0">
-                  <div className="text-sm font-bold text-coffee whitespace-normal wrap-break-words">
+                <div className="w-full min-w-0 overflow-hidden">
+                  <div className="text-sm font-bold text-coffee wrap-break-word">
                     <span className="text-coffee/70">{msg.player}:</span>{" "}
                     {msg.text}
                   </div>

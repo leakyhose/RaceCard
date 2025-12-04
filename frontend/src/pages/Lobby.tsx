@@ -94,9 +94,9 @@ export default function Lobby() {
         isLeader={isLeader}
         lobby={lobby}
       />
-
-      <div className="flex flex-1 overflow-hidden border-t-2 border-coffee">
-        <div className="w-65 flex flex-col bg-vanilla">
+      {/* */}
+      <div className="flex flex-1 overflow-hidden border-coffee">
+        <div className="w-65 flex flex-col p-4 bg-light-vanilla">
           <Players
             players={lobby.players}
             gameStatus={lobby.status}
@@ -161,13 +161,13 @@ export default function Lobby() {
           )}
         </div>
 
-        <div className="flex-1 p-0 overflow-y-auto overflow-x-hidden bg-light-vanilla relative">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-light-vanilla relative">
           {lobby.status === "starting" ||
           lobby.status === "ongoing" ||
           lobby.status === "finished" ? (
             <Game />
           ) : (
-            <div className="h-full p-5 bg-light-vanilla overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-light-vanilla [&::-webkit-scrollbar-thumb]:bg-coffee [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-light-vanilla">
+            <div className="h-full p-4 bg-light-vanilla overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-light-vanilla [&::-webkit-scrollbar-thumb]:bg-coffee [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-light-vanilla">
               <FlashcardPreview
                 flashcards={lobby.flashcards}
                 answerByTerm={lobby.settings.answerByTerm}
@@ -177,8 +177,10 @@ export default function Lobby() {
           )}
         </div>
 
-        <div className="w-65 border-l-2 border-coffee bg-vanilla">
-          <Chat />
+        <div className="w-65 flex flex-col gap-4 p-4 bg-light-vanilla">
+          <div className="h-1/2 border-2 border-coffee rounded-lg bg-light-vanilla overflow-hidden">
+            <Chat />
+          </div>
         </div>
       </div>
 
