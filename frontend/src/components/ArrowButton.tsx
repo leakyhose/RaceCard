@@ -1,5 +1,3 @@
-import React from "react";
-
 interface ArrowButtonProps {
   onClick: () => void;
   direction?: "up" | "down";

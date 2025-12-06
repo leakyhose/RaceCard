@@ -151,7 +151,7 @@ export function LoadFlashcards({ isLeader }: LoadFlashcardsProps) {
                             <div
                                 key={set.id}
                                 onClick={() => handleLoadSet(set.id)}
-                                className={`p-2 rounded-sm border-2 border-coffee cursor-pointer transition-all group min-h-[3.5rem] flex flex-col justify-center ${
+                                className={`p-2 rounded-sm border-2 border-coffee cursor-pointer transition-all group min-h-14 flex flex-col justify-center ${
                                   shakingSetId === set.id
                                     ? "animate-shake bg-red-500 text-vanilla"
                                     : "bg-vanilla/50 hover:bg-white hover:border-coffee/30"
