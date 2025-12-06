@@ -170,68 +170,8 @@ export default function Lobby() {
       {/* */}
       <div className="flex flex-1 overflow-hidden border-coffee">
         <div className="w-65 flex flex-col p-4 bg-light-vanilla">
-          <Players
-            players={lobby.players}
-            gameStatus={lobby.status}
-            isLeader={isLeader}
-            leader={lobby.leader}
-          />
-
-          {isLeader && lobby.status === "waiting" && (
-            <div className="p-4 border-2 border-coffee flex flex-col gap-4 bg-vanilla">
-              <div className="flex flex-row justify-center gap-15">
-                <ChangeSettings
-                  isLeader={isLeader}
-                  currentSettings={lobby.settings}
-                />
-                <UploadFlashcard isLeader={isLeader} lobby={lobby} />
-              </div>
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={() => {
-                    if (user) {
-                      setShowLoadModal(true);
-                    } else {
-                      setLoadShake(true);
-                      setTimeout(() => setLoadShake(false), 500);
-                    }
-                  }}
-                  onMouseEnter={() => setLoadHovered(true)}
-                  onMouseLeave={() => setLoadHovered(false)}
-                  className={`w-full border-2 border-coffee px-2 py-3 font-bold transition-colors ${
-                    loadShake
-                      ? "animate-shake bg-red-500 text-vanilla"
-                      : "bg-powder text-coffee hover:bg-coffee hover:text-vanilla"
-                  }`}
-                >
-                  {!user && loadHovered ? "Log In to Load" : "Load Flashcards"}
-                </button>
-                {lobby.flashcards.length > 0 && (
-                  <button
-                    onClick={() => {
-                      if (user) {
-                        setShowSaveModal(true);
-                      } else {
-                        setSaveShake(true);
-                        setTimeout(() => setSaveShake(false), 500);
-                      }
-                    }}
-                    onMouseEnter={() => setSaveHovered(true)}
-                    onMouseLeave={() => setSaveHovered(false)}
-                    className={`w-full border-2 border-coffee px-4 py-3 font-bold transition-colors ${
-                      saveShake
-                        ? "animate-shake bg-red-500 text-vanilla"
-                        : "bg-thistle text-coffee hover:bg-coffee hover:text-vanilla"
-                    }`}
-                  >
-                    {!user && saveHovered
-                      ? "Log In to Save"
-                      : "Save Flashcards"}
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
+          <div className="flex-1" />
+          <Chat />
         </div>
 
         <div
@@ -299,8 +239,68 @@ export default function Lobby() {
         </div>
 
         <div className="w-65 flex flex-col p-4 bg-light-vanilla">
-          <div className="flex-1" />
-          <Chat />
+          <Players
+            players={lobby.players}
+            gameStatus={lobby.status}
+            isLeader={isLeader}
+            leader={lobby.leader}
+          />
+
+          {isLeader && lobby.status === "waiting" && (
+            <div className="p-4 border-2 border-coffee flex flex-col gap-4 bg-vanilla">
+              <div className="flex flex-row justify-center gap-15">
+                <ChangeSettings
+                  isLeader={isLeader}
+                  currentSettings={lobby.settings}
+                />
+                <UploadFlashcard isLeader={isLeader} lobby={lobby} />
+              </div>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => {
+                    if (user) {
+                      setShowLoadModal(true);
+                    } else {
+                      setLoadShake(true);
+                      setTimeout(() => setLoadShake(false), 500);
+                    }
+                  }}
+                  onMouseEnter={() => setLoadHovered(true)}
+                  onMouseLeave={() => setLoadHovered(false)}
+                  className={`w-full border-2 border-coffee px-2 py-3 font-bold transition-colors ${
+                    loadShake
+                      ? "animate-shake bg-red-500 text-vanilla"
+                      : "bg-powder text-coffee hover:bg-coffee hover:text-vanilla"
+                  }`}
+                >
+                  {!user && loadHovered ? "Log In to Load" : "Load Flashcards"}
+                </button>
+                {lobby.flashcards.length > 0 && (
+                  <button
+                    onClick={() => {
+                      if (user) {
+                        setShowSaveModal(true);
+                      } else {
+                        setSaveShake(true);
+                        setTimeout(() => setSaveShake(false), 500);
+                      }
+                    }}
+                    onMouseEnter={() => setSaveHovered(true)}
+                    onMouseLeave={() => setSaveHovered(false)}
+                    className={`w-full border-2 border-coffee px-4 py-3 font-bold transition-colors ${
+                      saveShake
+                        ? "animate-shake bg-red-500 text-vanilla"
+                        : "bg-thistle text-coffee hover:bg-coffee hover:text-vanilla"
+                    }`}
+                  >
+                    {!user && saveHovered
+                      ? "Log In to Save"
+                      : "Save Flashcards"}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

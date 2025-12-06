@@ -47,38 +47,40 @@ export function Chat() {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 w-full">
-      <div className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col space-y-2 mask-[linear-gradient(to_bottom,transparent,black_1.5rem)] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-coffee/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-coffee/40">
-        <div className="grow" />
-        {messages.length === 0 ? (
-          <div className="text-center text-xs italic text-coffee/50 px-1">
-            Empty chat. Say hi!
-          </div>
-        ) : (
-          messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`${
-                msg.player === "System" ? "text-center my-1" : ""
-              }`}
-            >
-              {msg.player === "System" ? (
-                <span className="text-xs font-medium text-coffee/50 italic px-1">
-                  {msg.text}
-                </span>
-              ) : (
-                <div className="flex flex-col items-start mb-1 px-1">
-                  <div className="text-xs font-bold text-coffee/70 mb-0.5">
-                    {msg.player}
-                  </div>
-                  <div className="text-xs font-medium text-coffee wrap-break-word leading-snug">
-                    {msg.text}
-                  </div>
-                </div>
-              )}
+        <div className="flex-1 overflow-x-hidden p-2 [overflow-y:overlay] mask-[linear-gradient(to_bottom,transparent,black_1.5rem)] [direction:rtl] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-coffee/50 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-coffee/40">
+        <div className="flex flex-col space-y-1 [direction:ltr] min-h-full">
+          <div className="grow" />
+          {messages.length === 0 ? (
+            <div className="text-coffee/40 text-sm font-bold text-center italic py-4">
+              Start the conversation...
             </div>
-          ))
-        )}
-        <div ref={messagesEndRef} />
+          ) : (
+            messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`${
+                  msg.player === "System" ? "text-center my-1" : ""
+                }`}
+              >
+                {msg.player === "System" ? (
+                  <span className="text-xs font-medium text-coffee/50 italic px-1">
+                    {msg.text}
+                  </span>
+                ) : (
+                  <div className="flex flex-col items-start mt-2 px-1">
+                    <div className="text-xs font-bold text-coffee/70 mb-0.5">
+                      {msg.player}
+                    </div>
+                    <div className="text-sm font-medium text-coffee wrap-break-word leading-snug">
+                      {msg.text}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
       <div className="pt-0">
