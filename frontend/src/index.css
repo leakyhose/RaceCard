@@ -112,18 +112,18 @@
     animation: shake 0.5s;
   }
 
-::-webkit-scrollbar {
-  width: 0.5rem;
-  position: absolute;
-}
+  ::-webkit-scrollbar {
+    width: 0.5rem;
+    position: absolute;
+  }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: var(--color-coffee);
-  border: 2px solid var(--color-vanilla);
-  border-radius: 0;
-}
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-coffee);
+    border: 2px solid var(--color-vanilla);
+    border-radius: 0;
+  }
 }

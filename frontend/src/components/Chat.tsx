@@ -45,49 +45,51 @@ export function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-vanilla overflow-hidden">
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-vanilla [&::-webkit-scrollbar-thumb]:bg-coffee [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-vanilla">
-        {messages.length === 0 ? (
-          <div className="text-coffee/50 text-sm font-bold text-center mt-4">
-            No messages yet
-          </div>
-        ) : (
-          messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`${
-                msg.player === "System"
-                  ? "text-center text-coffee/60 italic text-sm"
-                  : ""
-              }`}
-            >
-              {msg.player === "System" ? (
-                <div className="font-bold wrap-break-word">{msg.text}</div>
-              ) : (
-                <div className="w-full min-w-0 overflow-hidden">
-                  <div className="text-sm font-bold text-coffee wrap-break-word">
-                    <span className="text-coffee/70">{msg.player}:</span>{" "}
-                    {msg.text}
-                  </div>
-                </div>
-              )}
+    <div className="h-1/2 border-2 border-coffee rounded-lg bg-light-vanilla overflow-hidden">
+      <div className="flex flex-col h-full bg-vanilla overflow-hidden">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-vanilla [&::-webkit-scrollbar-thumb]:bg-coffee [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-vanilla">
+          {messages.length === 0 ? (
+            <div className="text-coffee/50 text-sm font-bold text-center mt-4">
+              No messages yet
             </div>
-          ))
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+          ) : (
+            messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`${
+                  msg.player === "System"
+                    ? "text-center text-coffee/60 italic text-sm"
+                    : ""
+                }`}
+              >
+                {msg.player === "System" ? (
+                  <div className="font-bold wrap-break-word">{msg.text}</div>
+                ) : (
+                  <div className="w-full min-w-0 overflow-hidden">
+                    <div className="text-sm font-bold text-coffee wrap-break-word">
+                      <span className="text-coffee/70">{msg.player}:</span>{" "}
+                      {msg.text}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
 
-      <div className="border-t-2 border-coffee p-4 bg-vanilla">
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="TYPE MESSAGE..."
-            maxLength={200}
-            className="w-full px-3 py-2 border-2 border-coffee bg-white/50 text-coffee placeholder-coffee/30 focus:outline-none focus:bg-white font-bold text-sm"
-          />
-        </form>
+        <div className="border-t-2 border-coffee p-4 bg-vanilla">
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="TYPE MESSAGE..."
+              maxLength={200}
+              className="w-full px-3 py-2 border-2 border-coffee bg-white/50 text-coffee placeholder-coffee/30 focus:outline-none focus:bg-white font-bold text-sm"
+            />
+          </form>
+        </div>
       </div>
     </div>
   );

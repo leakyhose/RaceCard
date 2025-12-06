@@ -73,7 +73,7 @@ export function FlashcardStudy({
               {/* Under Card (Front) */}
               <div className="shadow-[0_0_10px_rgba(0,0,0,0.2)] border-2 border-coffee absolute inset-0 rounded-[20px] bg-vanilla flex items-end justify-center pb-1 -z-10">
                 <div className="text-center text-coffee/80 text-[0.69rem] font-bold tracking-[0.2em]">
-                  click to flip
+                  click for answer
                 </div>
               </div>
 
@@ -97,7 +97,7 @@ export function FlashcardStudy({
               {/* Under Card (Back) */}
               <div className="shadow-[0_0_10px_rgba(0,0,0,0.212)] border-2 border-coffee absolute inset-0 rounded-[20px] bg-vanilla flex items-end justify-center pb-1 -z-10">
                 <div className="text-center text-coffee/80 text-[0.69rem] font-bold tracking-[0.2em]">
-                  click to flip
+                  click for question
                 </div>
               </div>
 

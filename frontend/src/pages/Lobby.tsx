@@ -31,7 +31,9 @@ export default function Lobby() {
   const [saveHovered, setSaveHovered] = useState(false);
   const [loadShake, setLoadShake] = useState(false);
   const [saveShake, setSaveShake] = useState(false);
-  const [currentSection, setCurrentSection] = useState<"study" | "all">("study");
+  const [currentSection, setCurrentSection] = useState<"study" | "all">(
+    "study",
+  );
   const [isTransitioning, setIsTransitioning] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const allCardsRef = useRef<HTMLDivElement>(null);
@@ -70,10 +72,11 @@ export default function Lobby() {
         if (timeElapsed < duration) {
           // easeInOutQuad
           let val = timeElapsed / (duration / 2);
-          const progress = val < 1 
-            ? change / 2 * val * val + start 
-            : -change / 2 * ((--val) * (val - 2) - 1) + start;
-          
+          const progress =
+            val < 1
+              ? (change / 2) * val * val + start
+              : (-change / 2) * (--val * (val - 2) - 1) + start;
+
           element.scrollTop = progress;
           requestAnimationFrame(animateScroll);
         } else {
@@ -89,7 +92,7 @@ export default function Lobby() {
     flushSync(() => {
       setIsTransitioning(true);
     });
-    
+
     if (allCardsRef.current && scrollContainerRef.current) {
       smoothScroll(allCardsRef.current.offsetTop, 1000).then(() => {
         flushSync(() => {
@@ -111,7 +114,7 @@ export default function Lobby() {
     if (studyRef.current && scrollContainerRef.current) {
       const studyHeight = studyRef.current.offsetHeight;
       scrollContainerRef.current.scrollTop = studyHeight;
-      
+
       smoothScroll(0, 1000).then(() => {
         setCurrentSection("study");
         setIsTransitioning(false);
@@ -231,7 +234,7 @@ export default function Lobby() {
           )}
         </div>
 
-        <div 
+        <div
           ref={scrollContainerRef}
           className={`flex-1 bg-light-vanilla relative ${currentSection === "all" && !isTransitioning ? "overflow-y-auto [&::-webkit-scrollbar]:hidden" : "overflow-hidden"}`}
         >
@@ -243,7 +246,10 @@ export default function Lobby() {
             <>
               {/* Study section - render when in study mode or transitioning */}
               {(currentSection === "study" || isTransitioning) && (
-                <div ref={studyRef} className="h-screen bg-light-vanilla flex flex-col items-center justify-center">
+                <div
+                  ref={studyRef}
+                  className="h-screen bg-light-vanilla flex flex-col items-center justify-center"
+                >
                   <FlashcardStudy
                     flashcards={lobby.flashcards}
                     answerByTerm={lobby.settings.answerByTerm}
@@ -258,10 +264,10 @@ export default function Lobby() {
                   </button>
                 </div>
               )}
-              
+
               {/* All flashcards section - render when in all mode or transitioning */}
               {(currentSection === "all" || isTransitioning) && (
-                <div 
+                <div
                   ref={allCardsRef}
                   className="min-h-screen bg-light-vanilla"
                 >
@@ -293,9 +299,7 @@ export default function Lobby() {
         </div>
 
         <div className="w-65 flex flex-col gap-4 p-4 bg-light-vanilla">
-          <div className="h-1/2 border-2 border-coffee rounded-lg bg-light-vanilla overflow-hidden">
-            <Chat />
-          </div>
+          <Chat />
         </div>
       </div>
 

@@ -37,7 +37,14 @@ async function generateDistractors(
   apiClient: OpenAI,
   pairs: { question: string; answer: string }[],
   onProgress?: (completed: number, total: number) => void,
-): Promise<{ distractors: string[][], usage: { promptTokens: number, completionTokens: number, totalTokens: number } }> {
+): Promise<{
+  distractors: string[][];
+  usage: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+}> {
   const allDistractors: string[][] = [];
   let totalPromptTokens = 0;
   let totalCompletionTokens = 0;
@@ -75,16 +82,18 @@ async function generateDistractors(
         });
 
         const parsed = response.choices[0]!.message.parsed;
-        
+
         // Track token usage
         if (response.usage) {
           totalPromptTokens += response.usage.prompt_tokens;
           totalCompletionTokens += response.usage.completion_tokens;
           totalTokens += response.usage.total_tokens;
         }
-        
+
         if (!parsed) {
-          throw new Error(`Failed to parse distractors response for batch ${batchIndex + 1}`);
+          throw new Error(
+            `Failed to parse distractors response for batch ${batchIndex + 1}`,
+          );
         }
 
         if (parsed.distractors.length !== batch.length) {
@@ -101,14 +110,26 @@ async function generateDistractors(
 
         completedBatches++;
         onProgress?.(completedBatches, totalBatches);
-        return { distractors: parsed.distractors, usage: { promptTokens: totalPromptTokens, completionTokens: totalCompletionTokens, totalTokens } };
+        return {
+          distractors: parsed.distractors,
+          usage: {
+            promptTokens: totalPromptTokens,
+            completionTokens: totalCompletionTokens,
+            totalTokens,
+          },
+        };
       } catch (error) {
         if (attempt === MAX_RETRIES - 1) throw error;
-        console.warn(`Batch ${batchIndex + 1} attempt ${attempt + 1} failed:`, error);
+        console.warn(
+          `Batch ${batchIndex + 1} attempt ${attempt + 1} failed:`,
+          error,
+        );
       }
     }
 
-    throw new Error(`Failed to generate distractors for batch ${batchIndex + 1} after ${MAX_RETRIES} attempts`);
+    throw new Error(
+      `Failed to generate distractors for batch ${batchIndex + 1} after ${MAX_RETRIES} attempts`,
+    );
   });
 
   const results = await Promise.all(batchPromises);
@@ -119,7 +140,14 @@ async function generateDistractors(
     totalTokens += result.usage.totalTokens;
   });
 
-  return { distractors: allDistractors, usage: { promptTokens: totalPromptTokens, completionTokens: totalCompletionTokens, totalTokens } };
+  return {
+    distractors: allDistractors,
+    usage: {
+      promptTokens: totalPromptTokens,
+      completionTokens: totalCompletionTokens,
+      totalTokens,
+    },
+  };
 }
 
 export async function generateResponse(
@@ -144,26 +172,30 @@ export async function generateResponse(
 
   // Create pairs for both term and definition generation
   const termPairs = flashcards.map((card) => ({
-    question: card.question,  // Question provides context
-    answer: card.answer,      // AI matches answer (term) format
+    question: card.question, // Question provides context
+    answer: card.answer, // AI matches answer (term) format
   }));
 
   const definitionPairs = flashcards.map((card) => ({
-    question: card.answer,    
-    answer: card.question,   
+    question: card.answer,
+    answer: card.question,
   }));
 
   // Generate distractors for both in parallel
   const [termResult, definitionResult] = await Promise.all([
-    generateDistractors(apiClient, termPairs, () => updateProgress()),      // First call
+    generateDistractors(apiClient, termPairs, () => updateProgress()), // First call
     generateDistractors(apiClient, definitionPairs, () => updateProgress()), // Second call
   ]);
 
   // Calculate total usage
   const totalUsage = {
-    promptTokens: termResult.usage.promptTokens + definitionResult.usage.promptTokens,
-    completionTokens: termResult.usage.completionTokens + definitionResult.usage.completionTokens,
-    totalTokens: termResult.usage.totalTokens + definitionResult.usage.totalTokens,
+    promptTokens:
+      termResult.usage.promptTokens + definitionResult.usage.promptTokens,
+    completionTokens:
+      termResult.usage.completionTokens +
+      definitionResult.usage.completionTokens,
+    totalTokens:
+      termResult.usage.totalTokens + definitionResult.usage.totalTokens,
   };
 
   return JSON.stringify({
@@ -171,4 +203,3 @@ export async function generateResponse(
     definitionDistractors: definitionResult.distractors,
   });
 }
-

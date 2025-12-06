@@ -50,7 +50,10 @@ export function Players({
                   {hasMiniStatus ? (
                     <>
                       <div className="truncate leading-tight text-coffee">
-                        {player.name}{player.id === leader && <span className="text-[10px] align-middle"> 👑</span>}
+                        {player.name}
+                        {player.id === leader && (
+                          <span className="text-[10px] align-middle"> 👑</span>
+                        )}
                       </div>
 
                       <div className="text-sm truncate leading-tight text-coffee font-bold">
@@ -61,7 +64,10 @@ export function Players({
                     </>
                   ) : (
                     <div className="truncate leading-tight text-coffee">
-                      {player.name}{player.id === leader && <span className="text-[10px] align-middle"> 👑</span>}
+                      {player.name}
+                      {player.id === leader && (
+                        <span className="text-[10px] align-middle"> 👑</span>
+                      )}
                     </div>
                   )}
                 </div>

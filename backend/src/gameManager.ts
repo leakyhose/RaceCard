@@ -163,14 +163,20 @@ export function getCurrentQuestion(
   const answerByTerm = lobby?.settings.answerByTerm ?? false;
 
   // Dynamically determine what to show based on mode
-  const question = answerByTerm ? currentFlashcard.answer : currentFlashcard.question;
-  const correctAnswer = answerByTerm ? currentFlashcard.question : currentFlashcard.answer;
+  const question = answerByTerm
+    ? currentFlashcard.answer
+    : currentFlashcard.question;
+  const correctAnswer = answerByTerm
+    ? currentFlashcard.question
+    : currentFlashcard.answer;
 
   let choices: string[] | null = null;
   if (isMultipleChoice && currentFlashcard.isGenerated) {
     // answerByTerm: show term, need definition distractors (trickDefinitions)
     // answerByDefinition: show definition, need term distractors (trickTerms)
-    const distractors = answerByTerm ? currentFlashcard.trickDefinitions : currentFlashcard.trickTerms;
+    const distractors = answerByTerm
+      ? currentFlashcard.trickDefinitions
+      : currentFlashcard.trickTerms;
 
     if (distractors && distractors.length === 3) {
       choices = shuffle([correctAnswer, ...distractors]);
@@ -198,11 +204,12 @@ export function validateAnswer(socketId: string, answerText: string) {
 
   // Determine correct answer based on mode
   const answerByTerm = lobby.settings.answerByTerm ?? false;
-  const correctAnswer = answerByTerm ? currentFlashcard.question : currentFlashcard.answer;
+  const correctAnswer = answerByTerm
+    ? currentFlashcard.question
+    : currentFlashcard.answer;
 
   const isCorrect =
-    correctAnswer.toLowerCase().trim() ===
-    answerText.toLowerCase().trim();
+    correctAnswer.toLowerCase().trim() === answerText.toLowerCase().trim();
 
   if (isCorrect) {
     if (!gs.correctAnswers.find((a) => a.player === player.name)) {

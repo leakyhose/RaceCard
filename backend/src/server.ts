@@ -260,7 +260,7 @@ io.on("connection", (socket) => {
         const runGameplayLoop = (lobbyCode: string) => {
           const currentLobby = getLobbyByCode(lobbyCode);
           if (!currentLobby) return;
-          
+
           const questionData = getCurrentQuestion(lobbyCode);
           if (!questionData) {
             const finalLobby = getLobbyByCode(lobbyCode);
