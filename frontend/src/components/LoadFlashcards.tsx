@@ -110,7 +110,7 @@ export function LoadFlashcards({ isLeader }: LoadFlashcardsProps) {
   return (
     <div className="flex flex-col flex-1 min-h-0 w-full mb-10">
       {/* Tabs */}
-      <div className="justify-center flex space-x-4 mb-2 border-b-2 border-coffee/10 pb-1 px-2">
+      <div className="justify-center flex space-x-4 border-b-2 border-coffee/50 pb-1 px-2">
         <button
           onClick={() => setActiveTab("personal")}
           className={`text-sm font-bold transition-colors ${
