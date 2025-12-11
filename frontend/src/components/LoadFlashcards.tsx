@@ -109,24 +109,31 @@ export function LoadFlashcards({ isLeader }: LoadFlashcardsProps) {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 w-full mb-5">
-      {/* Tabs */}
-      <div className="justify-center flex space-x-4 border-b-2 border-coffee/50 pb-1 px-2">
-        <button
-          onClick={() => setActiveTab("personal")}
-          className={`text-sm font-bold transition-colors ${
-            activeTab === "personal" ? "text-terracotta" : "text-coffee/40 hover:text-coffee/70"
-          }`}
-        >
-          My Cards
-        </button>
-        <button
-          onClick={() => setActiveTab("community")}
-          className={`text-sm font-bold transition-colors ${
-            activeTab === "community" ? "text-terracotta" : "text-coffee/40 hover:text-coffee/70"
-          }`}
-        >
-          Public Cards
-        </button>
+      {/* Toggle Switch */}
+      <div className="flex justify-center items-center pb-3 border-b-2 border-coffee/50">
+        <label className="relative inline-flex items-center cursor-pointer select-none">
+          <input 
+            type="checkbox" 
+            className="sr-only peer" 
+            checked={activeTab === "community"}
+            onChange={() => setActiveTab(activeTab === "personal" ? "community" : "personal")}
+          />
+          
+          {/* Track */}
+          <div className="w-10 h-4 bg-terracotta/90 border-2 border-coffee rounded-[5px] shadow-[2px_2px_0px_0px_var(--color-coffee)] transition-colors duration-300 peer-checked:bg-powder box-border relative group">
+             {/* Knob */}
+             {/* Slider Knob */}
+             <div className={`absolute h-4 w-4 bg-vanilla border-2 border-coffee rounded-[5px] shadow-[0px_3px_0px_0px_var(--color-coffee)] group-hover:shadow-[0px_5px_0px_0px_var(--color-coffee)] transition-all duration-300 -left-0.5 bottom-[0.75px] group-hover:-translate-y-[0.09rem] ${activeTab === "community" ? "translate-x-[25px]" : ""}`}></div>
+          </div>
+
+          {/* Labels */}
+          <span className={`absolute right-[calc(100%+20px)] text-sm font-bold text-coffee transition-all duration-300 ${activeTab === "personal" ? "underline decoration-2 underline-offset-4" : "no-underline opacity-60"}`}>
+            Private
+          </span>
+          <span className={`absolute left-[calc(100%+20px)] text-sm font-bold text-coffee transition-all duration-300 ${activeTab === "community" ? "underline decoration-2 underline-offset-4" : "no-underline opacity-60"}`}>
+            Public
+          </span>
+        </label>
       </div>
 
       {/* Content */}
@@ -155,7 +162,7 @@ export function LoadFlashcards({ isLeader }: LoadFlashcardsProps) {
                                   shakingSetId === set.id ? "animate-shake" : ""
                                 }`}
                             >
-                                <span className={`w-full h-full rounded-xl border-2 border-coffee p-2 text-left translate-y-0 transition-transform duration-100 ease-out group-hover:-translate-y-0.5 group-active:translate-y-0 flex flex-col justify-center min-h-14 ${
+                                <span className={`w-full h-full rounded-xl border-2 border-coffee p-2 text-left -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0 flex flex-col justify-center min-h-14 ${
                                   shakingSetId === set.id 
                                     ? "bg-red-500 text-vanilla" 
                                     : "bg-vanilla text-coffee"

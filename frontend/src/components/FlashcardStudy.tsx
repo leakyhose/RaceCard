@@ -60,10 +60,10 @@ export function FlashcardStudy({
   const answer = answerByTerm ? currentCard.question : currentCard.answer;
 
   return (
-    <div className="flex items-center justify-center w-full p-8">
+    <div className="flex items-center justify-center w-full p-8 relative">
       <div className="flex flex-col items-center justify-center w-full max-w-3xl gap-6">
         {/* Flashcard */}
-        <div className="group relative w-full max-w-3xl min-h-[60vh] flex flex-col perspective-[1000px]">
+        <div className="group relative w-full max-w-3xl min-h-[60vh] flex flex-col perspective-[1000px] z-40">
           <div
             onClick={handleFlip}
             className={`
@@ -143,7 +143,7 @@ export function FlashcardStudy({
           </div>
         </div>
 
-        <div className="flex items-center gap-4 w-full">
+        <div className="flex items-center gap-4 w-full relative z-40">
           <ArrowButton
             onClick={handlePrevious}
             direction="right"

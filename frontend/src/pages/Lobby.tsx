@@ -40,6 +40,7 @@ export default function Lobby() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const allCardsRef = useRef<HTMLDivElement>(null);
   const studyRef = useRef<HTMLDivElement>(null);
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
 
   useCodeValidation(code);
 
@@ -60,16 +61,15 @@ export default function Lobby() {
     setIsLeader(lobby?.leader === socket.id);
   }, [lobby]);
 
-  const smoothScroll = (target: number, duration: number) => {
-    const element = scrollContainerRef.current;
+  const smoothTransform = (start: number, end: number, duration: number) => {
+    const element = contentWrapperRef.current;
     if (!element) return Promise.resolve();
 
     return new Promise<void>((resolve) => {
-      const start = element.scrollTop;
-      const change = target - start;
+      const change = end - start;
       const startTime = performance.now();
 
-      const animateScroll = (currentTime: number) => {
+      const animate = (currentTime: number) => {
         const timeElapsed = currentTime - startTime;
         if (timeElapsed < duration) {
           // easeInOutQuad
@@ -79,14 +79,14 @@ export default function Lobby() {
               ? (change / 2) * val * val + start
               : (-change / 2) * (--val * (val - 2) - 1) + start;
 
-          element.scrollTop = progress;
-          requestAnimationFrame(animateScroll);
+          element.style.transform = `translateY(${progress}px)`;
+          requestAnimationFrame(animate);
         } else {
-          element.scrollTop = target;
+          element.style.transform = `translateY(${end}px)`;
           resolve();
         }
       };
-      requestAnimationFrame(animateScroll);
+      requestAnimationFrame(animate);
     });
   };
 
@@ -95,12 +95,19 @@ export default function Lobby() {
       setIsTransitioning(true);
     });
 
-    if (allCardsRef.current && scrollContainerRef.current) {
-      smoothScroll(allCardsRef.current.offsetTop, 1000).then(() => {
+    if (studyRef.current && contentWrapperRef.current) {
+      const studyHeight = studyRef.current.offsetHeight;
+      // Lock height
+      studyRef.current.style.height = `${studyHeight}px`;
+
+      smoothTransform(0, -studyHeight, 1000).then(() => {
         flushSync(() => {
           setCurrentSection("all");
           setIsTransitioning(false);
         });
+        if (contentWrapperRef.current) {
+          contentWrapperRef.current.style.transform = "";
+        }
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTop = 0;
         }
@@ -113,13 +120,23 @@ export default function Lobby() {
       setIsTransitioning(true);
     });
 
-    if (studyRef.current && scrollContainerRef.current) {
-      const studyHeight = studyRef.current.offsetHeight;
-      scrollContainerRef.current.scrollTop = studyHeight;
+    if (studyRef.current && contentWrapperRef.current && scrollContainerRef.current) {
+      // Lock height to viewport height
+      const containerHeight = scrollContainerRef.current.clientHeight;
+      studyRef.current.style.height = `${containerHeight}px`;
 
-      smoothScroll(0, 1000).then(() => {
+      const studyHeight = studyRef.current.offsetHeight;
+      contentWrapperRef.current.style.transform = `translateY(-${studyHeight}px)`;
+
+      smoothTransform(-studyHeight, 0, 1000).then(() => {
         setCurrentSection("study");
         setIsTransitioning(false);
+        if (contentWrapperRef.current) {
+          contentWrapperRef.current.style.transform = "";
+        }
+        if (studyRef.current) {
+          studyRef.current.style.height = ""; // Reset
+        }
       });
     }
   };
@@ -163,14 +180,16 @@ export default function Lobby() {
 
   return (
     <div className="flex flex-col h-screen bg-light-vanilla text-coffee font-executive overflow-hidden">
-      <LobbyHeader
-        code={code!}
-        nickname={nickname}
-        isLeader={isLeader}
-        lobby={lobby}
-      />
+      <div className="relative z-20">
+        <LobbyHeader
+          code={code!}
+          nickname={nickname}
+          isLeader={isLeader}
+          lobby={lobby}
+        />
+      </div>
       {/* */}
-      <div className="flex flex-1 overflow-hidden border-coffee">
+      <div className="flex flex-1 min-h-0 border-coffee">
         <div className="w-65 flex flex-col p-4 bg-light-vanilla h-full">
           <div className="h-9/16 flex flex-col min-h-0 mb-4">
             <LoadFlashcards isLeader={isLeader} />
@@ -182,42 +201,48 @@ export default function Lobby() {
 
         <div
           ref={scrollContainerRef}
-          className={`flex-1 bg-light-vanilla relative ${currentSection === "all" && !isTransitioning ? "overflow-y-auto [&::-webkit-scrollbar]:hidden" : "overflow-hidden"}`}
+          className={`flex-1 bg-light-vanilla relative flex flex-col ${
+            currentSection === "all" && !isTransitioning
+              ? "overflow-y-auto [&::-webkit-scrollbar]:hidden"
+              : "overflow-visible"
+          }`}
         >
           {lobby.status === "starting" ||
           lobby.status === "ongoing" ||
           lobby.status === "finished" ? (
             <Game />
           ) : (
-            <>
+            <div
+              ref={contentWrapperRef}
+              className="flex flex-col min-h-full w-full relative"
+            >
               {/* Study section - render when in study mode or transitioning */}
               {(currentSection === "study" || isTransitioning) && (
                 <div
                   ref={studyRef}
-                  className="h-screen bg-light-vanilla flex flex-col items-center justify-center"
+                  className="h-full bg-light-vanilla flex flex-col items-center justify-center shrink-0 w-full"
                 >
                   <FlashcardStudy
                     flashcards={lobby.flashcards}
                     answerByTerm={lobby.settings.answerByTerm}
                     multipleChoice={lobby.settings.multipleChoice}
                   />
-                  <div className="mt-8">
-                    <ArrowButton
-                      onClick={scrollToAllCards}
-                      disabled={isTransitioning}
-                      direction="down"
-                    />
-                  </div>
+                  {lobby.flashcards.length > 0 && (
+                    <div className="mt-8 relative z-30">
+                      <ArrowButton
+                        onClick={scrollToAllCards}
+                        disabled={isTransitioning}
+                        direction="down"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* All flashcards section - render when in all mode or transitioning */}
               {(currentSection === "all" || isTransitioning) && (
-                <div
-                  ref={allCardsRef}
-                  className="min-h-screen bg-light-vanilla"
-                >
-                  <div className="sticky top-0 bg-light-vanilla z-10 px-4 pt-4">
+                <div ref={allCardsRef} className="bg-light-vanilla w-full pb-20">
+                  <div className="bg-light-vanilla px-4 pt-4">
                     <div className="flex justify-center mb-4">
                       <ArrowButton
                         onClick={scrollToStudy}
@@ -225,12 +250,11 @@ export default function Lobby() {
                         direction="up"
                       />
                     </div>
-                    <div className="border-b-2 border-coffee pb-4 bg-light-vanilla">
-                      <h2 className="text-2xl font-bold text-coffee text-center">
-                        Flashcards
-                      </h2>
-                    </div>
+                    <h2 className="text-2xl font-bold text-coffee text-center pb-4">
+                      Flashcards
+                    </h2>
                   </div>
+                  <div className="sticky top-0 z-50 w-full h-0.5 bg-coffee"></div>
                   <div className="p-4">
                     <FlashcardPreview
                       flashcards={lobby.flashcards}
@@ -240,7 +264,7 @@ export default function Lobby() {
                   </div>
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
 

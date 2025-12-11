@@ -97,7 +97,7 @@ export function Chat() {
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Send a message..."
             maxLength={200}
-            className="w-full pl-4 pr-4 py-2.5 bg-vanilla border-2 border-coffee rounded-xl text-coffee placeholder:text-coffee/30 translate-y-0 transition-transform duration-100 ease-out hover:-translate-y-0.5 focus:-translate-y-0.5 font-bold text-sm outline-none focus:shadow-[inset_0_0_0_1px_var(--color-powder)]"
+            className="w-full pl-4 pr-4 py-2.5 bg-vanilla border-2 border-coffee rounded-xl text-coffee placeholder:text-coffee/30 -translate-y-0.5 transition-transform duration-100 ease-out hover:-translate-y-1 focus:-translate-y-1 font-bold text-sm outline-none focus:shadow-[inset_0_0_0_1px_var(--color-powder)]"
           />
 
         </form>
