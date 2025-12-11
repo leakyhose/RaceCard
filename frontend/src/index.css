@@ -174,3 +174,29 @@
 .swallow-icon:hover span:after {
   transform: rotate(-50deg);
 }
+
+.arrow-animating span:before {
+  animation: arrow-click-before 0.15s ease;
+}
+
+.arrow-animating span:after {
+  animation: arrow-click-after 0.15s ease;
+}
+
+@keyframes arrow-click-before {
+  0%, 100% {
+    transform: rotate(50deg);
+  }
+  50% {
+    transform: rotate(58deg);
+  }
+}
+
+@keyframes arrow-click-after {
+  0%, 100% {
+    transform: rotate(-50deg);
+  }
+  50% {
+    transform: rotate(-58deg);
+  }
+}

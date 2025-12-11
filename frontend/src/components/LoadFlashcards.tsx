@@ -108,7 +108,7 @@ export function LoadFlashcards({ isLeader }: LoadFlashcardsProps) {
   };
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 w-full mb-10">
+    <div className="flex flex-col flex-1 min-h-0 w-full mb-5">
       {/* Tabs */}
       <div className="justify-center flex space-x-4 border-b-2 border-coffee/50 pb-1 px-2">
         <button
@@ -155,7 +155,7 @@ export function LoadFlashcards({ isLeader }: LoadFlashcardsProps) {
                                   shakingSetId === set.id ? "animate-shake" : ""
                                 }`}
                             >
-                                <span className={`w-full h-full rounded-xl border-2 border-coffee p-2 text-left -translate-y-0 transition-transform duration-100 ease-out group-hover:-translate-y-0.5 group-active:translate-y-0 flex flex-col justify-center min-h-14 ${
+                                <span className={`w-full h-full rounded-xl border-2 border-coffee p-2 text-left translate-y-0 transition-transform duration-100 ease-out group-hover:-translate-y-0.5 group-active:translate-y-0 flex flex-col justify-center min-h-14 ${
                                   shakingSetId === set.id 
                                     ? "bg-red-500 text-vanilla" 
                                     : "bg-vanilla text-coffee"

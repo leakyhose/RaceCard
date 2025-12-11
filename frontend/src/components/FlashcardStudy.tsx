@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Flashcard } from "@shared/types";
+import { ArrowButton } from "./ArrowButton";
 
 interface FlashcardStudyProps {
   flashcards: Flashcard[];
@@ -143,13 +144,10 @@ export function FlashcardStudy({
         </div>
 
         <div className="flex items-center gap-4 w-full">
-          <button
+          <ArrowButton
             onClick={handlePrevious}
-            className="shrink-0 w-12 h-12 border-2 border-coffee bg-vanilla hover:bg-coffee hover:text-vanilla transition-colors font-bold text-2xl"
-            aria-label="Previous card"
-          >
-            ←
-          </button>
+            direction="right"
+          />
 
           <input
             type="range"
@@ -157,16 +155,13 @@ export function FlashcardStudy({
             max={flashcards.length - 1}
             value={safeIndex}
             onChange={handleSliderChange}
-            className="flex-1 h-2 bg-vanilla border-2 border-coffee appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-coffee [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-coffee [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+            className="flex-1 h-0 bg-vanilla border rounded-xl border-coffee appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-coffee [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-coffee [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
           />
 
-          <button
+          <ArrowButton
             onClick={handleNext}
-            className="shrink-0 w-12 h-12 border-2 border-coffee bg-vanilla hover:bg-coffee hover:text-vanilla transition-colors font-bold text-2xl"
-            aria-label="Next card"
-          >
-            →
-          </button>
+            direction="left"
+          />
         </div>
       </div>
     </div>

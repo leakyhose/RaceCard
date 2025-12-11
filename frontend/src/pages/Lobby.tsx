@@ -194,14 +194,14 @@ export default function Lobby() {
               {(currentSection === "study" || isTransitioning) && (
                 <div
                   ref={studyRef}
-                  className="h-full w-full bg-light-vanilla flex flex-col items-center justify-center relative"
+                  className="h-screen bg-light-vanilla flex flex-col items-center justify-center"
                 >
                   <FlashcardStudy
                     flashcards={lobby.flashcards}
                     answerByTerm={lobby.settings.answerByTerm}
                     multipleChoice={lobby.settings.multipleChoice}
                   />
-                  <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+                  <div className="mt-8">
                     <ArrowButton
                       onClick={scrollToAllCards}
                       disabled={isTransitioning}
