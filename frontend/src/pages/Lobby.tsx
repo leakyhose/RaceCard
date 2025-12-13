@@ -36,7 +36,6 @@ export default function Lobby() {
   const [loadShake, setLoadShake] = useState(false);
   const [saveShake, setSaveShake] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [canQuickSave, setCanQuickSave] = useState(false);
   const [currentSection, setCurrentSection] = useState<"study" | "all">(
     "study",
   );
@@ -93,6 +92,53 @@ export default function Lobby() {
   useCodeValidation(code);
 
   const lobby = useLobbyData(code);
+  const prevDistractorStatus = useRef(lobby?.distractorStatus);
+
+  const handleAutoUpdate = async () => {
+    if (!user || !trackedSetId) return;
+
+    try {
+      // Delete old flashcards
+      const { error: deleteError } = await supabase
+        .from("flashcards")
+        .delete()
+        .eq("set_id", trackedSetId);
+
+      if (deleteError) throw deleteError;
+
+      // Insert new flashcards
+      const flashcardsToInsert = lobby!.flashcards.map((card) => ({
+        set_id: trackedSetId,
+        term: card.question,
+        definition: card.answer,
+        trick_terms: card.trickTerms || [],
+        trick_definitions: card.trickDefinitions || [],
+        is_generated: card.isGenerated || false,
+      }));
+
+      const { error: insertError } = await supabase
+        .from("flashcards")
+        .insert(flashcardsToInsert);
+
+      if (insertError) throw insertError;
+
+      // Update local state
+      setIsSaved(true);
+      setRefreshTrigger((prev) => prev + 1);
+    } catch (err) {
+      console.error("Failed to auto update:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      prevDistractorStatus.current === "generating" &&
+      lobby?.distractorStatus === "ready"
+    ) {
+      handleAutoUpdate();
+    }
+    prevDistractorStatus.current = lobby?.distractorStatus;
+  }, [lobby?.distractorStatus]);
 
   // Sync trackedSetId with lobby.flashcardID
   useEffect(() => {
@@ -106,7 +152,11 @@ export default function Lobby() {
     const checkSavedStatus = async () => {
       if (!user || !trackedSetId || trackedSetId === "UNNAMED") {
         setIsSaved(false);
-        setCanQuickSave(false);
+        return;
+      }
+
+      // Avoid checking while generating to prevent flickering
+      if (lobby?.distractorStatus === "generating") {
         return;
       }
 
@@ -120,38 +170,45 @@ export default function Lobby() {
 
         if (error || !setData) {
           setIsSaved(false);
-          setCanQuickSave(false);
         } else {
-          // Check if DB has generated cards
-          const { data: generatedCards } = await supabase
-            .from("flashcards")
-            .select("is_generated")
-            .eq("set_id", trackedSetId)
-            .eq("is_generated", true)
-            .limit(1);
-
-          const dbHasGenerated = generatedCards && generatedCards.length > 0;
           const lobbyHasGenerated = lobby?.flashcards.some(
             (f) => f.isGenerated,
           );
 
-          if (lobbyHasGenerated && !dbHasGenerated) {
-            // Mismatch: Lobby has generated content, DB does not
-            setIsSaved(false);
-            setCanQuickSave(true);
-          } else {
+          if (!lobbyHasGenerated) {
             setIsSaved(true);
-            setCanQuickSave(false);
+          } else {
+            // Lobby has generated content, check if it matches DB
+            const { data: generatedCards } = await supabase
+              .from("flashcards")
+              .select("is_generated")
+              .eq("set_id", trackedSetId)
+              .eq("is_generated", true)
+              .limit(1);
+
+            const dbHasGenerated = generatedCards && generatedCards.length > 0;
+
+            if (lobbyHasGenerated && !dbHasGenerated) {
+              // Mismatch: Lobby has generated content, DB does not
+              setIsSaved(false);
+            } else {
+              setIsSaved(true);
+            }
           }
         }
       } catch {
         setIsSaved(false);
-        setCanQuickSave(false);
       }
     };
 
     checkSavedStatus();
-  }, [trackedSetId, lobby?.flashcards, user, refreshTrigger]);
+  }, [
+    trackedSetId,
+    lobby?.flashcards,
+    user,
+    refreshTrigger,
+    lobby?.distractorStatus,
+  ]);
 
   // Update page title with lobby code
   useEffect(() => {
@@ -245,43 +302,6 @@ export default function Lobby() {
           studyRef.current.style.height = ""; // Reset
         }
       });
-    }
-  };
-
-  const handleQuickSave = async () => {
-    if (!user || !trackedSetId) return;
-
-    try {
-      // Delete old flashcards
-      const { error: deleteError } = await supabase
-        .from("flashcards")
-        .delete()
-        .eq("set_id", trackedSetId);
-
-      if (deleteError) throw deleteError;
-
-      // Insert new flashcards
-      const flashcardsToInsert = lobby!.flashcards.map((card) => ({
-        set_id: trackedSetId,
-        term: card.question,
-        definition: card.answer,
-        trick_terms: card.trickTerms || [],
-        trick_definitions: card.trickDefinitions || [],
-        is_generated: card.isGenerated || false,
-      }));
-
-      const { error: insertError } = await supabase
-        .from("flashcards")
-        .insert(flashcardsToInsert);
-
-      if (insertError) throw insertError;
-
-      // Update local state
-      setIsSaved(true);
-      setCanQuickSave(false);
-      setRefreshTrigger((prev) => prev + 1);
-    } catch (err) {
-      console.error("Failed to quick save:", err);
     }
   };
 
@@ -392,11 +412,7 @@ export default function Lobby() {
                     isSaved={isSaved}
                     onSave={() => {
                       if (user) {
-                        if (canQuickSave) {
-                          handleQuickSave();
-                        } else {
-                          setShowSaveModal(true);
-                        }
+                        setShowSaveModal(true);
                       } else {
                         setSaveShake(true);
                         setTimeout(() => setSaveShake(false), 500);
