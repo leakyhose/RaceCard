@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 @theme {
   --color-vanilla: #f0e9ce;
   --color-coffee: #644536;
@@ -9,9 +8,6 @@
   --color-thistle: #e7c8dd;
   --color-light-vanilla: #eee1b3;
   --color-mint: #b8e6b8;
-
-  --font: "RobotoSlab", serif;
-
 } 
 
 /* @theme {
@@ -86,7 +82,7 @@
   body {
     background-color: var(--color-vanilla);
     color: var(--color-coffee);
-    font-family: var(--font);
+    font-family: "RobotoSlab", serif;
   }
 
   *,

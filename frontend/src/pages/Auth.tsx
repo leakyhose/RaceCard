@@ -57,7 +57,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-vanilla flex items-center justify-center p-4">
+    <div className="min-h-screen bg-light-vanilla flex items-center justify-center p-4">
       <div className="w-full max-w-md border-3 border-coffee bg-vanilla p-8 shadow-[8px_8px_0px_0px_#644536]">
         <h1 className="text-4xl font-bold text-coffee mb-8 text-center tracking-widest">
           {isLogin ? "Login" : "Sign Up"}
