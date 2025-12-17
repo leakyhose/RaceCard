@@ -3,19 +3,16 @@ import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import * as z from "zod";
 import type { Flashcard } from "@shared/types.js";
+import fs from "fs";
+
+const distractorPrompt = fs.readFileSync("./src/distractorPrompt.md", "utf-8");
 
 const MODEL_NAME = "gpt-4.1-mini";
-const BATCH_SIZE = 50;
+const BATCH_SIZE = 25;
 
 // Load environment variables
 config();
 
-// Single prompt for both terms and definitions
-if (!process.env.DISTRACTOR_PROMPT) {
-  throw new Error("DISTRACTOR_PROMPT environment variable is required");
-}
-
-const distractorPrompt: string = process.env.DISTRACTOR_PROMPT;
 let client: OpenAI | null = null;
 
 function getClient() {
