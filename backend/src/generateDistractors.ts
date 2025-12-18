@@ -8,7 +8,7 @@ import fs from "fs";
 const distractorPrompt = fs.readFileSync("./src/distractorPrompt.md", "utf-8");
 
 const MODEL_NAME = "gpt-4.1-mini";
-const BATCH_SIZE = 25;
+const BATCH_SIZE = 50;
 
 // Load environment variables
 config();
@@ -24,10 +24,12 @@ function getClient() {
   return client;
 }
 
-// Zod schema for distractors
-const DistractorSet = z.object({
-  distractors: z.array(z.array(z.string().min(1)).length(3)),
-});
+const ids: string[] = [];
+for (let i = 0; i < BATCH_SIZE; i++) {
+  ids.push(`c${i}`);
+}
+
+const DistractorsPerCard = z.array(z.string().min(1)).length(3);
 
 // Generic function to generate distractors for any field
 async function generateDistractors(
@@ -42,26 +44,53 @@ async function generateDistractors(
     totalTokens: number;
   };
 }> {
-  const allDistractors: string[][] = [];
+  // Create a map to store results by original index
+  const resultsByIndex = new Map<number, string[]>();
   let totalPromptTokens = 0;
   let totalCompletionTokens = 0;
   let totalTokens = 0;
 
   // Split into batches and process in parallel
-  const batches: { question: string; answer: string }[][] = [];
-  for (let i = 0; i < pairs.length; i += BATCH_SIZE) {
-    batches.push(pairs.slice(i, i + BATCH_SIZE));
+  const batches: { id: string; originalIndex: number; question: string; answer: string }[][] = [];
+
+  // Initialize batches
+  for (let i = 0; i < Math.ceil(pairs.length / BATCH_SIZE); i++) {
+    batches[i] = [];
+  }
+
+  for (let i = 0; i < pairs.length; i += 1) {
+    const batchIndex = Math.floor(i / BATCH_SIZE);
+    const idInBatch = i % BATCH_SIZE;
+    const pair = pairs[i]!;
+    batches[batchIndex]!.push({
+      id: `c${idInBatch}`,
+      originalIndex: i,  // Store original index
+      question: pair.question,
+      answer: pair.answer,
+    });
   }
 
   let completedBatches = 0;
   const totalBatches = batches.length;
 
   // Process all batches in parallel
-  const batchPromises = batches.map(async (batch, batchIndex) => {
+  const batchPromises = batches.map(async (initialBatch, batchIndex) => {
     const MAX_RETRIES = 3;
+    let currentBatch = initialBatch;
+    const batchResults = new Map<string, { distractors: string[]; originalIndex: number }>();
 
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
+        // Create schema dynamically based on current batch IDs
+        const batchSchema: Record<string, typeof DistractorsPerCard> = {};
+        for (const item of currentBatch) {
+          batchSchema[item.id] = DistractorsPerCard;
+        }
+
+        const DistractorSet = z.object({
+          distractors: z.object(batchSchema),
+        });
+
         const response = await apiClient.chat.completions.parse({
           model: MODEL_NAME,
 
@@ -72,14 +101,13 @@ async function generateDistractors(
             },
             {
               role: "user",
-              content: JSON.stringify(batch),
+              content: JSON.stringify(currentBatch),
             },
           ],
           response_format: zodResponseFormat(DistractorSet, "distractor_set"),
         });
 
         const parsed = response.choices[0]!.message.parsed;
-
         // Track token usage
         if (response.usage) {
           totalPromptTokens += response.usage.prompt_tokens;
@@ -93,28 +121,57 @@ async function generateDistractors(
           );
         }
 
-        if (parsed.distractors.length !== batch.length) {
-          console.warn(
-            `Batch ${batchIndex + 1} attempt ${attempt + 1}: Expected ${batch.length} distractors, got ${parsed.distractors.length}. Retrying...`,
-          );
-          if (attempt === MAX_RETRIES - 1) {
-            throw new Error(
-              `Expected ${batch.length} distractor sets, got ${parsed.distractors.length} after ${MAX_RETRIES} attempts`,
-            );
+        // Match IDs from LLM response to requested IDs
+        const nextBatch: { id: string; originalIndex: number; question: string; answer: string }[] = [];
+
+        // Process each item in current batch
+        for (const item of currentBatch) {
+          const llmDistractors = parsed.distractors[item.id];
+          
+          if (llmDistractors) {
+            // LLM provided distractors for this ID - store with original index
+            batchResults.set(item.id, { 
+              distractors: llmDistractors,
+              originalIndex: item.originalIndex
+            });
+          } else {
+            // LLM didn't provide distractors, add to next batch
+            nextBatch.push(item);
           }
-          continue;
         }
 
-        completedBatches++;
-        onProgress?.(completedBatches, totalBatches);
-        return {
-          distractors: parsed.distractors,
-          usage: {
-            promptTokens: totalPromptTokens,
-            completionTokens: totalCompletionTokens,
-            totalTokens,
-          },
-        };
+        // If all items have results, we're done
+        if (nextBatch.length === 0) {
+          completedBatches++;
+          onProgress?.(completedBatches, totalBatches);
+          
+          // Store results in the global map by original index
+          for (const item of initialBatch) {
+            const result = batchResults.get(item.id)!;
+            resultsByIndex.set(result.originalIndex, result.distractors);
+          }
+          
+          return {
+            usage: {
+              promptTokens: totalPromptTokens,
+              completionTokens: totalCompletionTokens,
+              totalTokens,
+            },
+          };
+        }
+
+        // If this is the last retry and we still have missing items, throw error
+        if (attempt === MAX_RETRIES - 1) {
+          throw new Error(
+            `Failed to get distractors for ${nextBatch.length} items in batch ${batchIndex + 1} after ${MAX_RETRIES} attempts. Missing IDs: ${nextBatch.map((item) => item.id).join(", ")}`,
+          );
+        }
+
+        // Update current batch to only retry missing items
+        currentBatch = nextBatch;
+        console.warn(
+          `Batch ${batchIndex + 1} attempt ${attempt + 1}: Retrying ${nextBatch.length} missing items...`,
+        );
       } catch (error) {
         if (attempt === MAX_RETRIES - 1) throw error;
         console.warn(
@@ -130,12 +187,23 @@ async function generateDistractors(
   });
 
   const results = await Promise.all(batchPromises);
+  
+  // Accumulate token usage
   results.forEach((result) => {
-    allDistractors.push(...result.distractors);
     totalPromptTokens += result.usage.promptTokens;
     totalCompletionTokens += result.usage.completionTokens;
     totalTokens += result.usage.totalTokens;
   });
+
+  // Build final array in original order
+  const allDistractors: string[][] = [];
+  for (let i = 0; i < pairs.length; i++) {
+    const distractors = resultsByIndex.get(i);
+    if (!distractors) {
+      throw new Error(`Missing distractors for index ${i}`);
+    }
+    allDistractors.push(distractors);
+  }
 
   return {
     distractors: allDistractors,
@@ -194,6 +262,8 @@ export async function generateResponse(
     totalTokens:
       termResult.usage.totalTokens + definitionResult.usage.totalTokens,
   };
+
+  console.log(totalUsage);
 
   return JSON.stringify({
     termDistractors: termResult.distractors,
