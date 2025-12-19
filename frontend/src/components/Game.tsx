@@ -5,6 +5,12 @@ import { MiniLeaderboard } from "./MiniLeaderboard";
 import { useParams } from "react-router-dom";
 import { useLobbyData } from "../hooks/useLobbyData";
 
+const getChoiceFontSize = (text: string) => {
+  if (text.length > 50) return "text-xs md:text-sm";
+  if (text.length > 25) return "text-sm md:text-base";
+  return "text-base md:text-xl";
+};
+
 export function Game() {
   const { code } = useParams();
   const lobby = useLobbyData(code);
@@ -168,24 +174,20 @@ export function Game() {
 
 return (
     <div className="flex flex-col h-full items-center justify-start pt-15 relative overflow-hidden w-full">
-      {/* Center Stage */}
       <div className="relative w-full max-w-3xl flex flex-col items-center justify-center">
         
-        {/* The Card */}
         <div className={`
             relative z-20 w-full transition-all duration-800 ease-in-out perspective-[1000px]
-            ${showResults ? 'h-[200px]' : 'h-[450px] translate-y-0'}
+            ${showResults ? 'h-[200px]' : 'h-[300px] md:h-[450px] translate-y-0'}
         `}>
             <div className={`
                 relative w-full h-full transition-transform duration-800 transform-3d rounded-[20px]
                 ${showResults ? 'transform-[rotateY(180deg)]' : 'transform-[rotateY(0deg)]'}
             `}>
-                {/* Front (Question) */}
                 <div className="absolute inset-0 backface-hidden bg-vanilla border-2 border-coffee rounded-[20px] flex items-center justify-center p-8 shadow-[inset_0_0_0_2px_var(--color-terracotta)]">
                     <div className="text-3xl font-bold text-coffee text-center wrap-break-word">{currentQuestion}</div>
                 </div>
 
-                {/* Back (Answer) */}
                 <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)] bg-vanilla border-3 border-coffee rounded-[20px] flex flex-col items-center justify-center p-8 shadow-[inset_0_0_0_2px_var(--color-powder)]">
                      <div className="text-sm text-coffee/60 mb-2 font-bold uppercase tracking-widest">Correct Answer</div>
                      <div className="text-3xl font-bold text-coffee text-center wrap-break-word">{results?.Answer || lastAnswer}</div>
@@ -193,11 +195,10 @@ return (
             </div>
         </div>
 
-        {/* Game Drawer (Inputs / Status) */}
         <div className={`
             absolute top-0 w-full flex justify-center z-10 transition-all duration-600
             ${showResults ? 'ease-in' : 'ease-out'}
-            ${!showResults ? 'translate-y-[480px] opacity-100' : 'translate-y-[1000px] opacity-0'}
+            ${!showResults ? 'translate-y-[330px] md:translate-y-[480px] opacity-100' : 'translate-y-[1000px] opacity-0'}
         `}>
              <div className="w-full max-w-2xl">
                 {!hasAnswered ? (
@@ -209,8 +210,10 @@ return (
                               onClick={() => handleChoiceClick(choice)}
                               className="group relative w-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none"
                             >
-                              <span className="w-full h-full rounded-xl border-[0.2rem] border-coffee p-4 text-center -translate-y-0.5 transition-transform duration-100 ease-out group-hover:-translate-y-1 group-active:translate-y-0 flex flex-col justify-center min-h-20 bg-vanilla text-coffee text-xl font-bold">
-                                {choice}
+                              <span className="w-full h-full rounded-xl border-[0.2rem] border-coffee p-4 text-center -translate-y-0.5 transition-transform duration-100 ease-out group-hover:-translate-y-1 group-active:translate-y-0 flex flex-col justify-center min-h-20 bg-vanilla text-coffee font-bold">
+                                <span className={`w-full line-clamp-2 break-words ${getChoiceFontSize(choice)}`}>
+                                  {choice}
+                                </span>
                               </span>
                             </button>
                           ))}
@@ -252,7 +255,6 @@ return (
              </div>
         </div>
 
-        {/* Result Drawer (Leaderboards) */}
         <div className={`
             absolute top-0 w-full flex justify-center z-10 transition-all duration-500 ease-in-out
             ${showResults ? 'translate-y-[220px] opacity-100' : 'translate-y-[100px] opacity-0'}
