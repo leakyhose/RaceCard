@@ -172,13 +172,13 @@ export function Game() {
     );
   }
 
-return (
-    <div className="flex flex-col h-full items-center justify-start pt-4 md:pt-15 relative overflow-y-auto overflow-x-hidden w-full">
-      <div className="relative w-full max-w-3xl flex flex-col items-center justify-center min-h-fit pb-8">
+  return (
+    <div className="absolute inset-0 flex flex-col overflow-hidden w-full">
+      <div className="w-full max-w-3xl mx-auto flex flex-col h-full p-4 pb-4">
         
         <div className={`
-            relative z-20 w-full transition-all duration-800 ease-in-out perspective-[1000px]
-            ${showResults ? 'h-[200px]' : 'h-[200px] sm:h-[300px] md:h-[450px] translate-y-0'}
+            relative z-20 w-full transition-all duration-800 ease-in-out perspective-[1000px] shrink-0
+            ${showResults ? 'h-[200px]' : 'h-[200px] sm:h-[300px] md:h-[450px]'}
         `}>
             <div className={`
                 relative w-full h-full transition-transform duration-800 transform-3d rounded-[20px]
@@ -195,110 +195,113 @@ return (
             </div>
         </div>
 
-        <div className={`
-            relative w-full flex justify-center z-10 transition-all duration-400
-            ${showResults ? 'ease-in' : 'ease-out'}
-            ${showResults ? '-mt-[250px] opacity-0 pointer-events-none' : 'mt-0 opacity-100'}
-        `}>
-             <div className="w-full max-w-2xl">
-                {!hasAnswered ? (
-                    currentChoices ? (
-                        <div className="grid grid-cols-2 gap-6 mt-8">
-                          {currentChoices.map((choice, index) => (
-                            <button
-                              key={index}
-                              onClick={() => handleChoiceClick(choice)}
-                              className="group relative w-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none"
-                            >
-                              <span className="w-full h-full rounded-xl border-[0.2rem] border-coffee p-4 text-center -translate-y-0.5 transition-transform duration-100 ease-out group-hover:-translate-y-1 group-active:translate-y-0 flex flex-col justify-center min-h-20 bg-vanilla text-coffee font-bold">
-                                <span className={`w-full line-clamp-2 wrap-break-word ${getChoiceFontSize(choice)}`}>
-                                  {choice}
-                                </span>
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                    ) : (
-                        <form onSubmit={handleSubmitAnswer} className="mt-8 relative group rounded-xl bg-coffee">
-                          <input
-                            ref={gameInputRef}
-                            type="text"
-                            autoComplete="off"
-                            value={answer}
-                            onChange={(e) => setAnswer(e.target.value)}
-                            placeholder="TYPE YOUR ANSWER..."
-                            className="w-full px-6 py-4 text-2xl bg-vanilla border-2 border-coffee rounded-xl text-coffee placeholder:text-coffee/30 -translate-y-1 transition-transform duration-100 ease-out hover:-translate-y-2 focus:-translate-y-2 font-bold outline-none focus:shadow-[inset_0_0_0_1px_var(--color-terracotta)] text-center"
-                            autoFocus
-                            disabled={showResults}
-                          />
-                        </form>
-                    )
-                ) : (
-                    <div className="text-center p-6 mt-8">
-                        {isCorrect === true ? (
-                          <div>
-                            <div className="text-4xl mb-2 text-coffee">✓</div>
-                            <div className="text-xl font-bold text-coffee tracking-widest">Correct</div>
-                          </div>
+        <div className="relative flex-1 w-full min-h-0 mt-8 overflow-hidden">
+             <div className={`
+                absolute inset-0 w-full h-full transition-all duration-500 ease-in-out flex flex-col
+                ${showResults ? 'opacity-0 translate-y-10 pointer-events-none' : 'opacity-100 translate-y-0 z-10'}
+            `}>
+                <div className={`w-full max-w-2xl mx-auto max-h-full p-2 ${!showResults ? 'overflow-y-auto' : 'overflow-hidden'}`}>
+                    {!hasAnswered ? (
+                        currentChoices ? (
+                            <div className="grid grid-cols-2 gap-6">
+                              {currentChoices.map((choice, index) => (
+                                <button
+                                  key={index}
+                                  onClick={() => handleChoiceClick(choice)}
+                                  className="group relative w-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none"
+                                >
+                                  <span className="w-full h-full rounded-xl border-[0.2rem] border-coffee p-4 text-center -translate-y-0.5 transition-transform duration-100 ease-out group-hover:-translate-y-1 group-active:translate-y-0 flex flex-col justify-center min-h-20 bg-vanilla text-coffee font-bold">
+                                    <span className={`w-full line-clamp-2 wrap-break-word ${getChoiceFontSize(choice)}`}>
+                                      {choice}
+                                    </span>
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
                         ) : (
-                          <div>
-                            <div className="text-4xl mb-2 text-terracotta">✗</div>
-                            <div className="text-xl font-bold text-terracotta tracking-widest">Incorrect</div>
-                          </div>
-                        )}
-                        {answerTime !== null && (
-                          <div className="text-lg text-coffee mt-2 font-bold">{(answerTime / 1000).toFixed(3)}s</div>
-                        )}
-                        <div className="text-coffee/50 mt-2 font-bold text-sm">Please wait for current flashcard to end...</div>
-                    </div>
-                )}
-             </div>
-        </div>
-
-        <div className={`
-            absolute top-0 w-full flex justify-center z-10 transition-all duration-500 ease-in-out
-            ${showResults ? 'translate-y-[220px] opacity-100' : 'translate-y-[100px] opacity-0'}
-        `}>
-             {(results || lastResults) && (
-                <div className="flex gap-6 justify-center flex-wrap w-full max-h-[50vh] overflow-y-auto p-4">
-                  {(results || lastResults)?.fastestPlayers && (results || lastResults)!.fastestPlayers.length > 0 ? (
-                    <>
-                      <MiniLeaderboard
-                        leaderboardName="Fastest Answers"
-                        playerList={(results || lastResults)!.fastestPlayers.map((player) => ({
-                          player: player.player,
-                          value: `${(Number(player.time) / 1000).toFixed(3)}s`,
-                        }))}
-                      />
-                      {(results || lastResults)!.wrongAnswers.length > 0 && (
-                        <MiniLeaderboard
-                          leaderboardName="Wrong Answers"
-                          playerList={(results || lastResults)!.wrongAnswers.map((player) => ({
-                            player: player.player,
-                            value: player.answer,
-                          }))}
-                        />
-                      )}
-                    </>
-                  ) : (
-                    <div className="flex flex-col items-center w-full gap-6">
+                            <form onSubmit={handleSubmitAnswer} className="relative group rounded-xl bg-coffee">
+                              <input
+                                ref={gameInputRef}
+                                type="text"
+                                autoComplete="off"
+                                value={answer}
+                                onChange={(e) => setAnswer(e.target.value)}
+                                placeholder="TYPE YOUR ANSWER..."
+                                className="w-full px-6 py-4 text-2xl bg-vanilla border-2 border-coffee rounded-xl text-coffee placeholder:text-coffee/30 -translate-y-1 transition-transform duration-100 ease-out hover:-translate-y-2 focus:-translate-y-2 font-bold outline-none focus:shadow-[inset_0_0_0_1px_var(--color-terracotta)] text-center"
+                                autoFocus
+                                disabled={showResults}
+                              />
+                            </form>
+                        )
+                    ) : (
                         <div className="text-center p-6">
-                            <div className="text-4xl text-coffee/50 mb-2">✗</div>
-                            <div className="text-xl font-bold text-coffee tracking-widest">No Correct Answers</div>
+                            {isCorrect === true ? (
+                              <div>
+                                <div className="text-4xl mb-2 text-coffee">✓</div>
+                                <div className="text-xl font-bold text-coffee tracking-widest">Correct</div>
+                              </div>
+                            ) : (
+                              <div>
+                                <div className="text-4xl mb-2 text-terracotta">✗</div>
+                                <div className="text-xl font-bold text-terracotta tracking-widest">Incorrect</div>
+                              </div>
+                            )}
+                            {answerTime !== null && (
+                              <div className="text-lg text-coffee mt-2 font-bold">{(answerTime / 1000).toFixed(3)}s</div>
+                            )}
+                            <div className="text-coffee/50 mt-2 font-bold text-sm">Please wait for current flashcard to end...</div>
                         </div>
-                        {(results || lastResults)?.wrongAnswers && (results || lastResults)!.wrongAnswers.length > 0 && (
-                            <MiniLeaderboard
-                                leaderboardName="Wrong Answers"
-                                playerList={(results || lastResults)!.wrongAnswers.map((player) => ({
-                                player: player.player,
-                                value: player.answer,
-                                }))}
-                            />
-                        )}
-                    </div>
-                  )}
+                    )}
                 </div>
-             )}
+             </div>
+
+             <div className={`
+                absolute inset-0 w-full h-full transition-all duration-500 ease-in-out
+                ${showResults ? 'opacity-100 translate-y-0 z-10' : 'opacity-0 translate-y-10 pointer-events-none'}
+            `}>
+                 <div className={`w-full h-full p-2 ${showResults ? 'overflow-y-auto' : 'overflow-hidden'}`}>
+                     {(results || lastResults) && (
+                        <div className="flex gap-6 justify-center flex-wrap w-full">
+                          {(results || lastResults)?.fastestPlayers && (results || lastResults)!.fastestPlayers.length > 0 ? (
+                            <>
+                              <MiniLeaderboard
+                                leaderboardName="Fastest Answers"
+                                playerList={(results || lastResults)!.fastestPlayers.map((player) => ({
+                                  player: player.player,
+                                  value: `${(Number(player.time) / 1000).toFixed(3)}s`,
+                                }))}
+                              />
+                              {(results || lastResults)!.wrongAnswers.length > 0 && (
+                                <MiniLeaderboard
+                                  leaderboardName="Wrong Answers"
+                                  playerList={(results || lastResults)!.wrongAnswers.map((player) => ({
+                                    player: player.player,
+                                    value: player.answer,
+                                  }))}
+                                />
+                              )}
+                            </>
+                          ) : (
+                            <div className="flex flex-col items-center w-full gap-6">
+                                <div className="text-center p-6">
+                                    <div className="text-4xl text-coffee/50 mb-2">✗</div>
+                                    <div className="text-xl font-bold text-coffee tracking-widest">No Correct Answers</div>
+                                </div>
+                                {(results || lastResults)?.wrongAnswers && (results || lastResults)!.wrongAnswers.length > 0 && (
+                                    <MiniLeaderboard
+                                        leaderboardName="Wrong Answers"
+                                        playerList={(results || lastResults)!.wrongAnswers.map((player) => ({
+                                        player: player.player,
+                                        value: player.answer,
+                                        }))}
+                                    />
+                                )}
+                            </div>
+                          )}
+                        </div>
+                     )}
+                </div>
+             </div>
         </div>
 
       </div>
