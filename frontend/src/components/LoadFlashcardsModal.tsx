@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../supabaseClient";
 import { socket } from "../socket";
-import type { Flashcard } from "@shared/types";
+import type { Flashcard, Settings } from "@shared/types";
+import { PublishFlashcardsModal } from "./PublishFlashcardsModal";
 
 interface LoadFlashcardsModalProps {
   isOpen: boolean;
   onClose: () => void;
   refreshTrigger?: number;
   onDeleteSuccess?: () => void;
+  currentSettings: Settings;
 }
 
 interface FlashcardSet {
@@ -24,12 +26,14 @@ export function LoadFlashcardsModal({
   onClose,
   refreshTrigger = 0,
   onDeleteSuccess,
+  currentSettings,
 }: LoadFlashcardsModalProps) {
   const { user } = useAuth();
   const [sets, setSets] = useState<FlashcardSet[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingSetId, setLoadingSetId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [publishingSet, setPublishingSet] = useState<FlashcardSet | null>(null);
 
   const fetchSets = async () => {
     if (!user) return;
@@ -215,6 +219,13 @@ export function LoadFlashcardsModal({
                   </div>
                   <div className="flex gap-2 shrink-0">
                     <button
+                      onClick={() => setPublishingSet(set)}
+                      disabled={loadingSetId !== null}
+                      className="border-2 border-coffee bg-mint text-coffee px-4 py-2 hover:bg-coffee hover:text-vanilla transition-colors text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Publish
+                    </button>
+                    <button
                       onClick={() => handleLoadSet(set.id, set.name)}
                       disabled={loadingSetId !== null}
                       className="border-2 border-coffee bg-powder text-coffee px-4 py-2 hover:bg-coffee hover:text-vanilla transition-colors text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
@@ -242,6 +253,17 @@ export function LoadFlashcardsModal({
           Close
         </button>
       </div>
+
+      {publishingSet && (
+        <PublishFlashcardsModal
+          isOpen={true}
+          onClose={() => setPublishingSet(null)}
+          setId={publishingSet.id}
+          initialName={publishingSet.name}
+          hasGenerated={publishingSet.has_generated}
+          currentSettings={currentSettings}
+        />
+      )}
     </div>
   );
 }

@@ -609,6 +609,7 @@ export default function Lobby() {
         onClose={() => setShowLoadModal(false)}
         refreshTrigger={refreshTrigger}
         onDeleteSuccess={() => setRefreshTrigger((prev) => prev + 1)}
+        currentSettings={lobby.settings}
       />
     </div>
   );

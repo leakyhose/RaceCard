@@ -51,7 +51,7 @@ export function Players({
                 className={`flex w-full overflow-hidden rounded-lg ${isLeader && player.id != socket.id ? "cursor-pointer" : ""}`}
                 onClick={() => isLeader && handleUpdateLeader(player.id)}
               >
-                <div className="flex-1 flex flex-col justify-center overflow-visible px-3 py-1 relative">
+                <div className="flex-1 flex flex-col justify-center min-w-0 px-3 py-1 relative">
                   {hasMiniStatus ? (
                     <>
                       <div className="font-bold truncate leading-tight text-coffee">

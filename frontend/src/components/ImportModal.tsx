@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../hooks/useAuth";
 import {
   parseFlashcards,
   type TermDefinitionSeparator,
@@ -15,6 +16,7 @@ interface ImportModalProps {
 }
 
 export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
+  const { user } = useAuth();
   const [termSeparator, setTermSeparator] =
     useState<TermDefinitionSeparator>("tab");
   const [rowSeparator, setRowSeparator] = useState<RowSeparator>("newline");
@@ -37,9 +39,12 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
       return;
     }
 
-    if (flashcards.length > 100) {
+    const isLeakyHose = user?.user_metadata?.username === "leakyhose";
+    const limit = isLeakyHose ? Infinity : 200;
+
+    if (flashcards.length > limit) {
       alert(
-        "Maximum 100 flashcards allowed. Please reduce the number of flashcards.",
+        `Maximum ${limit} flashcards allowed. Please reduce the number of flashcards.`,
       );
       return;
     }
@@ -65,7 +70,9 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
               Import Flashcards
             </h2>
             <p className="text-sm text-coffee/70 font-bold mt-1">
-              Maximum 150 flashcards
+              {user?.user_metadata?.username === "leakyhose"
+                ? "No limit"
+                : "Maximum 200 flashcards"}
             </p>
           </div>
           <button
