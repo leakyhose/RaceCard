@@ -12,6 +12,7 @@ import { LobbyHeader } from "../components/LobbyHeader";
 import { FlashcardPreview } from "../components/FlashcardPreview";
 import { FlashcardStudy } from "../components/FlashcardStudy";
 import { Game } from "../components/Game";
+import { GameControls } from "../components/GameControls";
 import { SaveFlashcardsModal } from "../components/SaveFlashcardsModal";
 import { LoadFlashcardsModal } from "../components/LoadFlashcardsModal";
 import { LoadFlashcards } from "../components/LoadFlashcards";
@@ -99,6 +100,22 @@ export default function Lobby() {
   const lobby = useLobbyData(code);
   const prevDistractorStatus = useRef(lobby?.distractorStatus);
 
+  // Auto-adjust split ratio when game starts/ends
+  useEffect(() => {
+    if (
+      lobby?.status === "ongoing" ||
+      lobby?.status === "finished" ||
+      lobby?.status === "starting"
+    ) {
+      // When game is active/finished/starting, shrink the top section to fit stats/commands
+      // 0.35 gives enough room for stats + commands while maximizing chat space
+      setSplitRatio(0.35);
+    } else if (lobby?.status === "waiting") {
+      // Reset to default when back in waiting room
+      setSplitRatio(0.5);
+    }
+  }, [lobby?.status]);
+
   useEffect(() => {
     const handleAutoUpdate = async () => {
       if (!user || !trackedSetId) return;
@@ -138,7 +155,8 @@ export default function Lobby() {
 
     if (
       prevDistractorStatus.current === "generating" &&
-      lobby?.distractorStatus === "ready"
+      lobby?.distractorStatus === "ready" &&
+      lobby?.leader === socket.id
     ) {
       handleAutoUpdate();
     }
@@ -394,27 +412,32 @@ export default function Lobby() {
             style={{ height: `${splitRatio * 100}%` }}
             className="flex flex-col min-h-0 overflow-hidden pl-4 pr-4 pt-4 pb-2 mask-[linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)]"
           >
-            <LoadFlashcards
-              isLeader={isLeader}
-              refreshTrigger={refreshTrigger}
-              autoSelectedSetId={trackedSetId}
-              onOpenModal={() => setShowLoadModal(true)}
-              isGenerating={lobby?.distractorStatus === "generating"}
-              onTooltipChange={(
-                show: boolean,
-                text?: string,
-                x?: number,
-                y?: number,
-              ) => {
-                setShowTooltip(show);
-                if (show && text) {
-                  setTooltipText(text);
-                } else if (!show) {
-                  setTooltipText(null);
-                }
-                if (x !== undefined && y !== undefined) setTooltipPos({ x, y });
-              }}
-            />
+            {lobby.status === "waiting" ? (
+              <LoadFlashcards
+                isLeader={isLeader}
+                refreshTrigger={refreshTrigger}
+                autoSelectedSetId={trackedSetId}
+                onOpenModal={() => setShowLoadModal(true)}
+                isGenerating={lobby?.distractorStatus === "generating"}
+                onTooltipChange={(
+                  show: boolean,
+                  text?: string,
+                  x?: number,
+                  y?: number,
+                ) => {
+                  setShowTooltip(show);
+                  if (show && text) {
+                    setTooltipText(text);
+                  } else if (!show) {
+                    setTooltipText(null);
+                  }
+                  if (x !== undefined && y !== undefined)
+                    setTooltipPos({ x, y });
+                }}
+              />
+            ) : (
+              <GameControls lobby={lobby} userId={socket.id || ""} />
+            )}
           </div>
 
           <div

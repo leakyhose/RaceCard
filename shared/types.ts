@@ -15,6 +15,9 @@ export interface Player {
   score: number;
   miniStatus: number | string | null;
   isCorrect?: boolean;
+  answerTimes: number[]; // List of time taken for each correct answer (in ms)
+  totalAnswers: number; // Total number of answers attempted
+  correctAnswers: number; // Total number of correct answers
 }
 
 export interface Settings {
@@ -38,6 +41,7 @@ export interface Lobby {
   leader: string; // ID of leader
   distractorStatus?: "idle" | "generating" | "ready" | "error";
   generationProgress?: string | undefined; // Progress message
+  endGameVotes: string[]; // List of player IDs who voted to end the game
 }
 
 export interface FlashcardEnd {
@@ -81,4 +85,5 @@ export interface ClientToServerEvents {
   generateMultipleChoice: () => void;
 
   answer: (text: string) => void;
+  voteEndGame: () => void;
 }

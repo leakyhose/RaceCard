@@ -24,7 +24,16 @@ export function createLobby(hostID: string, hostName: string): Lobby {
   const newLobby: Lobby = {
     code,
     players: [
-      { id: hostID, name: hostName, score: 0, wins: 0, miniStatus: null },
+      {
+        id: hostID,
+        name: hostName,
+        score: 0,
+        wins: 0,
+        miniStatus: null,
+        answerTimes: [],
+        totalAnswers: 0,
+        correctAnswers: 0,
+      },
     ],
     flashcards: [],
     flashcardID: "",
@@ -38,6 +47,7 @@ export function createLobby(hostID: string, hostName: string): Lobby {
       roundTime: 10,
     }, // DEFAULT SETTINGS HERE WHEN CREATING LOBBY
     leader: hostID,
+    endGameVotes: [],
   };
   lobbies.set(code, newLobby);
   socketToLobby.set(hostID, code);

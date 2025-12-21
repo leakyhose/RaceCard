@@ -18,7 +18,16 @@ export function addPlayer(
   const lobby = getLobbyByCode(code);
   if (!lobby) return null;
   if (lobby.players.find((p: Player) => p.id === id)) return lobby;
-  lobby.players.push({ id, name, score, wins: 0, miniStatus: null });
+  lobby.players.push({
+    id,
+    name,
+    score,
+    wins: 0,
+    miniStatus: null,
+    answerTimes: [],
+    totalAnswers: 0,
+    correctAnswers: 0,
+  });
   trackSocket(id, code);
   return lobby;
 }

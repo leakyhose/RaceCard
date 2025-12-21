@@ -61,6 +61,32 @@ const activeRounds = new Map<
   }
 >();
 
+// Store active timers for each lobby to allow clearing them on forced end
+const lobbyTimers = new Map<string, Set<NodeJS.Timeout>>();
+
+function setLobbyTimeout(code: string, fn: () => void, delay: number) {
+  const timer = setTimeout(() => {
+    const timers = lobbyTimers.get(code);
+    if (timers) timers.delete(timer);
+    fn();
+  }, delay);
+
+  if (!lobbyTimers.has(code)) {
+    lobbyTimers.set(code, new Set());
+  }
+  lobbyTimers.get(code)!.add(timer);
+  return timer;
+}
+
+function clearLobbyTimers(code: string) {
+  const timers = lobbyTimers.get(code);
+  if (timers) {
+    timers.forEach((t) => clearTimeout(t));
+    timers.clear();
+    lobbyTimers.delete(code);
+  }
+}
+
 // NOTE: THERE ARE SOME INCONSISTENCIES WITH FUNCTIONS TAKING IN CODE OR LOBBY ID,
 // MAKE SURE THEY MATCH THE ONES IN THE MANAGER FILES
 io.on("connection", (socket) => {
@@ -235,6 +261,8 @@ io.on("connection", (socket) => {
       return;
     }
 
+    lobby.endGameVotes = []; // Reset votes for new game
+
     lobby.status = "starting";
     lobby.players = sortPlayersByMetric(lobby);
     io.to(lobby.code).emit("lobbyUpdated", lobby);
@@ -304,7 +332,7 @@ io.on("connection", (socket) => {
             if (lobby) io.to(lobbyCode).emit("lobbyUpdated", lobby);
 
             // Wait 5 seconds to show results
-            setTimeout(() => {
+            setLobbyTimeout(lobbyCode, () => {
               const nextQuestionData = advanceToNextFlashcard(lobbyCode);
 
               if (nextQuestionData) {
@@ -330,7 +358,7 @@ io.on("connection", (socket) => {
           // Store round info, callback endRound is called if answers are given faster than round
           activeRounds.set(lobbyCode, { endRound, roundStartTime, roundEnded });
 
-          setTimeout(() => {
+          setLobbyTimeout(lobbyCode, () => {
             endRound();
           }, ROUND_DURATION);
         };
@@ -347,6 +375,20 @@ io.on("connection", (socket) => {
     if (result.isCorrect || result.lobby.settings.multipleChoice) {
       socket.emit("endGuess", result.timeTaken, result.isCorrect);
     }
+
+    const player = result.lobby.players.find((p) => p.id === socket.id);
+    if (player) {
+      if (!player.totalAnswers) player.totalAnswers = 0;
+      if (!player.correctAnswers) player.correctAnswers = 0;
+
+      player.totalAnswers++;
+      if (result.isCorrect) {
+        player.correctAnswers++;
+        if (!player.answerTimes) player.answerTimes = [];
+        player.answerTimes.push(result.timeTaken);
+      }
+    }
+
     result.lobby.players = sortPlayersByMetric(result.lobby);
     io.to(result.lobby.code).emit("lobbyUpdated", result.lobby);
 
@@ -363,7 +405,44 @@ io.on("connection", (socket) => {
       const timeUntilEnd = ROUND_DURATION - elapsedTime;
       const delay = Math.min(timeUntilEnd, MIN_DELAY_AFTER_ALL_ANSWERED);
 
-      setTimeout(() => roundInfo.endRound(), delay);
+      setLobbyTimeout(result.lobby.code, () => roundInfo.endRound(), delay);
+    }
+  });
+
+  socket.on("voteEndGame", () => {
+    const lobby = getLobbyBySocket(socket.id);
+    if (!lobby) return;
+
+    if (lobby.status !== "ongoing") return;
+
+    if (!lobby.endGameVotes) lobby.endGameVotes = []; // Safety check
+
+    if (!lobby.endGameVotes.includes(socket.id)) {
+      lobby.endGameVotes.push(socket.id);
+
+      const totalPlayers = lobby.players.length;
+      const votes = lobby.endGameVotes.length;
+
+      if (votes / totalPlayers > 0.75) {
+        lobby.status = "finished";
+        if (lobby.players[0]) {
+          lobby.players[0].wins += 1;
+        }
+        lobby.players = sortPlayersByMetric(lobby);
+
+        const activeRound = activeRounds.get(lobby.code);
+        if (activeRound) {
+          activeRound.roundEnded = true;
+          activeRounds.delete(lobby.code);
+        }
+
+        clearLobbyTimers(lobby.code); // Clear any pending game loop timers
+
+        io.to(lobby.code).emit("lobbyUpdated", lobby);
+        endGame(lobby.code);
+      } else {
+        io.to(lobby.code).emit("lobbyUpdated", lobby);
+      }
     }
   });
 

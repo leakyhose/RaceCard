@@ -2,6 +2,7 @@ import type { Lobby } from "@shared/types";
 import { socket } from "../socket";
 import { useState } from "react";
 import { UserStatusHeader } from "./UserStatusHeader";
+//import racecatImage from "@shared/images/racecat.png";
 
 interface LobbyHeaderProps {
   code: string;
@@ -45,17 +46,20 @@ export function LobbyHeader({ code, isLeader, lobby }: LobbyHeaderProps) {
 
   return (
     <div className="flex justify-between relative p-3 items-center bg-light-vanilla text-coffee">
-      <div className="flex flex-col gap-0">
+      <div className="flex flex-row gap-0">
         <div
           onClick={handleCopyCode}
-          className="font-bold shrink-0 w-72 text-2xl tracking-widest group cursor-pointer inline-block relative"
+          className="font-bold shrink-0 w-60 text-2xl tracking-widest group cursor-pointer inline-block relative"
         >
           RaceCard.io/{code}
           <div className="leading-none absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-coffee text-vanilla font-bold tracking-wider text-xs pointer-events-none">
             {showCopyMessage ? "Copied!" : "Click to Copy"}
           </div>
+
         </div>
+
       </div>
+      
 
       <div className="absolute left-1/2 -translate-x-1/2 text-coffee">
         {isGenerating ? (
