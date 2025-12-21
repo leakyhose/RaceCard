@@ -206,8 +206,9 @@ export default function Lobby() {
   // Check if current flashcard set is saved and if it needs update
   useEffect(() => {
     const checkSavedStatus = async () => {
-      if (!user || !trackedSetId || trackedSetId === "UNNAMED") {
+      if (!trackedSetId || trackedSetId === "UNNAMED") {
         setIsSaved(false);
+        setIsPublicSet(false);
         return;
       }
 
@@ -226,6 +227,30 @@ export default function Lobby() {
         return;
       }
 
+      // 1. Check if it's a public set (no auth required)
+      try {
+        const { data: publicSet } = await supabase
+          .from("public_flashcard_sets")
+          .select("id")
+          .eq("id", trackedSetId)
+          .single();
+
+        if (publicSet) {
+          setIsPublicSet(true);
+          setIsSaved(true);
+          return;
+        }
+      } catch {
+        // Ignore error, proceed to check private sets
+      }
+
+      // 2. Check if it's a private set (auth required)
+      if (!user) {
+        setIsSaved(false);
+        setIsPublicSet(false);
+        return;
+      }
+
       try {
         const { data: setData, error } = await supabase
           .from("flashcard_sets")
@@ -236,8 +261,12 @@ export default function Lobby() {
 
         if (error || !setData) {
           setIsSaved(false);
+          setIsPublicSet(false);
           return;
         }
+
+        // It is a private set
+        setIsPublicSet(false);
 
         const lobbyHasGenerated = lobby?.flashcards.some((f) => f.isGenerated);
 
@@ -258,6 +287,7 @@ export default function Lobby() {
         setIsSaved(!!dbHasGenerated);
       } catch {
         setIsSaved(false);
+        setIsPublicSet(false);
       }
     };
 

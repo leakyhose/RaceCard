@@ -74,7 +74,9 @@ Distractors must be:
 - believable
 - educationally useful
 
-but they must still be **WRONG**.
+but they must still be **WRONG**. They must be THOROUGHLY WRONG too. It can be cleverly wrong, but it must be WRONG.
+
+Example: `"Dogs are cute and loyal"` → NO distractor can be `"Dogs are fluffy and nice"` as this is still TRUE, despite being different than the answer. Distractors must be something like `"Dogs are dangerous and unfriendly"`.
 
 ---
 
