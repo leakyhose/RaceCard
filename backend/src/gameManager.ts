@@ -201,6 +201,11 @@ export function validateAnswer(socketId: string, answerText: string) {
   const player = lobby.players.find((p) => p.id === socketId);
   if (!player) return null;
 
+  // Check if player already submitted in MC mode
+  if (lobby.settings.multipleChoice && gs.submittedPlayers.includes(player.id)) {
+    return null;
+  }
+
   const timeTaken = Math.max(307, Date.now() - gs.roundStart) - 300; // Buffer for animation of the card fliping into position.
 
   // Determine correct answer based on mode

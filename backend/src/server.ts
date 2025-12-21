@@ -369,6 +369,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on("answer", (text) => {
+    const lobby = getLobbyBySocket(socket.id);
+    if (!lobby) return;
+
+    const roundInfo = activeRounds.get(lobby.code);
+    if (roundInfo && roundInfo.roundEnded) {
+      return;
+    }
+
     const result = validateAnswer(socket.id, text);
     if (!result) return;
 
