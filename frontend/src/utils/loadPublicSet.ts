@@ -40,7 +40,8 @@ export async function loadPublicSet(setId: string): Promise<LoadedPublicSet | nu
     const { data: cardsData, error: cardsError } = await supabase
       .from("flashcards")
       .select("term, definition, trick_terms, trick_definitions, is_generated")
-      .eq("public_set_id", setId);
+      .eq("public_set_id", setId)
+      .order("id", { ascending: true });
 
     if (cardsError) throw cardsError;
 

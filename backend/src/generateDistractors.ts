@@ -7,8 +7,8 @@ import fs from "fs";
 
 const distractorPrompt = fs.readFileSync("./src/distractorPrompt.md", "utf-8");
 
-const MODEL_NAME = "gpt-4.1-mini";
-const BATCH_SIZE = 50;
+const MODEL_NAME = "gpt-4.1";
+const BATCH_SIZE = 25;
 
 // Load environment variables
 config();
@@ -112,7 +112,9 @@ async function generateDistractors(
               content: JSON.stringify(currentBatch),
             },
           ],
+          //reasoning:{"effort": "minimal"},
           response_format: zodResponseFormat(DistractorSet, "distractor_set"),
+
         });
 
         const parsed = response.choices[0]!.message.parsed;

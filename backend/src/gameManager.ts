@@ -30,7 +30,8 @@ export async function generateDistractors(
   }
 
   // Work with lobby flashcards directly, not gamestate (gamestate may not exist yet)
-  const flashcardsToGenerate = lobby.flashcards;
+  // Create a shallow copy to ensure order is preserved during generation
+  const flashcardsToGenerate = [...lobby.flashcards];
   if (!flashcardsToGenerate || flashcardsToGenerate.length === 0) return;
 
   distractorStatus.set(lobbyCode, { ready: false, generating: true });

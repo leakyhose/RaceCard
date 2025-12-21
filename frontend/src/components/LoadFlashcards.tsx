@@ -171,7 +171,8 @@ export function LoadFlashcards({
         .select(
           "term, definition, trick_terms, trick_definitions, is_generated",
         )
-        .eq("set_id", setId);
+        .eq("set_id", setId)
+        .order("id", { ascending: true });
 
       if (fetchError) throw fetchError;
 
