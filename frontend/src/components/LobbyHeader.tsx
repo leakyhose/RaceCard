@@ -9,9 +9,10 @@ interface LobbyHeaderProps {
   nickname: string;
   isLeader: boolean;
   lobby: Lobby;
+  isPublicSet?: boolean;
 }
 
-export function LobbyHeader({ code, isLeader, lobby }: LobbyHeaderProps) {
+export function LobbyHeader({ code, isLeader, lobby, isPublicSet }: LobbyHeaderProps) {
   const [showCopyMessage, setShowCopyMessage] = useState(false);
 
   const handleStartGame = () => {
@@ -74,7 +75,7 @@ export function LobbyHeader({ code, isLeader, lobby }: LobbyHeaderProps) {
             <div className="font-bold text-lg tracking-wide">
               Upload or create Flashcards to start
             </div>
-          ) : needsGeneration && lobby.status === "waiting" ? (
+          ) : needsGeneration && lobby.status === "waiting" && !isPublicSet ? (
             <div className="flex flex-col items-center gap-2">
               <button
                 onClick={handleGenerateMultipleChoice}
@@ -97,7 +98,7 @@ export function LobbyHeader({ code, isLeader, lobby }: LobbyHeaderProps) {
               >
                 Start Game
               </button>
-              {lobby.settings.multipleChoice && (
+              {lobby.settings.multipleChoice && !isPublicSet && (
                 <button
                   onClick={handleGenerateMultipleChoice}
                   disabled={isGenerating}

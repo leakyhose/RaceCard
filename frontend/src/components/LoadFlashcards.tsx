@@ -3,6 +3,7 @@ import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../supabaseClient";
 import { socket } from "../socket";
 import type { Flashcard } from "@shared/types";
+import { loadPublicSet, type LoadedPublicSet } from "../utils/loadPublicSet";
 
 interface FlashcardSet {
   id: string;
@@ -10,6 +11,7 @@ interface FlashcardSet {
   created_at: string;
   flashcard_count: number;
   has_generated: boolean;
+  plays?: number;
 }
 
 interface LoadFlashcardsProps {
@@ -17,6 +19,7 @@ interface LoadFlashcardsProps {
   refreshTrigger?: number;
   autoSelectedSetId?: string | null;
   onOpenModal?: () => void;
+  onOpenPublicModal?: () => void;
   isGenerating?: boolean;
   onTooltipChange?: (
     show: boolean,
@@ -24,6 +27,8 @@ interface LoadFlashcardsProps {
     x?: number,
     y?: number,
   ) => void;
+  onPublicSetLoaded?: (set: LoadedPublicSet) => void;
+  onPrivateSetLoaded?: (saved?: boolean) => void;
 }
 
 export function LoadFlashcards({
@@ -31,8 +36,11 @@ export function LoadFlashcards({
   refreshTrigger = 0,
   autoSelectedSetId,
   onOpenModal,
+  onOpenPublicModal,
   isGenerating = false,
   onTooltipChange,
+  onPublicSetLoaded,
+  onPrivateSetLoaded,
 }: LoadFlashcardsProps) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"personal" | "community">(
@@ -46,17 +54,48 @@ export function LoadFlashcards({
 
   useEffect(() => {
     const fetchSets = async () => {
-      if (!user) return;
-
       setLoading(true);
 
       try {
-        const { data, error: fetchError } = await supabase
-          .from("flashcard_sets")
-          .select("id, name, created_at")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(10);
+        let data: FlashcardSet[] | null = [];
+        let fetchError = null;
+
+        if (activeTab === "personal") {
+          if (!user) {
+            setSets([]);
+            setLoading(false);
+            return;
+          }
+          const result = await supabase
+            .from("flashcard_sets")
+            .select("id, name, created_at")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(10);
+          
+          // Map result to FlashcardSet type
+          data = result.data ? result.data.map(item => ({
+            ...item,
+            flashcard_count: 0,
+            has_generated: false
+          })) : [];
+          fetchError = result.error;
+        } else {
+          // Fetch public sets
+          const result = await supabase
+            .from("public_flashcard_sets")
+            .select("id, name, created_at, plays")
+            .order("plays", { ascending: false })
+            .limit(10);
+            
+          // Map result to FlashcardSet type
+          data = result.data ? result.data.map(item => ({
+            ...item,
+            flashcard_count: 0,
+            has_generated: false
+          })) : [];
+          fetchError = result.error;
+        }
 
         if (fetchError) throw fetchError;
 
@@ -65,12 +104,12 @@ export function LoadFlashcards({
             const { count } = await supabase
               .from("flashcards")
               .select("*", { count: "exact", head: true })
-              .eq("set_id", set.id);
+              .eq(activeTab === "personal" ? "set_id" : "public_set_id", set.id);
 
             const { data: generatedCards } = await supabase
               .from("flashcards")
               .select("is_generated")
-              .eq("set_id", set.id)
+              .eq(activeTab === "personal" ? "set_id" : "public_set_id", set.id)
               .eq("is_generated", true)
               .limit(1);
 
@@ -91,9 +130,7 @@ export function LoadFlashcards({
       }
     };
 
-    if (activeTab === "personal" && user) {
-      fetchSets();
-    }
+    fetchSets();
   }, [activeTab, user, refreshTrigger]);
 
   useEffect(() => {
@@ -110,12 +147,23 @@ export function LoadFlashcards({
     if (isGenerating) {
       return;
     }
+    
     if (!isLeader) {
       setShakingSetId(setId);
       setTimeout(() => setShakingSetId(null), 500);
       return;
     }
     setLoadingSetId(setId);
+
+    if (activeTab === "community") {
+      const loadedSet = await loadPublicSet(setId);
+      if (loadedSet) {
+        onPublicSetLoaded?.(loadedSet);
+        setCurrentlyLoaded(setId);
+      }
+      setLoadingSetId(null);
+      return;
+    }
 
     try {
       const { data, error: fetchError } = await supabase
@@ -141,6 +189,7 @@ export function LoadFlashcards({
 
       socket.emit("updateFlashcard", flashcards, setName, setId);
       setCurrentlyLoaded(setId);
+      onPrivateSetLoaded?.(true);
     } catch {
       console.error("Failed to load set");
     } finally {
@@ -209,83 +258,83 @@ export function LoadFlashcards({
       {/* Content */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 [direction:rtl] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-coffee/50 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-coffee/40 [&::-webkit-scrollbar]:absolute [&::-webkit-scrollbar]:left-0">
         <div className="flex flex-col space-y-2 [direction:ltr] min-h-full mb-1">
-          {activeTab === "personal" ? (
-            <>
-              {!user ? (
-                <div className="text-coffee/40 text-sm font-bold text-center italic py-2">
-                  Log in to save flashcards!
-                </div>
-              ) : loading && sets.length === 0 ? (
-                <div className="text-coffee/40 text-sm font-bold text-center italic py-2">
-                  Loading...
-                </div>
-              ) : sets.length === 0 ? (
-                <div className="text-coffee/40 text-sm font-bold text-center italic py-2">
-                  No flashcard sets.
-                </div>
-              ) : (
-                <>
-                  {sets.map((set) => (
-                    <button
-                      key={set.id}
-                      onClick={() => handleLoadSet(set.id)}
-                      className={`group relative w-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none ${
-                        shakingSetId === set.id ? "animate-shake" : ""
-                      }`}
-                    >
-                      <span
-                        className={`w-full h-full rounded-xl border-2 border-coffee p-2 text-left -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0 flex flex-col justify-center min-h-15 ${
-                          shakingSetId === set.id
-                            ? "bg-coffee/80 text-vanilla"
-                            : `${set.id == currentlyLoaded ? "shadow-[inset_0_0_0_2px_var(--color-powder)]" : ""} bg-vanilla text-coffee`
-                        }`}
-                      >
-                        {shakingSetId === set.id ? (
-                          <div className="text-center font-bold text-sm">
-                            Must be leader
-                          </div>
-                        ) : (
-                          <div className="flex flex-col w-full">
-                            <div className="w-full">
-                              <h3 className="truncate font-bold text-sm transition-colors">
-                                {set.name}
-                              </h3>
-                            </div>
-                            <div className="flex justify-between items-center w-full mt-0.5">
-                              <p
-                                className={`text-xs font-medium ${
-                                  shakingSetId === set.id
-                                    ? "text-vanilla/80"
-                                    : "text-coffee/50"
-                                }`}
-                              >
-                                {set.flashcard_count} cards •{" "}
-                                {new Date(set.created_at).toLocaleDateString()}
-                              </p>
-                              {loadingSetId === set.id && (
-                                <div className="ml-2 shrink-0">
-                                  <div className="w-4 h-4 border-2 border-coffee border-t-transparent border-b-transparent rounded-full animate-spin"></div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </span>
-                    </button>
-                  ))}
-                  <button
-                    className="text-center text-coffee font-bold underline decoration-2 underline-offset-2 hover:text-terracotta transition-colors cursor-pointer"
-                    onClick={() => onOpenModal?.()}
-                  >
-                    See More
-                  </button>
-                </>
-              )}
-            </>
-          ) : (
+          {activeTab === "personal" && !user ? (
             <div className="text-coffee/40 text-sm font-bold text-center italic py-2">
-              Community sets coming soon
+              Log in to save flashcards!
             </div>
+          ) : loading ? (
+            <div className="flex-1 flex items-center justify-center py-4">
+              <div className="w-6 h-6 border-2 border-coffee border-t-transparent border-b-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : sets.length === 0 ? (
+            <div className="text-coffee/40 text-sm font-bold text-center italic py-2">
+              {activeTab === "personal"
+                ? "No flashcard sets."
+                : "No public sets found."}
+            </div>
+          ) : (
+            <>
+              {sets.map((set) => (
+                <button
+                  key={set.id}
+                  onClick={() => handleLoadSet(set.id)}
+                  className={`group relative w-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none ${
+                    shakingSetId === set.id ? "animate-shake" : ""
+                  }`}
+                >
+                  <span
+                    className={`w-full h-full rounded-xl border-2 border-coffee p-2 text-left -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0 flex flex-col justify-center min-h-15 ${
+                      shakingSetId === set.id
+                        ? "bg-coffee/80 text-vanilla"
+                        : `${set.id == currentlyLoaded ? "shadow-[inset_0_0_0_2px_var(--color-powder)]" : ""} bg-vanilla text-coffee`
+                    }`}
+                  >
+                    {shakingSetId === set.id ? (
+                      <div className="text-center font-bold text-sm">
+                        Must be leader
+                      </div>
+                    ) : (
+                      <div className="flex flex-col w-full">
+                        <div className="w-full">
+                          <h3 className="truncate font-bold text-sm transition-colors">
+                            {set.name}
+                          </h3>
+                        </div>
+                        <div className="flex justify-between items-center w-full mt-0.5">
+                          <p
+                            className={`text-xs font-medium ${
+                              shakingSetId === set.id
+                                ? "text-vanilla/80"
+                                : "text-coffee/50"
+                            }`}
+                          >
+                            {set.flashcard_count} cards •{" "}
+                            {activeTab === "personal"
+                              ? new Date(set.created_at).toLocaleDateString()
+                              : `${set.plays || 0} plays`}
+                          </p>
+                          {loadingSetId === set.id && (
+                            <div className="ml-2 shrink-0">
+                              <div className="w-4 h-4 border-2 border-coffee border-t-transparent border-b-transparent rounded-full animate-spin"></div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </span>
+                </button>
+              ))}
+              <button
+                className="text-center text-coffee font-bold underline decoration-2 underline-offset-2 hover:text-terracotta transition-colors cursor-pointer"
+                onClick={() =>
+                  activeTab === "personal"
+                    ? onOpenModal?.()
+                    : onOpenPublicModal?.()
+                }
+              >
+                See More
+              </button>
+            </>
           )}
         </div>
       </div>

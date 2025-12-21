@@ -11,6 +11,7 @@ interface LoadFlashcardsModalProps {
   refreshTrigger?: number;
   onDeleteSuccess?: () => void;
   currentSettings: Settings;
+  onSetLoaded?: (saved?: boolean) => void;
 }
 
 interface FlashcardSet {
@@ -27,6 +28,7 @@ export function LoadFlashcardsModal({
   refreshTrigger = 0,
   onDeleteSuccess,
   currentSettings,
+  onSetLoaded,
 }: LoadFlashcardsModalProps) {
   const { user } = useAuth();
   const [sets, setSets] = useState<FlashcardSet[]>([]);
@@ -122,6 +124,7 @@ export function LoadFlashcardsModal({
       }));
 
       socket.emit("updateFlashcard", flashcards, setName, setId);
+      onSetLoaded?.(true);
       onClose();
     } catch {
       setError("Failed to load flashcards");
@@ -177,7 +180,7 @@ export function LoadFlashcardsModal({
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center py-12">
-            <div className="text-coffee">Loading...</div>
+            <div className="w-8 h-8 border-2 border-coffee border-t-transparent border-b-transparent rounded-full animate-spin"></div>
           </div>
         ) : error ? (
           <div className="mb-4 p-3 border-2 border-terracotta bg-terracotta/10 text-terracotta text-sm">

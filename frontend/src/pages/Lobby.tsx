@@ -15,9 +15,12 @@ import { Game } from "../components/Game";
 import { GameControls } from "../components/GameControls";
 import { SaveFlashcardsModal } from "../components/SaveFlashcardsModal";
 import { LoadFlashcardsModal } from "../components/LoadFlashcardsModal";
+import { PublicFlashcardsModal } from "../components/PublicFlashcardsModal";
 import { LoadFlashcards } from "../components/LoadFlashcards";
 import { ArrowButton } from "../components/ArrowButton";
 import { supabase } from "../supabaseClient";
+import { type LoadedPublicSet } from "../utils/loadPublicSet";
+import type { Settings } from "@shared/types";
 
 export default function Lobby() {
   const { code } = useParams();
@@ -37,6 +40,7 @@ export default function Lobby() {
 
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showLoadModal, setShowLoadModal] = useState(false);
+  const [showPublicModal, setShowPublicModal] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [trackedSetId, setTrackedSetId] = useState<string | null>(null);
   const [saveShake, setSaveShake] = useState(false);
@@ -59,6 +63,26 @@ export default function Lobby() {
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [tooltipText, setTooltipText] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [lockedSettings, setLockedSettings] = useState<Partial<Settings>>({});
+  const [isPublicSet, setIsPublicSet] = useState(false);
+
+  const handlePublicSetLoaded = (set: LoadedPublicSet) => {
+    setIsSaved(true);
+    setIsPublicSet(true);
+    setLockedSettings(set.settings);
+    setTrackedSetId(set.id);
+    
+    if (isLeader && lobby) {
+        const newSettings = { ...lobby.settings, ...set.settings };
+        socket.emit("updateSettings", newSettings);
+    }
+  };
+
+  const handlePrivateSetLoaded = (saved = false) => {
+    setIsPublicSet(false);
+    setLockedSettings({});
+    setIsSaved(saved);
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -408,6 +432,7 @@ export default function Lobby() {
           nickname={nickname}
           isLeader={isLeader}
           lobby={lobby}
+          isPublicSet={isPublicSet}
         />
       </div>
       <div className="flex flex-1 min-h-0 border-coffee">
@@ -425,7 +450,10 @@ export default function Lobby() {
                 refreshTrigger={refreshTrigger}
                 autoSelectedSetId={trackedSetId}
                 onOpenModal={() => setShowLoadModal(true)}
+                onOpenPublicModal={() => setShowPublicModal(true)}
                 isGenerating={lobby?.distractorStatus === "generating"}
+                onPublicSetLoaded={handlePublicSetLoaded}
+                onPrivateSetLoaded={handlePrivateSetLoaded}
                 onTooltipChange={(
                   show: boolean,
                   text?: string,
@@ -516,7 +544,7 @@ export default function Lobby() {
                     flashcardName={lobby.flashcardName}
                     answerByTerm={lobby.settings.answerByTerm}
                     multipleChoice={lobby.settings.multipleChoice}
-                    isSaved={isSaved}
+                    isSaved={isSaved || isPublicSet}
                     onSave={() => {
                       if (user) {
                         setShowSaveModal(true);
@@ -585,6 +613,8 @@ export default function Lobby() {
               currentSettings={lobby.settings}
               onUpdate={(settings) => socket.emit("updateSettings", settings)}
               lobby={lobby}
+              lockedSettings={lockedSettings}
+              onPrivateSetLoaded={handlePrivateSetLoaded}
             />
           </div>
         </div>
@@ -610,6 +640,13 @@ export default function Lobby() {
         refreshTrigger={refreshTrigger}
         onDeleteSuccess={() => setRefreshTrigger((prev) => prev + 1)}
         currentSettings={lobby.settings}
+        onSetLoaded={handlePrivateSetLoaded}
+      />
+
+      <PublicFlashcardsModal
+        isOpen={showPublicModal}
+        onClose={() => setShowPublicModal(false)}
+        onPublicSetLoaded={handlePublicSetLoaded}
       />
     </div>
   );

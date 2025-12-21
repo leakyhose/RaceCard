@@ -117,6 +117,7 @@ export function PublishFlashcardsModal({
         .from("public_flashcard_sets")
         .insert({
           user_id: user.id,
+          username: user.user_metadata?.username || "Unknown",
           name: name.trim(),
           description: description.trim(),
           shuffle_flashcard: settings.shuffle.locked
