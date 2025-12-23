@@ -254,7 +254,7 @@ export function LoadFlashcardsModal({
               {sets.map((set) => (
                 <div
                   key={set.id}
-                  className="border-2 border-coffee p-4 bg-vanilla hover:bg-light-vanilla transition-colors flex flex-col h-full"
+                  className="border-2 border-coffee p-4 bg-white/60 transition-colors flex flex-col h-full"
                 >
                   <div className="flex-1 min-w-0 mb-4">
                     <div className="font-bold text-lg mb-1 truncate">
