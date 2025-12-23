@@ -155,12 +155,10 @@ async function generateDistractors(
           }
         }
 
-        // If all items have results, we're done
         if (nextBatch.length === 0) {
           completedBatches++;
           onProgress?.(completedBatches, totalBatches);
 
-          // Store results in the global map by original index
           for (const item of initialBatch) {
             const result = batchResults.get(item.id)!;
             resultsByIndex.set(result.originalIndex, result.distractors);

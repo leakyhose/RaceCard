@@ -108,20 +108,33 @@ export function parseAdvancedFlashcards(
     if (!trimmedRow) continue;
 
     const parts = trimmedRow.split(termSep);
-    // Expecting at least 5 parts: Question, Answer, Wrong1, Wrong2, Wrong3
-    if (parts.length >= 5) {
+    // Expecting at least 3 parts: Question, Answer, Wrong1
+    if (parts.length >= 3) {
       const question = parts[0].trim();
       const answer = parts[1].trim();
-      const wrong1 = parts[2].trim();
-      const wrong2 = parts[3].trim();
-      const wrong3 = parts[4].trim();
+      
+      // Get all wrong answers (distractors)
+      const rawDistractors = parts.slice(2).map(p => p.trim()).filter(p => p !== "");
 
-      if (question && answer && wrong1 && wrong2 && wrong3) {
+      if (question && answer && rawDistractors.length >= 1) {
+        let trickDefinitions: string[] = [];
+        
+        if (rawDistractors.length === 1) {
+             // [Correct, wrong, wrong]
+             trickDefinitions = [answer, rawDistractors[0], rawDistractors[0]];
+        } else if (rawDistractors.length === 2) {
+             // [wrong1, wrong2, wrong2]
+             trickDefinitions = [rawDistractors[0], rawDistractors[1], rawDistractors[1]];
+        } else {
+             // [wrong1, wrong2, wrong3] (take first 3)
+             trickDefinitions = rawDistractors.slice(0, 3);
+        }
+
         flashcards.push({
           id: crypto.randomUUID(),
           question,
           answer,
-          trickDefinitions: [wrong1, wrong2, wrong3],
+          trickDefinitions,
           isGenerated: true,
         });
       }

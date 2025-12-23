@@ -78,8 +78,10 @@ export async function generateDistractors(
         Array.isArray(definitionDistractors) &&
         definitionDistractors.length === 3
       ) {
-        flashcard.trickTerms = termDistractors;
-        flashcard.trickDefinitions = definitionDistractors;
+        // termDistractors are generated from termPairs (question=Term, answer=Definition) -> Fake Definitions
+        // definitionDistractors are generated from definitionPairs (question=Definition, answer=Term) -> Fake Terms
+        flashcard.trickTerms = definitionDistractors;
+        flashcard.trickDefinitions = termDistractors;
         flashcard.isGenerated = true;
       } else {
         console.error(`Invalid distractors for flashcard ${index}`);

@@ -53,8 +53,8 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
       return;
     }
 
-    const isLeakyHose = user?.user_metadata?.username === "leakyhose";
-    const limit = isLeakyHose ? Infinity : 200;
+    const isAdmin = user?.user_metadata?.username === "leakyhose" || user?.user_metadata?.username === "RaceCard.io";
+    const limit = isAdmin ? Infinity : 200;
 
     if (flashcards.length > limit) {
       alert(
@@ -240,7 +240,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
               {mode === "advanced" && (
                 <div className="flex-1 flex flex-col justify-center text-sm font-bold text-coffee">
                   <p className="mb-2">
-                    Each row MUST have 5 values separated by your chosen
+                    Each row has 5 values separated by your chosen
                     separator:
                   </p>
                   <ul className="list-disc pl-5 space-y-1 mb-2">
@@ -251,7 +251,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
                     <li>Wrong Answer 3</li>
                   </ul>
                   <p className="mb-0">
-                    If these are not satisfied, you will not be allowed to import.
+                    NOTE: Number of Wrong Answers must be at least 1, and no more than 3.  
                   </p>
                 </div>
               )}

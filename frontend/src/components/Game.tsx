@@ -238,22 +238,24 @@ export function Game() {
               <div className="w-full max-w-2xl mx-auto p-6">
                 {!hasAnswered ? (
                   currentChoices ? (
-                    <div className="grid grid-cols-2 gap-6">
-                      {currentChoices.map((choice, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleChoiceClick(choice)}
-                          className="group relative w-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none"
-                        >
-                          <span className="w-full h-full rounded-xl border-[0.2rem] border-coffee p-4 text-center -translate-y-0.5 transition-transform duration-100 ease-out group-hover:-translate-y-1 group-active:translate-y-0 flex flex-col justify-center min-h-20 bg-vanilla text-coffee font-bold">
-                            <span
-                              className={`w-full line-clamp-2 wrap-break-word ${getChoiceFontSize(choice)}`}
-                            >
-                              {choice}
+                    <div className="grid grid-cols-2 gap-6 auto-rows-fr min-h-[11.5rem]">
+                      {Array.from(new Set(currentChoices)).map(
+                        (choice, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleChoiceClick(choice)}
+                            className="group relative w-full h-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none"
+                          >
+                            <span className="w-full h-full rounded-xl border-[0.2rem] border-coffee p-4 text-center -translate-y-0.5 transition-transform duration-100 ease-out group-hover:-translate-y-1 group-active:translate-y-0 flex flex-col justify-center min-h-20 bg-vanilla text-coffee font-bold">
+                              <span
+                                className={`w-full line-clamp-2 wrap-break-word ${getChoiceFontSize(choice)}`}
+                              >
+                                {choice}
+                              </span>
                             </span>
-                          </span>
-                        </button>
-                      ))}
+                          </button>
+                        ),
+                      )}
                     </div>
                   ) : (
                     <form

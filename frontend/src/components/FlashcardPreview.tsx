@@ -40,28 +40,32 @@ export function FlashcardPreview({
                     <div className="p-2 border border-coffee bg-mint/30 text-sm text-center">
                       ✓ {flashcard.question}
                     </div>
-                    {flashcard.trickTerms?.map((trick, idx) => (
-                      <div
-                        key={idx}
-                        className="p-2 border border-coffee bg-vanilla text-sm text-center"
-                      >
-                        {trick}
-                      </div>
-                    ))}
+                    {Array.from(new Set(flashcard.trickTerms))
+                      .filter((trick) => trick !== flashcard.question)
+                      .map((trick, idx) => (
+                        <div
+                          key={idx}
+                          className="p-2 border border-coffee bg-vanilla text-sm text-center"
+                        >
+                          {trick}
+                        </div>
+                      ))}
                   </>
                 ) : (
                   <>
                     <div className="p-2 border border-coffee bg-mint/30 text-sm text-center">
                       ✓ {flashcard.answer}
                     </div>
-                    {flashcard.trickDefinitions?.map((trick, idx) => (
-                      <div
-                        key={idx}
-                        className="p-2 border border-coffee bg-vanilla text-sm text-center"
-                      >
-                        {trick}
-                      </div>
-                    ))}
+                    {Array.from(new Set(flashcard.trickDefinitions))
+                      .filter((trick) => trick !== flashcard.answer)
+                      .map((trick, idx) => (
+                        <div
+                          key={idx}
+                          className="p-2 border border-coffee bg-vanilla text-sm text-center"
+                        >
+                          {trick}
+                        </div>
+                      ))}
                   </>
                 )}
               </div>

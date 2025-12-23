@@ -127,17 +127,22 @@ export function FlashcardStudy({
                           <div className="p-3 border-2 border-coffee bg-mint/30 text-center font-bold">
                             ✓ {answer}
                           </div>
-                          {(answerByTerm
-                            ? currentCard.trickTerms
-                            : currentCard.trickDefinitions
-                          )?.map((trick, idx) => (
-                            <div
-                              key={idx}
-                              className="p-3 border border-coffee bg-vanilla/50 text-center"
-                            >
-                              {trick}
-                            </div>
-                          ))}
+                          {Array.from(
+                            new Set(
+                              answerByTerm
+                                ? currentCard.trickTerms
+                                : currentCard.trickDefinitions,
+                            ),
+                          )
+                            .filter((trick) => trick !== answer)
+                            .map((trick, idx) => (
+                              <div
+                                key={idx}
+                                className="p-3 border border-coffee bg-vanilla/50 text-center"
+                              >
+                                {trick}
+                              </div>
+                            ))}
                         </div>
                       ) : (
                         // Simple answer view
