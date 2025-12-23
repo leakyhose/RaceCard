@@ -192,7 +192,13 @@ export function Game() {
   }
 
   return (
-    <div ref={scrollRef} className="absolute inset-0 flex flex-col overflow-hidden w-full">
+    <div
+      ref={scrollRef}
+      className="absolute inset-0 flex flex-col overflow-hidden w-full"
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onPaste={(e) => e.preventDefault()}
+    >
       <div
         className={`w-full max-w-3xl mx-auto flex flex-col min-h-full p-4 justify-center ${currentChoices ? "pb-4" : "pb-20"}`}
       >
@@ -211,13 +217,13 @@ export function Game() {
                 ${showResults ? "transform-[rotateY(180deg)]" : "transform-[rotateY(0deg)]"}
             `}
             >
-              <div className="absolute inset-0 backface-hidden bg-vanilla border-2 border-coffee rounded-[20px] flex items-center justify-center p-8 shadow-[inset_0_0_0_2px_var(--color-terracotta)]">
+              <div className="absolute inset-0 backface-hidden bg-vanilla border-2 border-coffee rounded-[20px] flex items-center justify-center p-8 shadow-[inset_0_0_0_2px_var(--color-terracotta)] select-none">
                 <div className="text-3xl font-bold text-coffee text-center wrap-break-word w-full max-w-full overflow-hidden">
                   {currentQuestion}
                 </div>
               </div>
 
-              <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)] bg-vanilla border-3 border-coffee rounded-[20px] flex flex-col items-center justify-center p-8 shadow-[inset_0_0_0_2px_var(--color-powder)]">
+              <div className="absolute inset-0 backface-hidden transform-[rotateY(180deg)] bg-vanilla border-3 border-coffee rounded-[20px] flex flex-col items-center justify-center p-8 shadow-[inset_0_0_0_2px_var(--color-powder)] select-none">
                 <div className="text-sm text-coffee/60 mb-2 font-bold uppercase tracking-widest">
                   Correct Answer
                 </div>
@@ -244,7 +250,7 @@ export function Game() {
                           <button
                             key={index}
                             onClick={() => handleChoiceClick(choice)}
-                            className="group relative w-full h-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none"
+                            className="group relative w-full h-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none select-none"
                           >
                             <span className="w-full h-full rounded-xl border-[0.2rem] border-coffee p-4 text-center -translate-y-0.5 transition-transform duration-100 ease-out group-hover:-translate-y-1 group-active:translate-y-0 flex flex-col justify-center min-h-20 bg-vanilla text-coffee font-bold">
                               <span
@@ -272,6 +278,9 @@ export function Game() {
                         className="w-full px-6 py-4 text-2xl bg-vanilla border-2 border-coffee rounded-xl text-coffee placeholder:text-coffee/30 -translate-y-0.5 transition-transform duration-100 ease-out hover:-translate-y-1 focus:-translate-y-1 font-bold outline-none focus:shadow-[inset_0_0_0_1px_var(--color-terracotta)] text-center"
                         autoFocus
                         disabled={showResults}
+                        onPaste={(e) => e.preventDefault()}
+                        onCopy={(e) => e.preventDefault()}
+                        onCut={(e) => e.preventDefault()}
                       />
                     </form>
                   )
