@@ -145,9 +145,25 @@ export function parseAdvancedFlashcards(
 }
 
 export function getRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
+  let date = new Date(dateString);
   const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  // Check if date is in the future, suggesting a timezone mismatch (UTC parsed as Local)
+  if (date.getTime() > now.getTime()) {
+    // Try appending 'Z' to treat as UTC if not already present
+    if (!dateString.endsWith("Z") && !dateString.includes("+")) {
+      const isoString = dateString.replace(" ", "T") + "Z";
+      const utcDate = new Date(isoString);
+      if (!isNaN(utcDate.getTime())) {
+        date = utcDate;
+      }
+    }
+  }
+
+  let diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  // Clamp to 0 to avoid negative numbers
+  if (diffInSeconds < 0) diffInSeconds = 0;
 
   if (diffInSeconds < 60) {
     return `${diffInSeconds} second${diffInSeconds !== 1 ? "s" : ""} ago`;

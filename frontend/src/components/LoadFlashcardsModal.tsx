@@ -228,7 +228,7 @@ export function LoadFlashcardsModal({
         className="bg-vanilla border-3 border-coffee p-8 max-w-5xl w-full mx-4 shadow-[8px_8px_0px_0px_#644536] max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="font-bold text-2xl tracking-widest border-b-3 border-coffee pb-4 mb-6">
+        <h2 className="font-bold text-2xl tracking-widest border-b-3 border-coffee pb-4">
           Load Flashcard Set
         </h2>
 
@@ -251,7 +251,7 @@ export function LoadFlashcardsModal({
             className="flex-1 overflow-y-auto mb-6 pr-2"
             onScroll={handleScroll}
           >
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mt-4">
               {sets.map((set) => (
                 <div
                   key={set.id}
