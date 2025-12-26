@@ -40,6 +40,7 @@ const httpServer = createServer(app);
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
   cors: { origin: "*" },
+  maxHttpBufferSize: 1e7, // 10MB
 });
 
 // Testing

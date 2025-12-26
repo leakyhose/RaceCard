@@ -80,7 +80,7 @@ export function SaveFlashcardsModal({
       if (setError) throw setError;
 
       // Insert all flashcards
-      const flashcardsToInsert = flashcards.map((card) => ({
+      const flashcardsToInsert = flashcards.map((card, index) => ({
         set_id: setData.id,
         term: card.question,
         definition: card.answer,
@@ -89,13 +89,19 @@ export function SaveFlashcardsModal({
         is_generated: card.isGenerated || false,
         term_generated: card.termGenerated || false,
         definition_generated: card.definitionGenerated || false,
+        order_index: index,
       }));
 
-      const { error: cardsError } = await supabase
-        .from("flashcards")
-        .insert(flashcardsToInsert);
+      // Batch insert in chunks of 100 to avoid payload limits
+      const BATCH_SIZE = 100;
+      for (let i = 0; i < flashcardsToInsert.length; i += BATCH_SIZE) {
+        const batch = flashcardsToInsert.slice(i, i + BATCH_SIZE);
+        const { error: cardsError } = await supabase
+          .from("flashcards")
+          .insert(batch);
 
-      if (cardsError) throw cardsError;
+        if (cardsError) throw cardsError;
+      }
 
       if (isLeader) {
         socket.emit("updateFlashcard", flashcards, setName.trim(), setData.id);

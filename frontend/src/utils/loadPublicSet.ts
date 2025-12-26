@@ -10,7 +10,6 @@ export interface LoadedPublicSet {
 
 export async function loadPublicSet(setId: string): Promise<LoadedPublicSet | null> {
   try {
-    // 1. Fetch set details
     const { data: setData, error: setError } = await supabase
       .from("public_flashcard_sets")
       .select("*")
@@ -19,13 +18,11 @@ export async function loadPublicSet(setId: string): Promise<LoadedPublicSet | nu
 
     if (setError) throw setError;
 
-    // Increment plays - using RPC to bypass RLS if needed
     const { error: rpcError } = await supabase.rpc("increment_plays", {
       row_id: setId,
     });
 
     if (rpcError) {
-      // Fallback to direct update if RPC fails (e.g. function doesn't exist)
       const { error: updateError } = await supabase
         .from("public_flashcard_sets")
         .update({ plays: (Number(setData.plays) || 0) + 1 })
@@ -36,18 +33,47 @@ export async function loadPublicSet(setId: string): Promise<LoadedPublicSet | nu
       }
     }
 
-    // 2. Fetch flashcards
-    const { data: cardsData, error: cardsError } = await supabase
-      .from("flashcards")
-      .select(
-        "term, definition, trick_terms, trick_definitions, is_generated, term_generated, definition_generated",
-      )
-      .eq("public_set_id", setId)
-      .order("id", { ascending: true });
+    type CardData = {
+      term: string;
+      definition: string;
+      trick_terms?: string[];
+      trick_definitions?: string[];
+      is_generated?: boolean;
+      term_generated?: boolean;
+      definition_generated?: boolean;
+      order_index: number;
+    };
+    let allCardsData: CardData[] = [];
+    let page = 0;
+    const pageSize = 1000;
+    let hasMore = true;
 
-    if (cardsError) throw cardsError;
+    while (hasMore) {
+      const { data, error: fetchError } = await supabase
+        .from("flashcards")
+        .select(
+          "term, definition, trick_terms, trick_definitions, is_generated, term_generated, definition_generated, order_index",
+        )
+        .eq("public_set_id", setId)
+        .order("order_index", { ascending: true })
+        .order("id", { ascending: true }) // Fallback
+        .range(page * pageSize, (page + 1) * pageSize - 1);
 
-    const flashcards: Flashcard[] = cardsData.map((card, index) => ({
+      if (fetchError) throw fetchError;
+
+      if (data && data.length > 0) {
+        allCardsData = [...allCardsData, ...data];
+        if (data.length < pageSize) {
+          hasMore = false;
+        } else {
+          page++;
+        }
+      } else {
+        hasMore = false;
+      }
+    }
+
+    const flashcards: Flashcard[] = allCardsData.map((card, index) => ({
       id: index.toString(),
       question: card.term,
       answer: card.definition,
@@ -61,10 +87,8 @@ export async function loadPublicSet(setId: string): Promise<LoadedPublicSet | nu
       definitionGenerated: card.definition_generated || false,
     }));
 
-    // 3. Emit socket event
     socket.emit("updateFlashcard", flashcards, setData.name, setId);
 
-    // 4. Return settings
     const settings: Partial<Settings> = {};
     if (setData.shuffle_flashcard !== null && setData.shuffle_flashcard !== undefined) settings.shuffle = setData.shuffle_flashcard;
     if (setData.fuzzy_tolerance !== null && setData.fuzzy_tolerance !== undefined) settings.fuzzyTolerance = setData.fuzzy_tolerance;

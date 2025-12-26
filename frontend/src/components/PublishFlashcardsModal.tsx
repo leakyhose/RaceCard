@@ -3,6 +3,21 @@ import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../supabaseClient";
 import type { Settings } from "@shared/types";
 
+interface FlashcardDBRow {
+  id: string;
+  term: string;
+  definition: string;
+  trick_terms: string[] | null;
+  trick_definitions: string[] | null;
+  is_generated: boolean | null;
+  term_generated: boolean | null;
+  definition_generated: boolean | null;
+  order_index: number | null;
+  set_id: string | null;
+  public_set_id: string | null;
+  created_at: string;
+}
+
 interface PublishFlashcardsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -56,10 +71,6 @@ export function PublishFlashcardsModal({
       setError("");
       setSuccess(false);
 
-      // Determine if we should lock "Answer by Term"
-      // If only Term is generated, lock to Term (true)
-      // If only Definition is generated, lock to Definition (false)
-      // If both or neither, don't lock
       let termValue = currentSettings.answerByTerm;
 
       if (termGenerated && !definitionGenerated) {
@@ -68,24 +79,16 @@ export function PublishFlashcardsModal({
         termValue = false;
       }
 
-      // If MC is off, term shouldn't be locked by generation status necessarily,
-      // but if we are publishing settings for a game, maybe it matters.
-      // The user said: "you shouldnt be able to publish cards of mulitple choice on a term or defintino that doesnt have multiple choice options."
-      // So if MC is ON, we must enforce valid term/def choice.
-
       const mcValue = hasGenerated ? currentSettings.multipleChoice : false;
 
       if (mcValue) {
-        // If MC is ON, enforce term lock if partial generation
         if (termGenerated && !definitionGenerated) {
           termValue = true;
         } else if (definitionGenerated && !termGenerated) {
           termValue = false;
         }
       } else {
-        // If MC is OFF, maybe we don't care?
-        // But the user might turn MC ON.
-        // If they turn MC ON, we need to ensure Term is correct.
+        // If they turn MC ON, ensure Term is correct.
       }
 
       setSettings({
@@ -113,7 +116,6 @@ export function PublishFlashcardsModal({
     value: boolean,
   ) => {
     setSettings((prev) => {
-      // Prevent invalid term selection if MC is ON
       if (key === "term" && field === "value" && prev.mc.value) {
         if (termGenerated && !definitionGenerated && !value) {
           return prev;
@@ -151,16 +153,17 @@ export function PublishFlashcardsModal({
         if (key === "mc" && newSettings.mc.locked && value) {
           newSettings.fuzzy = { locked: true, value: false };
         }
+      }
 
-        // If MC is turned ON, check generation status and lock Term if needed
-        if (key === "mc" && value) {
-          if (termGenerated && !definitionGenerated) {
-            newSettings.term = { ...newSettings.term, value: true };
-          } else if (definitionGenerated && !termGenerated) {
-            newSettings.term = { ...newSettings.term, value: false };
-          }
+      // Enforce Term/Definition consistency if MC is ON (whether locked or value changed)
+      if (newSettings.mc.value) {
+        if (termGenerated && !definitionGenerated) {
+          newSettings.term = { ...newSettings.term, value: true };
+        } else if (definitionGenerated && !termGenerated) {
+          newSettings.term = { ...newSettings.term, value: false };
         }
       }
+
       return newSettings;
     });
   };
@@ -196,20 +199,41 @@ export function PublishFlashcardsModal({
 
       if (createError) throw createError;
 
-      // 2. Fetch original flashcards
-      const { data: originalCards, error: fetchError } = await supabase
-        .from("flashcards")
-        .select("*")
-        .eq("set_id", setId);
+      // 2. Fetch original flashcards with pagination to handle >1000 cards
+      let allOriginalCards: FlashcardDBRow[] = [];
+      let page = 0;
+      const pageSize = 1000;
+      let hasMore = true;
 
-      if (fetchError) throw fetchError;
+      while (hasMore) {
+        const { data, error: fetchError } = await supabase
+          .from("flashcards")
+          .select("*")
+          .eq("set_id", setId)
+          .order("order_index", { ascending: true })
+          .order("id", { ascending: true })
+          .range(page * pageSize, (page + 1) * pageSize - 1);
 
-      if (!originalCards || originalCards.length === 0) {
+        if (fetchError) throw fetchError;
+
+        if (data && data.length > 0) {
+          allOriginalCards = [...allOriginalCards, ...data];
+          if (data.length < pageSize) {
+            hasMore = false;
+          } else {
+            page++;
+          }
+        } else {
+          hasMore = false;
+        }
+      }
+
+      if (allOriginalCards.length === 0) {
         throw new Error("No flashcards found to publish");
       }
 
       // 3. Insert copies linked to public set
-      const cardsToInsert = originalCards.map((card) => ({
+      const cardsToInsert = allOriginalCards.map((card, index) => ({
         public_set_id: publicSet.id,
         term: card.term,
         definition: card.definition,
@@ -218,13 +242,19 @@ export function PublishFlashcardsModal({
         is_generated: card.is_generated || false,
         term_generated: card.term_generated || false,
         definition_generated: card.definition_generated || false,
+        order_index: card.order_index ?? index,
       }));
 
-      const { error: insertError } = await supabase
-        .from("flashcards")
-        .insert(cardsToInsert);
+      // Batch insert
+      const BATCH_SIZE = 100;
+      for (let i = 0; i < cardsToInsert.length; i += BATCH_SIZE) {
+        const batch = cardsToInsert.slice(i, i + BATCH_SIZE);
+        const { error: insertError } = await supabase
+          .from("flashcards")
+          .insert(batch);
 
-      if (insertError) throw insertError;
+        if (insertError) throw insertError;
+      }
 
       setSuccess(true);
       setTimeout(() => {
@@ -335,7 +365,6 @@ export function PublishFlashcardsModal({
                   const isMcLockedOn =
                     settings.mc.locked && settings.mc.value === true;
 
-                  // Check if Term setting is constrained by MC + Partial Generation
                   const isTermConstrained =
                     setting.key === "term" &&
                     settings.mc.value === true &&

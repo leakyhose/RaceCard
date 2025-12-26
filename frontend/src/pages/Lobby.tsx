@@ -184,7 +184,7 @@ export default function Lobby() {
         if (deleteError) throw deleteError;
 
         // Insert new flashcards
-        const flashcardsToInsert = lobby!.flashcards.map((card) => ({
+        const flashcardsToInsert = lobby!.flashcards.map((card, index) => ({
           set_id: trackedSetId,
           term: card.question,
           definition: card.answer,
@@ -193,6 +193,7 @@ export default function Lobby() {
           is_generated: card.isGenerated || false,
           term_generated: card.termGenerated || false,
           definition_generated: card.definitionGenerated || false,
+          order_index: index,
         }));
 
         const { error: insertError } = await supabase

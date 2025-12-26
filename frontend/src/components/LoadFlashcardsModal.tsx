@@ -6,6 +6,17 @@ import type { Flashcard, Settings } from "@shared/types";
 import { PublishFlashcardsModal } from "./PublishFlashcardsModal";
 import { getRelativeTime } from "../utils/flashcardUtils";
 
+interface FlashcardDBRow {
+  term: string;
+  definition: string;
+  trick_terms: string[] | null;
+  trick_definitions: string[] | null;
+  is_generated: boolean | null;
+  term_generated: boolean | null;
+  definition_generated: boolean | null;
+  order_index: number | null;
+}
+
 interface LoadFlashcardsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -85,21 +96,28 @@ export function LoadFlashcardsModal({
             .eq("set_id", set.id);
 
           // Check if any flashcards have generated MC options
-          const { data: generatedCards } = await supabase
+          // We check for existence of ANY card with term_generated=true or definition_generated=true
+          const { count: termGenCount } = await supabase
             .from("flashcards")
-            .select("term_generated, definition_generated")
+            .select("*", { count: "exact", head: true })
             .eq("set_id", set.id)
-            .or("term_generated.eq.true,definition_generated.eq.true")
-            .limit(1);
+            .eq("term_generated", true);
+
+          const { count: defGenCount } = await supabase
+            .from("flashcards")
+            .select("*", { count: "exact", head: true })
+            .eq("set_id", set.id)
+            .eq("definition_generated", true);
+
+          const hasTermGen = (termGenCount || 0) > 0;
+          const hasDefGen = (defGenCount || 0) > 0;
 
           return {
             ...set,
             flashcard_count: count || 0,
-            has_generated:
-              (generatedCards && generatedCards.length > 0) || false,
-            term_generated: generatedCards?.[0]?.term_generated || false,
-            definition_generated:
-              generatedCards?.[0]?.definition_generated || false,
+            has_generated: hasTermGen || hasDefGen,
+            term_generated: hasTermGen,
+            definition_generated: hasDefGen,
           };
         }),
       );
@@ -145,24 +163,44 @@ export function LoadFlashcardsModal({
     setError("");
 
     try {
-      // Fetch flashcards for this set
-      const { data, error: fetchError } = await supabase
-        .from("flashcards")
-        .select(
-          "term, definition, trick_terms, trick_definitions, is_generated, term_generated, definition_generated",
-        )
-        .eq("set_id", setId)
-        .order("id", { ascending: true });
+      // Fetch flashcards for this set with pagination to handle >1000 cards
+      let allData: FlashcardDBRow[] = [];
+      let page = 0;
+      const pageSize = 1000;
+      let hasMore = true;
 
-      if (fetchError) throw fetchError;
+      while (hasMore) {
+        const { data, error: fetchError } = await supabase
+          .from("flashcards")
+          .select(
+            "term, definition, trick_terms, trick_definitions, is_generated, term_generated, definition_generated, order_index",
+          )
+          .eq("set_id", setId)
+          .order("order_index", { ascending: true })
+          .order("id", { ascending: true }) // Fallback for old cards
+          .range(page * pageSize, (page + 1) * pageSize - 1);
 
-      if (!data || data.length === 0) {
+        if (fetchError) throw fetchError;
+
+        if (data && data.length > 0) {
+          allData = [...allData, ...data];
+          if (data.length < pageSize) {
+            hasMore = false;
+          } else {
+            page++;
+          }
+        } else {
+          hasMore = false;
+        }
+      }
+
+      if (allData.length === 0) {
         setError("This set has no flashcards");
         return;
       }
 
       // Convert to Flashcard format and send to server
-      const flashcards: Flashcard[] = data.map((card, index) => ({
+      const flashcards: Flashcard[] = allData.map((card, index) => ({
         id: index.toString(),
         question: card.term,
         answer: card.definition,
