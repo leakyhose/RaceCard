@@ -109,7 +109,8 @@ io.on("connection", (socket) => {
     }
     socket.join(code);
     lobby.players = sortPlayersByMetric(lobby);
-    io.to(code).emit("lobbyUpdated", lobby);
+    socket.emit("lobbyUpdated", lobby);
+    socket.to(code).emit("playersUpdated", lobby.players);
     // Send join notification to chat
     io.to(code).emit("chatMessage", {
       player: "System",
@@ -142,7 +143,7 @@ io.on("connection", (socket) => {
     }
 
     lobby.distractorStatus = "idle";
-    io.to(lobby.code).emit("lobbyUpdated", lobby);
+    io.to(lobby.code).emit("flashcardsUpdated", lobby.flashcards, lobby.flashcardID, lobby.flashcardName);
   });
 
   // Updates settings
@@ -153,7 +154,7 @@ io.on("connection", (socket) => {
       return;
     }
 
-    io.to(lobby.code).emit("lobbyUpdated", lobby);
+    io.to(lobby.code).emit("settingsUpdated", lobby.settings);
   });
 
   // Manual generation of multiple choice options
@@ -185,22 +186,23 @@ io.on("connection", (socket) => {
 
     lobby.distractorStatus = "generating";
     lobby.generationProgress = "Starting generation...";
-    io.to(lobby.code).emit("lobbyUpdated", lobby);
+    io.to(lobby.code).emit("distractorStatusUpdated", "generating", "Starting generation...");
 
     try {
       await generateDistractors(lobby.code, mode, (progress) => {
         lobby.generationProgress = progress;
-        io.to(lobby.code).emit("lobbyUpdated", lobby);
+        io.to(lobby.code).emit("distractorStatusUpdated", "generating", progress);
       });
       lobby.distractorStatus = "ready";
       lobby.generationProgress = undefined;
+      io.to(lobby.code).emit("distractorStatusUpdated", "ready");
+      io.to(lobby.code).emit("flashcardsUpdated", lobby.flashcards, lobby.flashcardID, lobby.flashcardName);
     } catch (error) {
       console.error("Error generating distractors:", error);
       lobby.distractorStatus = "error";
       lobby.generationProgress = undefined;
+      io.to(lobby.code).emit("distractorStatusUpdated", "error");
     }
-
-    io.to(lobby.code).emit("lobbyUpdated", lobby);
   });
 
   // Updates leader
@@ -210,7 +212,7 @@ io.on("connection", (socket) => {
       console.log(`Failed to update leader`);
       return;
     }
-    io.to(lobby.code).emit("lobbyUpdated", lobby);
+    io.to(lobby.code).emit("leaderUpdated", lobby.leader);
   });
 
   // Gets lobby data, used to check when lobby exists too when null is emitted
@@ -243,7 +245,8 @@ io.on("connection", (socket) => {
     }
     if (!lobby) return;
     lobby.players = sortPlayersByMetric(lobby);
-    io.to(lobby.code).emit("lobbyUpdated", lobby);
+    io.to(lobby.code).emit("playersUpdated", lobby.players);
+    io.to(lobby.code).emit("leaderUpdated", lobby.leader);
     // Send leave notification to chat
     if (playerName) {
       io.to(lobby.code).emit("chatMessage", {
@@ -266,7 +269,8 @@ io.on("connection", (socket) => {
 
     lobby.status = "starting";
     lobby.players = sortPlayersByMetric(lobby);
-    io.to(lobby.code).emit("lobbyUpdated", lobby);
+    io.to(lobby.code).emit("lobbyStatusUpdated", "starting");
+    io.to(lobby.code).emit("playersUpdated", lobby.players);
 
     shuffleGameCards(lobby.code);
 
@@ -285,7 +289,8 @@ io.on("connection", (socket) => {
         // Set status to ongoing before starting game loop
         lobby.status = "ongoing";
         lobby.players = sortPlayersByMetric(lobby);
-        io.to(lobby.code).emit("lobbyUpdated", lobby);
+        io.to(lobby.code).emit("lobbyStatusUpdated", "ongoing");
+        io.to(lobby.code).emit("playersUpdated", lobby.players);
 
         const runGameplayLoop = (lobbyCode: string) => {
           const currentLobby = getLobbyByCode(lobbyCode);
@@ -300,7 +305,8 @@ io.on("connection", (socket) => {
                 finalLobby.players[0].wins += 1;
               }
               finalLobby.players = sortPlayersByMetric(finalLobby);
-              io.to(lobbyCode).emit("lobbyUpdated", finalLobby);
+              io.to(lobbyCode).emit("lobbyStatusUpdated", "finished");
+              io.to(lobbyCode).emit("playersUpdated", finalLobby.players);
               endGame(lobbyCode);
             }
             return;
@@ -330,7 +336,7 @@ io.on("connection", (socket) => {
             }
 
             const lobby = wipeMiniStatus(lobbyCode);
-            if (lobby) io.to(lobbyCode).emit("lobbyUpdated", lobby);
+            if (lobby) io.to(lobbyCode).emit("playersUpdated", lobby.players);
 
             // Wait 5 seconds to show results
             setLobbyTimeout(lobbyCode, () => {
@@ -349,7 +355,8 @@ io.on("connection", (socket) => {
                     finalLobby.players[0].wins += 1;
                   }
                   finalLobby.players = sortPlayersByMetric(finalLobby);
-                  io.to(lobbyCode).emit("lobbyUpdated", finalLobby);
+                  io.to(lobbyCode).emit("lobbyStatusUpdated", "finished");
+                  io.to(lobbyCode).emit("playersUpdated", finalLobby.players);
                   endGame(lobbyCode);
                 }
                 return;
@@ -369,7 +376,8 @@ io.on("connection", (socket) => {
                     finalLobby.players[0].wins += 1;
                   }
                   finalLobby.players = sortPlayersByMetric(finalLobby);
-                  io.to(lobbyCode).emit("lobbyUpdated", finalLobby);
+                  io.to(lobbyCode).emit("lobbyStatusUpdated", "finished");
+                  io.to(lobbyCode).emit("playersUpdated", finalLobby.players);
                   endGame(lobbyCode);
                 }
                 return;
@@ -472,10 +480,11 @@ io.on("connection", (socket) => {
 
         clearLobbyTimers(lobby.code); // Clear any pending game loop timers
 
-        io.to(lobby.code).emit("lobbyUpdated", lobby);
+        io.to(lobby.code).emit("lobbyStatusUpdated", "finished");
+        io.to(lobby.code).emit("playersUpdated", lobby.players);
         endGame(lobby.code);
       } else {
-        io.to(lobby.code).emit("lobbyUpdated", lobby);
+        io.to(lobby.code).emit("endGameVotesUpdated", lobby.endGameVotes);
       }
     }
   });
@@ -520,7 +529,8 @@ io.on("connection", (socket) => {
     });
 
     lobby.players = sortPlayersByMetric(lobby);
-    io.to(lobby.code).emit("lobbyUpdated", lobby);
+    io.to(lobby.code).emit("lobbyStatusUpdated", "waiting");
+    io.to(lobby.code).emit("playersUpdated", lobby.players);
   });
 });
 httpServer.listen(3000, () => console.log("Server running on :3000"));

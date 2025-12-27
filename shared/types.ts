@@ -63,6 +63,14 @@ export interface Gamestate {
 
 export interface ServerToClientEvents {
   lobbyUpdated: (lobby: Lobby) => void;
+  settingsUpdated: (settings: Settings) => void;
+  flashcardsUpdated: (flashcards: Flashcard[], flashcardID: string, flashcardName: string) => void;
+  playersUpdated: (players: Player[]) => void;
+  lobbyStatusUpdated: (status: GameStatus) => void;
+  leaderUpdated: (leader: string) => void;
+  distractorStatusUpdated: (status: "idle" | "generating" | "ready" | "error", progress?: string) => void;
+  endGameVotesUpdated: (votes: string[]) => void;
+
   scoreUpdate: (players: Player[]) => void;
   chatMessage: (msg: { player: string; id: string; text: string }) => void;
   lobbyData: (lobby: Lobby | null) => void;
