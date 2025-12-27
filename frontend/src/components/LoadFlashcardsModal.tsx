@@ -4,6 +4,7 @@ import { supabase } from "../supabaseClient";
 import { socket } from "../socket";
 import type { Flashcard, Settings } from "@shared/types";
 import { PublishFlashcardsModal } from "./PublishFlashcardsModal";
+import { EditFlashcardsModal } from "./EditFlashcardsModal";
 import { getRelativeTime } from "../utils/flashcardUtils";
 
 interface FlashcardDBRow {
@@ -50,6 +51,7 @@ export function LoadFlashcardsModal({
   const [loadingSetId, setLoadingSetId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [publishingSet, setPublishingSet] = useState<FlashcardSet | null>(null);
+  const [editingSet, setEditingSet] = useState<FlashcardSet | null>(null);
   const mouseDownOnBackdrop = useRef(false);
 
   // Pagination state
@@ -313,15 +315,6 @@ export function LoadFlashcardsModal({
                       {set.flashcard_count !== 1 ? "s" : ""} • Created{" "}
                       {getRelativeTime(set.created_at)}
                     </div>
-                    {set.has_generated ? (
-                      <div className="text-xs text-coffee font-bold mt-1">
-                        ✓ Multiple Choice Ready
-                      </div>
-                    ) : (
-                      <div className="text-xs text-terracotta font-bold mt-1">
-                        ✗ No Multiple Choice Generated
-                      </div>
-                    )}
                   </div>
                   <div className="flex gap-2 shrink-0 mt-auto">
                     <button
@@ -330,6 +323,13 @@ export function LoadFlashcardsModal({
                       className="flex-1 border-2 border-coffee bg-mint text-coffee px-2 py-2 hover:bg-coffee hover:text-vanilla transition-colors text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Publish
+                    </button>
+                    <button
+                      onClick={() => setEditingSet(set)}
+                      disabled={loadingSetId !== null}
+                      className="flex-1 border-2 border-coffee bg-thistle text-coffee px-2 py-2 hover:bg-coffee hover:text-vanilla transition-colors text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Edit
                     </button>
                     <button
                       onClick={() => handleLoadSet(set.id, set.name)}
@@ -377,6 +377,20 @@ export function LoadFlashcardsModal({
           termGenerated={publishingSet.term_generated}
           definitionGenerated={publishingSet.definition_generated}
           currentSettings={currentSettings}
+        />
+      )}
+
+      {editingSet && (
+        <EditFlashcardsModal
+          isOpen={true}
+          onClose={() => setEditingSet(null)}
+          setId={editingSet.id}
+          setName={editingSet.name}
+          onSaveSuccess={() => {
+            setPage(0);
+            setHasMore(true);
+            fetchSets(0, true);
+          }}
         />
       )}
     </div>

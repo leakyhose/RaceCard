@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../socket";
-import type { Lobby } from "@shared/types";
+import type { Lobby, Player } from "@shared/types";
 
 // Keeps lobby instnance updated, redirecting to home if lobby ever doesnt exist
 export function useLobbyData(code: string | undefined) {
@@ -30,13 +30,22 @@ export function useLobbyData(code: string | undefined) {
       }
     };
 
+    const handlePlayersUpdated = (players: Player[]) => {
+      setLobby((prev) => {
+        if (!prev) return prev;
+        return { ...prev, players };
+      });
+    };
+
     socket.emit("getLobby", code);
     socket.on("lobbyData", handleLobbyData);
     socket.on("lobbyUpdated", handleLobbyUpdated);
+    socket.on("playersUpdated", handlePlayersUpdated);
 
     return () => {
       socket.off("lobbyData", handleLobbyData);
       socket.off("lobbyUpdated", handleLobbyUpdated);
+      socket.off("playersUpdated", handlePlayersUpdated);
     };
   }, [code, navigate]);
 

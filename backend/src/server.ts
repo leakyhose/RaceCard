@@ -420,7 +420,7 @@ io.on("connection", (socket) => {
     }
 
     result.lobby.players = sortPlayersByMetric(result.lobby);
-    io.to(result.lobby.code).emit("lobbyUpdated", result.lobby);
+    io.to(result.lobby.code).emit("playersUpdated", result.lobby.players);
 
     // Check if all players have answered correctly or someone won
     const pointsToWin = result.lobby.settings.pointsToWin || 100;
