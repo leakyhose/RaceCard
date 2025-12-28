@@ -156,15 +156,7 @@ export default function Lobby() {
 
   // Auto-adjust split ratio when game starts/ends
   useEffect(() => {
-    if (
-      lobby?.status === "ongoing" ||
-      lobby?.status === "finished" ||
-      lobby?.status === "starting"
-    ) {
-      // When game is active/finished/starting, shrink the top section to fit stats/commands
-      // 0.35 gives enough room for stats + commands while maximizing chat space
-      setSplitRatio(0.35);
-    } else if (lobby?.status === "waiting") {
+    if (lobby?.status === "waiting") {
       // Reset to default when back in waiting room
       setSplitRatio(0.5);
     }
@@ -499,80 +491,95 @@ export default function Lobby() {
           ref={sidebarRef}
           className="w-65 flex flex-col bg-light-vanilla h-full overflow-hidden relative"
         >
-          <div
-            style={{ height: `${splitRatio * 100}%` }}
-            className="flex flex-col min-h-0 overflow-hidden pl-4 pr-4 pt-4 pb-2 mask-[linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)]"
-          >
-            {lobby.status === "waiting" ? (
-              <LoadFlashcards
-                isLeader={isLeader}
-                refreshTrigger={refreshTrigger}
-                autoSelectedSetId={trackedSetId}
-                onOpenModal={() => setShowLoadModal(true)}
-                onOpenPublicModal={() => setShowPublicModal(true)}
-                isGenerating={lobby?.distractorStatus === "generating"}
-                onPublicSetLoaded={handlePublicSetLoaded}
-                onPrivateSetLoaded={handlePrivateSetLoaded}
-                onTooltipChange={(
-                  show: boolean,
-                  text?: string,
-                  x?: number,
-                  y?: number,
-                ) => {
-                  setShowTooltip(show);
-                  if (show && text) {
-                    setTooltipText(text);
-                  } else if (!show) {
-                    setTooltipText(null);
-                  }
-                  if (x !== undefined && y !== undefined)
-                    setTooltipPos({ x, y });
-                }}
-              />
-            ) : (
-              <GameControls lobby={lobby} userId={socket.id || ""} />
-            )}
-          </div>
-
-          <div
-            className={`absolute h-5 flex items-center justify-center cursor-ns-resize z-50 w-full group transition-colors duration-200`}
-            style={{ top: `calc(${splitRatio * 100}% - 10px)` }}
-            onMouseDown={handleMouseDown}
-          >
-            <div className="w-full flex items-center justify-center pointer-events-none px-4">
+          {lobby.status === "waiting" ? (
+            <>
               <div
-                className={`flex-1 transition-colors duration-200 ${isDragging ? "bg-coffee h-[3px]" : "bg-coffee/10 h-0.5 group-hover:h-[3px] group-hover:bg-coffee"}`}
-              ></div>
-              <div
-                className={`flex items-center justify-center transition-colors duration-200 ${isDragging ? "text-coffee" : "text-coffee/20 group-hover:text-coffee"}`}
+                style={{ height: `${splitRatio * 100}%` }}
+                className="flex flex-col min-h-0 overflow-hidden pl-4 pr-4 pt-4 pb-2 mask-[linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)]"
               >
-                {/* Minimalistic Drag Handle Icon */}
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M18 15l-6 6-6-6" />
-                  <path d="M18 9l-6-6-6 6" />
-                </svg>
+                <LoadFlashcards
+                  isLeader={isLeader}
+                  refreshTrigger={refreshTrigger}
+                  autoSelectedSetId={trackedSetId}
+                  onOpenModal={() => setShowLoadModal(true)}
+                  onOpenPublicModal={() => setShowPublicModal(true)}
+                  isGenerating={lobby?.distractorStatus === "generating"}
+                  onPublicSetLoaded={handlePublicSetLoaded}
+                  onPrivateSetLoaded={handlePrivateSetLoaded}
+                  onTooltipChange={(
+                    show: boolean,
+                    text?: string,
+                    x?: number,
+                    y?: number,
+                  ) => {
+                    setShowTooltip(show);
+                    if (show && text) {
+                      setTooltipText(text);
+                    } else if (!show) {
+                      setTooltipText(null);
+                    }
+                    if (x !== undefined && y !== undefined)
+                      setTooltipPos({ x, y });
+                  }}
+                />
               </div>
-              <div
-                className={`flex-1 transition-colors duration-200 ${isDragging ? "bg-coffee h-[3px]" : "bg-coffee/10 h-0.5 group-hover:h-[3px] group-hover:bg-coffee"}`}
-              ></div>
-            </div>
-          </div>
 
-          <div
-            style={{ height: `${(1 - splitRatio) * 100}%` }}
-            className="flex flex-col min-h-0 overflow-hidden pl-4 pr-4 pb-4 pt-2 mask-[linear-gradient(to_top,black_calc(100%-1.5rem),transparent)]"
-          >
-            <Chat />
-          </div>
+              <div
+                className={`absolute h-5 flex items-center justify-center cursor-ns-resize z-50 w-full group transition-colors duration-200`}
+                style={{ top: `calc(${splitRatio * 100}% - 10px)` }}
+                onMouseDown={handleMouseDown}
+              >
+                <div className="w-full flex items-center justify-center pointer-events-none px-4">
+                  <div
+                    className={`flex-1 transition-colors duration-200 ${isDragging ? "bg-coffee h-[3px]" : "bg-coffee/10 h-0.5 group-hover:h-[3px] group-hover:bg-coffee"}`}
+                  ></div>
+                  <div
+                    className={`flex items-center justify-center transition-colors duration-200 ${isDragging ? "text-coffee" : "text-coffee/20 group-hover:text-coffee"}`}
+                  >
+                    {/* Minimalistic Drag Handle Icon */}
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M18 15l-6 6-6-6" />
+                      <path d="M18 9l-6-6-6 6" />
+                    </svg>
+                  </div>
+                  <div
+                    className={`flex-1 transition-colors duration-200 ${isDragging ? "bg-coffee h-[3px]" : "bg-coffee/10 h-0.5 group-hover:h-[3px] group-hover:bg-coffee"}`}
+                  ></div>
+                </div>
+              </div>
+
+              <div
+                style={{ height: `${(1 - splitRatio) * 100}%` }}
+                className="flex flex-col min-h-0 overflow-hidden pl-4 pr-4 pb-4 pt-2 mask-[linear-gradient(to_top,black_calc(100%-1.5rem),transparent)]"
+              >
+                <Chat />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="h-[35%] flex flex-col min-h-0 overflow-hidden pl-4 pr-4 pt-4 pb-2 mask-[linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)] shrink-0">
+                <GameControls lobby={lobby} userId={socket.id || ""} />
+              </div>
+
+              <div className="h-5 flex items-center justify-center w-full px-4 shrink-0">
+                <div className="flex-1 bg-coffee/10 h-0.5"></div>
+                <div className="flex-1 bg-coffee/10 h-0.5"></div>
+              </div>
+
+              <div className="flex-1 flex flex-col min-h-0 overflow-hidden pl-4 pr-4 pb-4 pt-2 mask-[linear-gradient(to_top,black_calc(100%-1.5rem),transparent)]">
+                <Chat />
+              </div>
+            </>
+          )}
         </div>
 
         <div
@@ -666,7 +673,7 @@ export default function Lobby() {
             leader={lobby.leader}
           />
 
-          <div className="p-4 flex flex-col gap-4">
+          <div className="pt-4 flex flex-col gap-4">
             <GameSettings
               isLeader={isLeader}
               currentSettings={lobby.settings}

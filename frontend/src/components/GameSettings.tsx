@@ -78,7 +78,6 @@ export function GameSettings({
   };
 
   const isLocked = (key: keyof Settings) => lockedSettings[key] !== undefined;
-  const isMCLockedOn = lockedSettings.multipleChoice === true;
 
   return (
     <div
@@ -294,13 +293,19 @@ export function GameSettings({
         <>
           <button
             onClick={handleUploadClick}
-            className={`w-full border-2 border-coffee px-2 py-2 font-bold text-sm transition-colors mt-1 ${
-              shake
-                ? "animate-shake bg-red-500 text-vanilla"
-                : "bg-powder text-coffee hover:bg-coffee hover:text-vanilla"
+            className={` group relative w-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none mt-3 ${
+              shake ? "animate-shake" : ""
             }`}
           >
-            Upload Flashcards
+            <span
+              className={`block w-full h-full rounded-xl border-2 border-coffee px-2 py-2 font-bold text-sm -translate-y-[0.1rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.2rem] group-active:translate-y-0 ${
+                shake
+                  ? "bg-red-500 text-vanilla"
+                  : "bg-powder text-coffee"
+              }`}
+            >
+              Upload Flashcards
+            </span>
           </button>
           {isGenerating && (
             <div className="text-center text-[10px] font-bold text-coffee/60 mt-0.5">
