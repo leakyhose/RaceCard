@@ -167,7 +167,7 @@ export function LobbyHeader({
           ) : lobby.status === "starting" ? (
             <></>
           ) : (
-            <div className="text-terracotta font-bold">
+            <div className="text-coffee font-bold text-2xl">
               {roundCountdown !== null && roundCountdown > 0
                 ? `${roundCountdown}`
                 : ""}
@@ -182,7 +182,7 @@ export function LobbyHeader({
             Error occurred while generating choices
           </div>
         ) : lobby.status === "ongoing" ? (
-            <div className="text-terracotta font-bold">
+            <div className="text-coffee font-bold text-2xl">
               {roundCountdown !== null && roundCountdown > 0
                 ? `${roundCountdown}`
                 : ""}

@@ -49,7 +49,7 @@ export function GameControls({ lobby, userId }: GameControlsProps) {
         <h2 className="text-lg font-bold text-coffee wrap-break-words w-full">
           {lobby.flashcardName || "Unnamed Flashcard Set"}
         </h2>
-        <p className="text-xs text-coffee/70 italic warp-break-words w-full pt-4">
+        <p className="text-xs text-coffee/90 warp-break-words w-full pt-3">
           {lobby.flashcardDescription || "No description"}
         </p>
       </div>

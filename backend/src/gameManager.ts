@@ -357,6 +357,20 @@ export function advanceToNextFlashcard(
   return getCurrentQuestion(lobbyCode);
 }
 
+// Process stats for players who didn't answer
+export function processUnansweredPlayers(lobbyCode: string) {
+  const lobby = getLobbyByCode(lobbyCode);
+  const gs = codeToGamestate.get(lobbyCode);
+  if (!lobby || !gs) return;
+
+  lobby.players.forEach((player) => {
+    if (!gs.submittedPlayers.includes(player.id)) {
+      if (!player.totalAnswers) player.totalAnswers = 0;
+      player.totalAnswers++;
+    }
+  });
+}
+
 // Clean up game state when game ends
 export function endGame(lobbyCode: string) {
   codeToGamestate.delete(lobbyCode);

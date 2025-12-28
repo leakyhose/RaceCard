@@ -241,9 +241,11 @@ export function Game() {
                 ${showResults ? "opacity-0 pointer-events-none" : "opacity-100 z-10"}
             `}
             >
-              <div className="w-full max-w-2xl mx-auto p-6">
-                {!hasAnswered ? (
-                  currentChoices ? (
+              <div className="w-full max-w-2xl mx-auto p-6 relative">
+                <div
+                  className={`${hasAnswered ? "opacity-0 pointer-events-none" : ""}`}
+                >
+                  {currentChoices ? (
                     <div className="grid grid-cols-2 gap-6 auto-rows-fr min-h-46">
                       {Array.from(new Set(currentChoices)).map(
                         (choice, index) => (
@@ -283,31 +285,35 @@ export function Game() {
                         onCut={(e) => e.preventDefault()}
                       />
                     </form>
-                  )
-                ) : (
-                  <div className="text-center p-6">
-                    {isCorrect === true ? (
-                      <div>
-                        <div className="text-4xl mb-2 text-coffee">✓</div>
-                        <div className="text-xl font-bold text-coffee tracking-widest">
-                          Correct
+                  )}
+                </div>
+
+                {hasAnswered && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      {isCorrect === true ? (
+                        <div>
+                          <div className="text-4xl mb-2 text-coffee">✓</div>
+                          <div className="text-xl font-bold text-coffee tracking-widest">
+                            Correct
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="text-4xl mb-2 text-terracotta">✗</div>
-                        <div className="text-xl font-bold text-terracotta tracking-widest">
-                          Incorrect
+                      ) : (
+                        <div>
+                          <div className="text-4xl mb-2 text-terracotta">✗</div>
+                          <div className="text-xl font-bold text-terracotta tracking-widest">
+                            Incorrect
+                          </div>
                         </div>
+                      )}
+                      {answerTime !== null && (
+                        <div className="text-lg text-coffee mt-2 font-bold">
+                          {(answerTime / 1000).toFixed(3)}s
+                        </div>
+                      )}
+                      <div className="text-coffee/50 mt-2 font-bold text-sm">
+                        Please wait for current flashcard to end...
                       </div>
-                    )}
-                    {answerTime !== null && (
-                      <div className="text-lg text-coffee mt-2 font-bold">
-                        {(answerTime / 1000).toFixed(3)}s
-                      </div>
-                    )}
-                    <div className="text-coffee/50 mt-2 font-bold text-sm">
-                      Please wait for current flashcard to end...
                     </div>
                   </div>
                 )}

@@ -33,6 +33,7 @@ import {
   generateDistractors,
   areDistractorsReady,
   areDistractorsGenerating,
+  processUnansweredPlayers,
 } from "./gameManager.js";
 
 const app = express();
@@ -348,6 +349,8 @@ io.on("connection", (socket) => {
             if (roundEnded) return;
             roundEnded = true;
             activeRounds.delete(lobbyCode); // Clean up
+
+            processUnansweredPlayers(lobbyCode);
 
             const results = getRoundResults(lobbyCode);
             if (results) {
