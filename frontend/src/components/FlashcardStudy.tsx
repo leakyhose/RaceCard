@@ -122,8 +122,19 @@ export function FlashcardStudy({
                 <div className="col-start-1 row-start-1 backface-hidden relative w-full h-full">
                   {/* Under Card (Cover) */}
                   <div className="shadow-[0_0_10px_rgba(0,0,0,0.2)] border-2 border-coffee absolute inset-0 rounded-[20px] bg-vanilla flex items-end justify-center pb-1 -z-10">
-                    <div className="text-center text-coffee/80 text-[0.69rem] font-bold tracking-[0.2em]">
-                      cover card
+                    <div className="text-center text-coffee/80 text-[0.69rem] font-bold tracking-wider flex gap-2 px-4">
+                      {publicSetInfo.username && (
+                        <span>Created by {publicSetInfo.username}</span>
+                      )}
+                      {publicSetInfo.username && <span>•</span>}
+                      <span>
+                        Updated{" "}
+                        {getRelativeTime(
+                          publicSetInfo.updatedAt ||
+                            publicSetInfo.createdAt ||
+                            "",
+                        )}
+                      </span>
                     </div>
                   </div>
 
@@ -150,8 +161,8 @@ export function FlashcardStudy({
                       </div>
 
                       {/* Description Section */}
-                      <div className="flex items-center justify-center w-full px-8 overflow-y-auto max-h-[300px]">
-                        <div className="text-lg text-coffee/80 text-center">
+                      <div className="flex items-center justify-center w-full px-8">
+                        <div className="text-lg text-center font-bold text-coffee/80 whitespace-pre-wrap wrap-break-word hyphens-auto w-full max-w-full overflow-hidden">
                           {publicSetInfo.description || (
                             <span className="opacity-50">
                               No description provided
@@ -162,14 +173,6 @@ export function FlashcardStudy({
 
                       {/* Metadata Section */}
                       <div className="w-full flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-coffee/60 font-bold">
-                        {publicSetInfo.username && (
-                          <span>Created by {publicSetInfo.username}</span>
-                        )}
-                        {publicSetInfo.createdAt && (
-                          <span>
-                            Uploaded {getRelativeTime(publicSetInfo.createdAt)}
-                          </span>
-                        )}
                         <span>{flashcards.length} flashcards</span>
                       </div>
                     </div>
