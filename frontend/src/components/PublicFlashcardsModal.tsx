@@ -156,13 +156,15 @@ export function PublicFlashcardsModal({
       }}
       onClick={(e) => {
         if (mouseDownOnBackdrop.current && e.target === e.currentTarget) {
-          onClose();
+          if (loadingSetId === null) {
+            onClose();
+          }
         }
         mouseDownOnBackdrop.current = false;
       }}
     >
       <div
-        className="bg-vanilla border-3 border-coffee p-8 max-w-5xl w-full mx-4 shadow-[8px_8px_0px_0px_#644536] max-h-[80vh] flex flex-col"
+        className="bg-vanilla border-3 border-coffee p-8 max-w-5xl w-full mx-4 max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="font-bold text-2xl tracking-widest border-b-3 border-coffee pb-4">
@@ -233,7 +235,8 @@ export function PublicFlashcardsModal({
         <div className="border-t-3 border-coffee pt-4 mt-auto">
           <button
             onClick={onClose}
-            className="w-full border-2 border-coffee bg-vanilla text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold"
+            disabled={loadingSetId !== null}
+            className="w-full border-2 border-coffee bg-vanilla text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Close
           </button>

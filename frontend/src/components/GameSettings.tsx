@@ -106,7 +106,7 @@ export function GameSettings({
             />
           </div>
 
-          {!isMCLockedOn && (
+          {!currentSettings.multipleChoice && (
             <div
               className={`flex items-center justify-between ${canEdit && !isLocked("fuzzyTolerance") ? "cursor-pointer" : "cursor-not-allowed"} ${isLocked("fuzzyTolerance") ? "opacity-60 blur-[0.5px]" : ""}`}
               onClick={() =>

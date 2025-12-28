@@ -286,13 +286,15 @@ export function PublishFlashcardsModal({
       }}
       onClick={(e) => {
         if (mouseDownOnBackdrop.current && e.target === e.currentTarget) {
-          onClose();
+          if (!publishing) {
+            onClose();
+          }
         }
         mouseDownOnBackdrop.current = false;
       }}
     >
       <div
-        className="bg-vanilla border-3 border-coffee p-8 max-w-2xl w-full mx-4 shadow-[8px_8px_0px_0px_#644536] max-h-[90vh] flex flex-col overflow-y-auto"
+        className="bg-vanilla border-3 border-coffee p-8 max-w-2xl w-full mx-4 max-h-[90vh] flex flex-col overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="font-bold text-2xl tracking-widest border-b-3 border-coffee pb-4 mb-6">
@@ -496,7 +498,8 @@ export function PublishFlashcardsModal({
             <div className="flex gap-3 pt-4">
               <button
                 onClick={onClose}
-                className="flex-1 border-2 border-coffee bg-vanilla text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold"
+                disabled={publishing}
+                className="flex-1 border-2 border-coffee bg-vanilla text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>

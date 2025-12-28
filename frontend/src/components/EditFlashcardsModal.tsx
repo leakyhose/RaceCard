@@ -222,13 +222,15 @@ export function EditFlashcardsModal({
       }}
       onClick={(e) => {
         if (mouseDownOnBackdrop.current && e.target === e.currentTarget) {
-          onClose();
+          if (!saving && !loading) {
+            onClose();
+          }
         }
         mouseDownOnBackdrop.current = false;
       }}
     >
       <div
-        className="bg-vanilla border-3 border-coffee p-8 max-w-5xl w-full mx-4 shadow-[8px_8px_0px_0px_#644536] max-h-[80vh] flex flex-col"
+        className="bg-vanilla border-3 border-coffee p-8 max-w-5xl w-full mx-4 max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="font-bold text-2xl tracking-widest border-b-3 border-coffee pb-4 mb-4 flex justify-between items-center">
@@ -236,7 +238,8 @@ export function EditFlashcardsModal({
           <div className="flex items-center gap-4">
             <button
               onClick={() => setShowExport(true)}
-              className="text-sm font-bold text-coffee hover:text-terracotta underline decoration-2 underline-offset-2"
+              disabled={saving || loading}
+              className="text-sm font-bold text-coffee hover:text-terracotta underline decoration-2 underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Export
             </button>
@@ -371,8 +374,8 @@ export function EditFlashcardsModal({
         <div className="border-t-3 border-coffee pt-4 flex gap-4">
           <button
             onClick={onClose}
-            className="flex-1 border-2 border-coffee bg-vanilla text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold"
-            disabled={saving}
+            className="flex-1 border-2 border-coffee bg-vanilla text-coffee px-4 py-3 hover:bg-coffee hover:text-vanilla transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={saving || loading}
           >
             Cancel
           </button>

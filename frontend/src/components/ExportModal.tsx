@@ -145,13 +145,15 @@ export function ExportModal({
       }}
       onClick={(e) => {
         if (mouseDownOnBackdrop.current && e.target === e.currentTarget) {
-          onClose();
+          if (!loading) {
+            onClose();
+          }
         }
         mouseDownOnBackdrop.current = false;
       }}
     >
       <div
-        className="bg-vanilla border-3 border-coffee p-8 max-w-5xl w-full mx-4 shadow-[8px_8px_0px_0px_#644536] flex flex-col h-[80vh] overflow-hidden"
+        className="bg-vanilla border-3 border-coffee p-8 max-w-5xl w-full mx-4 flex flex-col h-[80vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="font-bold text-2xl tracking-widest border-b-3 border-coffee pb-4 mb-4">
@@ -212,7 +214,8 @@ export function ExportModal({
               <div className="flex justify-end gap-4 shrink-0 border-t-3 border-coffee pt-4">
                 <button
                   onClick={onClose}
-                  className="px-6 py-3 font-bold border-2 border-coffee bg-vanilla text-coffee hover:bg-coffee hover:text-vanilla transition-colors"
+                  disabled={loading}
+                  className="px-6 py-3 font-bold border-2 border-coffee bg-vanilla text-coffee hover:bg-coffee hover:text-vanilla transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Close
                 </button>
