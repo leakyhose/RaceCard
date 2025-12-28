@@ -7,6 +7,7 @@ import {
 import { generateResponse } from "./generateDistractors.js";
 
 import { shuffle, swap } from "./util.js";
+import { normalizeForFuzzy } from "./fuzzySearch.js";
 
 const codeToGamestate = new Map<string, Gamestate>();
 
@@ -243,8 +244,25 @@ export function validateAnswer(socketId: string, answerText: string) {
     ? currentFlashcard.question
     : currentFlashcard.answer;
 
-  const isCorrect =
-    correctAnswer.toLowerCase().trim() === answerText.toLowerCase().trim();
+  // Check if answer is correct
+  let isCorrect: boolean;
+  
+  // Fuzzy search only works in written mode (not multiple choice) and when setting is enabled
+  if (!lobby.settings.multipleChoice && lobby.settings.fuzzyTolerance) {
+    // Use fuzzy matching with normalization
+    const normalizedCorrect = normalizeForFuzzy(correctAnswer);
+    
+    // If the correct answer is a common word (normalizes to empty), fall back to standard matching
+    if (normalizedCorrect.length === 0) {
+      isCorrect = correctAnswer.toLowerCase().trim() === answerText.toLowerCase().trim();
+    } else {
+      const normalizedAnswer = normalizeForFuzzy(answerText);
+      isCorrect = normalizedCorrect === normalizedAnswer;
+    }
+  } else {
+    // Standard exact matching (with basic normalization)
+    isCorrect = correctAnswer.toLowerCase().trim() === answerText.toLowerCase().trim();
+  }
 
   if (isCorrect) {
     if (!gs.correctAnswers.find((a) => a.player === player.name)) {
