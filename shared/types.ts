@@ -40,6 +40,8 @@ export interface Lobby {
   flashcardID: string;
   flashcardName: string;
   flashcardDescription?: string;
+  allowView?: boolean;
+  allowSave?: boolean;
   status: GameStatus;
   settings: Settings;
   leader: string; // ID of leader
@@ -70,6 +72,8 @@ export interface ServerToClientEvents {
     flashcardID: string,
     flashcardName: string,
     flashcardDescription?: string,
+    allowView?: boolean,
+    allowSave?: boolean,
   ) => void;
   playersUpdated: (players: Player[]) => void;
   lobbyStatusUpdated: (status: GameStatus) => void;
@@ -99,6 +103,8 @@ export interface ClientToServerEvents {
     name: string,
     id: string,
     description?: string,
+    allowView?: boolean,
+    allowSave?: boolean,
   ) => void;
   updateSettings: (settings: Settings) => void;
   updateLeader: (nextLeaderId: string) => void;

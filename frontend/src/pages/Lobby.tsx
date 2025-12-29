@@ -446,6 +446,10 @@ export default function Lobby() {
 
   const isInLobby = lobby.players.some((player) => player.id === socket.id);
 
+  const canView = publicSetInfo
+    ? publicSetInfo.allow_view !== false
+    : lobby.allowView !== false;
+
   if (!nickname || !isInLobby) {
     return (
       <div>
@@ -598,7 +602,7 @@ export default function Lobby() {
           {lobby.status === "starting" ||
           lobby.status === "ongoing" ||
           lobby.status === "finished" ? (
-            <Game />
+            <Game lobby={lobby} />
           ) : (
             <div
               ref={contentWrapperRef}
@@ -626,10 +630,21 @@ export default function Lobby() {
                       }
                     }}
                     saveShake={saveShake}
-                    publicSetInfo={publicSetInfo}
+                    publicSetInfo={
+                      publicSetInfo ||
+                      (lobby.flashcardID
+                        ? {
+                            id: lobby.flashcardID,
+                            name: lobby.flashcardName,
+                            description: lobby.flashcardDescription,
+                            allow_view: lobby.allowView,
+                            allow_save: lobby.allowSave,
+                            settings: {},
+                          }
+                        : null)
+                    }
                   />
-                  {lobby.flashcards.length > 0 &&
-                    (!publicSetInfo || publicSetInfo.allow_view !== false) && (
+                  {lobby.flashcards.length > 0 && canView && (
                       <div className="mt-2 relative z-30">
                         <ArrowButton
                           onClick={scrollToAllCards}
@@ -642,7 +657,7 @@ export default function Lobby() {
               )}
 
               {/* All flashcards section - render when in all mode or transitioning */}
-              {(currentSection === "all" || isTransitioning) && (
+              {(currentSection === "all" || isTransitioning) && canView && (
                 <div
                   ref={allCardsRef}
                   className="bg-light-vanilla w-full pb-20"

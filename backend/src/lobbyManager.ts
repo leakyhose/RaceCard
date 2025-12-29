@@ -64,6 +64,8 @@ export function updateFlashcard(
   setName: string,
   setID: string,
   description: string = "",
+  allowView: boolean = true,
+  allowSave: boolean = true,
 ) {
   const lobby = getLobbyBySocket(socketId);
   if (!lobby) {
@@ -73,6 +75,8 @@ export function updateFlashcard(
   lobby.flashcardName = setName == " " ? "Unnamed Set" : setName;
   lobby.flashcardID = setID == " " ? "UNNAMED" : setID;
   lobby.flashcardDescription = description;
+  lobby.allowView = allowView;
+  lobby.allowSave = allowSave;
 
   // Update pointsToWin default
   const maxPoints = 5 * flashcards.length;

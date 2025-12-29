@@ -1,9 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { socket } from "../socket";
-import type { FlashcardEnd } from "@shared/types";
+import type { FlashcardEnd, Lobby } from "@shared/types";
 import { MiniLeaderboard } from "./MiniLeaderboard";
-import { useParams } from "react-router-dom";
-import { useLobbyData } from "../hooks/useLobbyData";
 
 const getChoiceFontSize = (text: string) => {
   if (text.length > 50) return "text-xs md:text-sm";
@@ -11,9 +9,11 @@ const getChoiceFontSize = (text: string) => {
   return "text-base md:text-xl";
 };
 
-export function Game() {
-  const { code } = useParams();
-  const lobby = useLobbyData(code);
+interface GameProps {
+  lobby: Lobby;
+}
+
+export function Game({ lobby }: GameProps) {
   const [countdown, setCountdown] = useState<number | string | null>(
     lobby?.status === "ongoing" ? "Waiting for current round to end..." : 3,
   );

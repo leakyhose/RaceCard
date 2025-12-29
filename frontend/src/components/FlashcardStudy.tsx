@@ -145,14 +145,16 @@ export function FlashcardStudy({
                         <span>Created by {publicSetInfo.username}</span>
                       )}
                       {publicSetInfo.username && <span>•</span>}
-                      <span>
-                        Updated{" "}
-                        {getRelativeTime(
-                          publicSetInfo.updatedAt ||
-                            publicSetInfo.createdAt ||
-                            "",
-                        )}
-                      </span>
+                      {(publicSetInfo.updatedAt || publicSetInfo.createdAt) && (
+                        <span>
+                          Updated{" "}
+                          {getRelativeTime(
+                            publicSetInfo.updatedAt ||
+                              publicSetInfo.createdAt ||
+                              "",
+                          )}
+                        </span>
+                      )}
                     </div>
                   </div>
 

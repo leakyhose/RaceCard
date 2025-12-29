@@ -154,7 +154,10 @@ export function parseAdvancedFlashcards(
 }
 
 export function getRelativeTime(dateString: string): string {
+  if (!dateString) return "";
   let date = new Date(dateString);
+  if (isNaN(date.getTime())) return "";
+
   const now = new Date();
 
   // Check if date is in the future, suggesting a timezone mismatch (UTC parsed as Local)

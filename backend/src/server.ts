@@ -136,22 +136,35 @@ io.on("connection", (socket) => {
   });
 
   // Loads flashcards
-  socket.on("updateFlashcard", async (cards, setName, setID, description) => {
-    const lobby = updateFlashcard(socket.id, cards, setName, setID, description);
-    if (!lobby) {
-      console.log(`Failed to update flashcards`);
-      return;
-    }
+  socket.on(
+    "updateFlashcard",
+    async (cards, setName, setID, description, allowView, allowSave) => {
+      const lobby = updateFlashcard(
+        socket.id,
+        cards,
+        setName,
+        setID,
+        description,
+        allowView,
+        allowSave,
+      );
+      if (!lobby) {
+        console.log(`Failed to update flashcards`);
+        return;
+      }
 
-    lobby.distractorStatus = "idle";
-    io.to(lobby.code).emit(
-      "flashcardsUpdated",
-      lobby.flashcards,
-      lobby.flashcardID,
-      lobby.flashcardName,
-      lobby.flashcardDescription,
-    );
-  });
+      lobby.distractorStatus = "idle";
+      io.to(lobby.code).emit(
+        "flashcardsUpdated",
+        lobby.flashcards,
+        lobby.flashcardID,
+        lobby.flashcardName,
+        lobby.flashcardDescription,
+        lobby.allowView,
+        lobby.allowSave,
+      );
+    },
+  );
 
   // Updates settings
   socket.on("updateSettings", async (settings) => {

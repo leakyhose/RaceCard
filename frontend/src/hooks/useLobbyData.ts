@@ -52,6 +52,8 @@ export function useLobbyData(code: string | undefined) {
       flashcardID: string,
       flashcardName: string,
       flashcardDescription?: string,
+      allowView?: boolean,
+      allowSave?: boolean,
     ) => {
       setLobby((prev) =>
         prev
@@ -61,6 +63,8 @@ export function useLobbyData(code: string | undefined) {
               flashcardID,
               flashcardName,
               flashcardDescription,
+              allowView,
+              allowSave,
             }
           : prev,
       );
