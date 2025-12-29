@@ -252,9 +252,9 @@ export function Game() {
                           <button
                             key={index}
                             onClick={() => handleChoiceClick(choice)}
-                            className="group relative w-full h-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none select-none"
+                            className="group relative w-full h-full rounded-lg bg-coffee border-none p-0 cursor-pointer outline-none select-none"
                           >
-                            <span className="w-full h-full rounded-xl border-[0.2rem] border-coffee p-4 text-center -translate-y-0.5 transition-transform duration-100 ease-out group-hover:-translate-y-1 group-active:translate-y-0 flex flex-col justify-center min-h-20 bg-vanilla text-coffee font-bold">
+                            <span className="w-full h-full rounded-lg border-[0.2rem] border-coffee p-4 text-center -translate-y-0.5 transition-transform duration-100 ease-out group-hover:-translate-y-1 group-active:translate-y-0 flex flex-col justify-center min-h-20 bg-vanilla text-coffee font-bold">
                               <span
                                 className={`w-full line-clamp-2 wrap-break-word ${getChoiceFontSize(choice)}`}
                               >

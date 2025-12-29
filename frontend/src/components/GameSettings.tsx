@@ -293,12 +293,12 @@ export function GameSettings({
         <>
           <button
             onClick={handleUploadClick}
-            className={` group relative w-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none mt-3 ${
+            className={` group relative w-full rounded-md bg-coffee border-none p-0 cursor-pointer outline-none mt-3 ${
               shake ? "animate-shake" : ""
             }`}
           >
             <span
-              className={`block w-full h-full rounded-xl border-2 border-coffee px-2 py-2 font-bold text-sm -translate-y-[0.1rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.2rem] group-active:translate-y-0 ${
+              className={`block w-full h-full rounded-md border-2 border-coffee px-2 py-2 font-bold text-sm -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0 ${
                 shake
                   ? "bg-red-500 text-vanilla"
                   : "bg-powder text-coffee"

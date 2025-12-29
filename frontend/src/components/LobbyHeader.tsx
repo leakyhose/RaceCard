@@ -122,9 +122,9 @@ export function LobbyHeader({
               <button
                 onClick={canGenerate ? handleGenerateMultipleChoice : undefined}
                 disabled={isGenerating || !canGenerate}
-                className="group relative rounded-lg bg-coffee border-none p-0 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative rounded-md bg-coffee border-none p-0 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="block w-full h-full rounded-lg border-2 border-coffee px-6 py-1 font-bold text-coffee bg-powder tracking-widest -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0">
+                <span className="block w-full h-full rounded-md border-2 border-coffee px-6 py-1 font-bold text-coffee bg-powder tracking-widest -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0">
                   {canGenerate
                     ? "Generate Multiple Choice"
                     : "Max 200 flashcards for generation"}
@@ -140,9 +140,9 @@ export function LobbyHeader({
               <button
                 onClick={handleStartGame}
                 disabled={isGenerating}
-                className="group relative rounded-lg bg-coffee border-none p-0 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative rounded-md bg-coffee border-none p-0 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="block w-full h-full rounded-lg border-2 border-coffee px-8 py-1 font-bold text-vanilla bg-terracotta tracking-widest -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0">
+                <span className="block w-full h-full rounded-md border-2 border-coffee px-8 py-1 font-bold text-vanilla bg-terracotta tracking-widest -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0">
                   Start Game
                 </span>
               </button>
@@ -152,9 +152,9 @@ export function LobbyHeader({
                     canGenerate ? handleGenerateMultipleChoice : undefined
                   }
                   disabled={isGenerating || !canGenerate}
-                  className="group relative rounded-lg bg-coffee border-none p-0 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="group relative rounded-md bg-coffee border-none p-0 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span className="block w-full h-full rounded-lg border-2 border-coffee px-6 py-1 font-bold text-coffee bg-powder tracking-widest -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0">
+                  <span className="block w-full h-full rounded-md border-2 border-coffee px-6 py-1 font-bold text-coffee bg-powder tracking-widest -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0">
                     {canGenerate
                       ? "Generate Again"
                       : "Max 200 flashcards for generation"}

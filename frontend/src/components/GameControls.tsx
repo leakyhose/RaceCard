@@ -79,10 +79,10 @@ export function GameControls({ lobby, userId }: GameControlsProps) {
           <button
             onClick={handleVote}
             disabled={hasVoted}
-            className="group relative rounded-lg bg-coffee border-none p-0 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed w-full"
+            className="group relative rounded-md bg-coffee border-none p-0 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed w-full"
           >
             <span
-              className={`text-xs block w-full h-full rounded-lg border-2 border-coffee px-4 py-2 font-bold text-vanilla bg-terracotta tracking-widest -translate-y-[0.05rem] transition-transform duration-100 ease-out ${
+              className={`text-xs block w-full h-full rounded-md border-2 border-coffee px-4 py-2 font-bold text-vanilla bg-terracotta tracking-widest -translate-y-[0.05rem] transition-transform duration-100 ease-out ${
                 !hasVoted
                   ? "group-hover:-translate-y-[0.175rem] group-active:translate-y-0"
                   : ""

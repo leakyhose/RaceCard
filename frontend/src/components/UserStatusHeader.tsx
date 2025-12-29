@@ -16,17 +16,21 @@ export function UserStatusHeader() {
           </div>
           <button
             onClick={signOut}
-            className="border-2 border-coffee bg-terracotta text-vanilla px-3 py-1 hover:bg-coffee transition-colors text-xs font-bold"
+            className="rounded-md group relative bg-coffee border-none p-0 cursor-pointer outline-none"
           >
-            Sign Out
+            <span className="rounded-md block w-full h-full border-2 border-coffee px-3 py-1 font-bold text-vanilla bg-terracotta text-xs -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0">
+              Sign Out
+            </span>
           </button>
         </div>
       ) : (
         <button
           onClick={() => redirectLogin()}
-          className="border-2 border-coffee bg-powder text-coffee px-3 py-1 hover:bg-coffee hover:text-vanilla transition-colors text-xs font-bold"
+          className="rounded-md group relative bg-coffee border-none p-0 cursor-pointer outline-none"
         >
-          Log In
+          <span className="rounded-md block w-full h-full border-2 border-coffee px-3 py-1 font-bold text-coffee bg-powder text-xs -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0">
+            Log In
+          </span>
         </button>
       )}
     </div>

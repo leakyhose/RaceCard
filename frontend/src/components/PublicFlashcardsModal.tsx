@@ -192,7 +192,7 @@ export function PublicFlashcardsModal({
               {sets.map((set) => (
                 <div
                   key={set.id}
-                  className="border-2 border-coffee p-4 bg-light-vanilla/60 transition-colors cursor-default flex flex-col h-full"
+                  className="rounded-md border-2 border-coffee p-4 bg-light-vanilla/60 transition-colors cursor-default flex flex-col h-full"
                 >
                   <div className="flex-1 min-w-0 mb-4">
                     <div className="font-bold text-lg truncate">

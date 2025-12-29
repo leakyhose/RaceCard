@@ -359,15 +359,15 @@ export function LoadFlashcards({
                 <button
                   key={set.id}
                   onClick={() => handleLoadSet(set.id)}
-                  className={`group relative w-full rounded-xl bg-coffee border-none p-0 cursor-pointer outline-none ${
+                  className={`group relative w-full rounded-lg bg-coffee border-none p-0 cursor-pointer outline-none ${
                     shakingSetId === set.id ? "animate-shake" : ""
                   }`}
                 >
                   <span
-                    className={`w-full h-full rounded-xl border-2 border-coffee p-2 text-left -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0 flex flex-col justify-center min-h-15 ${
+                    className={`w-full h-full rounded-lg border-2 border-coffee p-2 text-left -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0 flex flex-col justify-center min-h-15 ${
                       shakingSetId === set.id
                         ? "bg-coffee/80 text-vanilla"
-                        : `${set.id == currentlyLoaded ? "shadow-[inset_0_0_0_2px_var(--color-powder)]" : ""} bg-vanilla text-coffee`
+                        : `bg-vanilla text-coffee ${set.id == currentlyLoaded ? "bg-linear-to-r from-powder/30 to-powder/30" : ""}`
                     }`}
                   >
                     {shakingSetId === set.id ? (
@@ -398,11 +398,26 @@ export function LoadFlashcards({
                               ? getRelativeTime(set.created_at)
                               : `${set.plays || 0} plays`}
                           </p>
-                          {loadingSetId === set.id && (
+                          {loadingSetId === set.id ? (
                             <div className="ml-2 shrink-0">
                               <div className="w-4 h-4 border-2 border-coffee border-t-transparent border-b-transparent rounded-full animate-spin"></div>
                             </div>
-                          )}
+                          ) : set.id === currentlyLoaded ? (
+                            <div className="ml-2 shrink-0">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="w-3 h-3 text-coffee"
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            </div>
+                          ) : null}
                         </div>
                       </div>
                     )}
