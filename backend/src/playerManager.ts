@@ -38,6 +38,12 @@ export function removePlayer(socketId: string): Lobby | null {
   const lobby = getLobbyBySocket(socketId);
   if (!lobby) return null;
   lobby.players = lobby.players.filter((p: Player) => p.id !== socketId);
+
+  // Remove from endGameVotes if present
+  if (lobby.endGameVotes) {
+    lobby.endGameVotes = lobby.endGameVotes.filter((id) => id !== socketId);
+  }
+
   untrackSocket(socketId);
   return lobby;
 }

@@ -344,6 +344,7 @@ export function Game({ lobby }: GameProps) {
                         {(results || lastResults)!.wrongAnswers.length > 0 && (
                           <MiniLeaderboard
                             leaderboardName="Wrong Answers"
+                            valueDisplay="under"
                             playerList={(results ||
                               lastResults)!.wrongAnswers.map((player) => ({
                               player: player.player,
@@ -358,6 +359,7 @@ export function Game({ lobby }: GameProps) {
                         (results || lastResults)!.wrongAnswers.length > 0 ? (
                           <MiniLeaderboard
                             leaderboardName="Wrong Answers"
+                            valueDisplay="under"
                             playerList={(results ||
                               lastResults)!.wrongAnswers.map((player) => ({
                               player: player.player,

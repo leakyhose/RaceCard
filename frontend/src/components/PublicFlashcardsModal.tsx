@@ -6,6 +6,7 @@ interface PublicFlashcardsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onPublicSetLoaded?: (set: LoadedPublicSet) => void;
+  isLeader: boolean;
 }
 
 interface PublicFlashcardSet {
@@ -25,11 +26,13 @@ export function PublicFlashcardsModal({
   isOpen,
   onClose,
   onPublicSetLoaded,
+  isLeader,
 }: PublicFlashcardsModalProps) {
   const [sets, setSets] = useState<PublicFlashcardSet[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingSetId, setLoadingSetId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [shakingId, setShakingId] = useState<string | null>(null);
   const mouseDownOnBackdrop = useRef(false);
 
   // Pagination state
@@ -193,23 +196,34 @@ export function PublicFlashcardsModal({
                 <div
                   key={set.id}
                   onClick={() => {
+                    if (!isLeader) {
+                      setShakingId(set.id);
+                      setTimeout(() => setShakingId(null), 500);
+                      return;
+                    }
                     if (!loadingSetId) handleLoad(set.id);
                   }}
                   className={`group relative h-80 w-full perspective-[1000px] ${
-                    loadingSetId
-                      ? "cursor-not-allowed opacity-70"
-                      : "cursor-pointer"
-                  }`}
+                    loadingSetId ? "cursor-not-allowed opacity-70" : "cursor-pointer"
+                  } ${shakingId === set.id ? "animate-shake" : ""}`}
                 >
                   {/* Under Card */}
                   <div className="absolute inset-0 rounded-[20px] border-2 border-coffee bg-light-vanilla/50 shadow-[0_0_10px_rgba(0,0,0,0.2)] flex items-end justify-center pb-0 -z-10">
-                    <div className="text-center text-coffee/80 text-[9px] font-bold tracking-[0.2em]">
-                      click to load
+                    <div
+                      className={`text-center text-[9px] font-bold tracking-[0.2em] ${
+                        shakingId === set.id ? "text-terracotta" : "text-coffee/80"
+                      }`}
+                    >
+                      {shakingId === set.id ? "MUST BE LEADER" : "CLICK TO LOAD"}
                     </div>
                   </div>
 
                   {/* Top Card */}
-                  <div className="h-full w-full transition-transform duration-300 ease-out group-hover:-translate-y-[15px]">
+                  <div
+                    className={`h-full w-full transition-transform duration-300 ease-out ${
+                      !loadingSetId ? "group-hover:-translate-y-[15px]" : ""
+                    }`}
+                  >
                     <div className="relative h-full w-full rounded-[20px] border-2 border-coffee bg-vanilla overflow-hidden">
                       <div className="absolute inset-0 bg-light-vanilla/20 shadow-[inset_0_0_0_2px_var(--color-terracotta)] rounded-[18px]" />
                       <div className="relative h-full w-full p-6 flex flex-col items-center text-center">

@@ -48,6 +48,7 @@ export interface Lobby {
   distractorStatus?: "idle" | "generating" | "ready" | "error";
   generationProgress?: string | undefined; // Progress message
   endGameVotes: string[]; // List of player IDs who voted to end the game
+  shuffledFlashcards?: Flashcard[]; // Current state of the deck (shuffled/remaining)
 }
 
 export interface FlashcardEnd {

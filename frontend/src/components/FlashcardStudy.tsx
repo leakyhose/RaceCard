@@ -309,7 +309,7 @@ export function FlashcardStudy({
               className="flex-1 h-0 bg-vanilla border rounded-xl border-coffee appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-coffee [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-coffee [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
             />
           ) : (
-            <div className="w-full text-center text-sm font-bold text-coffee/60 italic">
+            <div className="w-full text-center text-sm font-bold text-coffee/60">
               Viewing all flashcards disabled by publisher.
             </div>
           )}

@@ -163,6 +163,7 @@ io.on("connection", (socket) => {
         lobby.allowView,
         lobby.allowSave,
       );
+      io.to(lobby.code).emit("settingsUpdated", lobby.settings);
     },
   );
 
@@ -280,6 +281,7 @@ io.on("connection", (socket) => {
     lobby.players = sortPlayersByMetric(lobby);
     io.to(lobby.code).emit("playersUpdated", lobby.players);
     io.to(lobby.code).emit("leaderUpdated", lobby.leader);
+    io.to(lobby.code).emit("endGameVotesUpdated", lobby.endGameVotes || []);
     // Send leave notification to chat
     if (playerName) {
       io.to(lobby.code).emit("chatMessage", {
@@ -304,6 +306,7 @@ io.on("connection", (socket) => {
     lobby.players = sortPlayersByMetric(lobby);
     io.to(lobby.code).emit("lobbyStatusUpdated", "starting");
     io.to(lobby.code).emit("playersUpdated", lobby.players);
+    io.to(lobby.code).emit("endGameVotesUpdated", []);
 
     shuffleGameCards(lobby.code);
 

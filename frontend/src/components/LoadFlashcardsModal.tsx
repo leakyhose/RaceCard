@@ -25,6 +25,7 @@ interface LoadFlashcardsModalProps {
   onDeleteSuccess?: () => void;
   currentSettings: Settings;
   onSetLoaded?: (saved?: boolean) => void;
+  isLeader: boolean;
 }
 
 interface FlashcardSet {
@@ -44,6 +45,7 @@ export function LoadFlashcardsModal({
   onDeleteSuccess,
   currentSettings,
   onSetLoaded,
+  isLeader,
 }: LoadFlashcardsModalProps) {
   const { user } = useAuth();
   const [sets, setSets] = useState<FlashcardSet[]>([]);
@@ -52,6 +54,7 @@ export function LoadFlashcardsModal({
   const [error, setError] = useState("");
   const [publishingSet, setPublishingSet] = useState<FlashcardSet | null>(null);
   const [editingSet, setEditingSet] = useState<FlashcardSet | null>(null);
+  const [shakingId, setShakingId] = useState<string | null>(null);
   const mouseDownOnBackdrop = useRef(false);
   const prevRefreshTrigger = useRef(refreshTrigger);
   const hasInitialLoad = useRef(false);
@@ -321,23 +324,34 @@ export function LoadFlashcardsModal({
                 <div
                   key={set.id}
                   onClick={() => {
+                    if (!isLeader) {
+                      setShakingId(set.id);
+                      setTimeout(() => setShakingId(null), 500);
+                      return;
+                    }
                     if (!loadingSetId) handleLoadSet(set.id, set.name);
                   }}
                   className={`group relative h-80 w-full perspective-[1000px] ${
-                    loadingSetId
-                      ? "cursor-not-allowed opacity-70"
-                      : "cursor-pointer"
-                  }`}
+                    loadingSetId ? "cursor-not-allowed opacity-70" : "cursor-pointer"
+                  } ${shakingId === set.id ? "animate-shake" : ""}`}
                 >
                   {/* Under Card */}
                   <div className="absolute inset-0 rounded-[20px] border-2 border-coffee bg-light-vanilla/50 shadow-[0_0_10px_rgba(0,0,0,0.2)] flex items-end justify-center pb-0 -z-10">
-                    <div className="text-center text-coffee/80 text-[9px] font-bold tracking-[0.2em]">
-                      click to load
+                    <div
+                      className={`text-center text-[9px] font-bold tracking-[0.2em] ${
+                        shakingId === set.id ? "text-terracotta" : "text-coffee/80"
+                      }`}
+                    >
+                      {shakingId === set.id ? "MUST BE LEADER" : "CLICK TO LOAD"}
                     </div>
                   </div>
 
                   {/* Top Card */}
-                  <div className="h-full w-full transition-transform duration-300 ease-out group-hover:-translate-y-[15px]">
+                  <div
+                    className={`h-full w-full transition-transform duration-300 ease-out ${
+                      !loadingSetId ? "group-hover:-translate-y-[15px]" : ""
+                    }`}
+                  >
                     <div className="relative h-full w-full rounded-[20px] border-2 border-coffee bg-vanilla overflow-hidden">
                     <div className="absolute inset-0 bg-light-vanilla/20 shadow-[inset_0_0_0_2px_var(--color-terracotta)] rounded-[18px]" />
                       <div className="relative h-full w-full p-6 flex flex-col items-center justify-between text-center">
@@ -365,9 +379,11 @@ export function LoadFlashcardsModal({
                         <button
                           onClick={() => setPublishingSet(set)}
                           disabled={loadingSetId !== null}
-                          className="p-2 rounded-full text-coffee disabled:opacity-50"
-                          title="Publish"
+                          className="relative p-2 rounded-full text-coffee disabled:opacity-50 hover:[&>div]:opacity-100"
                         >
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-0.5 text-coffee text-[10px] font-bold opacity-0 transition-opacity pointer-events-none whitespace-nowrap">
+                            Publish
+                          </div>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="20"
@@ -387,9 +403,11 @@ export function LoadFlashcardsModal({
                         <button
                           onClick={() => setEditingSet(set)}
                           disabled={loadingSetId !== null}
-                          className="p-2 rounded-full text-coffee disabled:opacity-50"
-                          title="Edit"
+                          className="relative p-2 rounded-full text-coffee disabled:opacity-50 hover:[&>div]:opacity-100"
                         >
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-0.5 text-coffee text-[10px] font-bold opacity-0 transition-opacity pointer-events-none whitespace-nowrap">
+                            Edit
+                          </div>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="20"
@@ -408,9 +426,11 @@ export function LoadFlashcardsModal({
                         <button
                           onClick={() => handleDelete(set.id, set.name)}
                           disabled={loadingSetId !== null}
-                          className="p-2 rounded-full text-coffee disabled:opacity-50"
-                          title="Delete"
+                          className="relative p-2 rounded-full text-coffee disabled:opacity-50 hover:[&>div]:opacity-100"
                         >
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-0.5 text-coffee text-[10px] font-bold opacity-0 transition-opacity pointer-events-none whitespace-nowrap">
+                            Delete
+                          </div>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="20"

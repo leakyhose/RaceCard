@@ -12,6 +12,7 @@ export interface LoadedPublicSet {
   allow_view?: boolean;
   allow_save?: boolean;
   settings: Partial<Settings>;
+  flashcardCount: number;
 }
 
 export async function loadPublicSet(
@@ -133,6 +134,7 @@ export async function loadPublicSet(
       allow_view: setData.allow_view,
       allow_save: setData.allow_save,
       settings,
+      flashcardCount: flashcards.length,
     };
   } catch (err) {
     console.error("Error loading public set:", err);

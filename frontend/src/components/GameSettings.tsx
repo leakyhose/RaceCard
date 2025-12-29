@@ -268,7 +268,8 @@ export function GameSettings({
                 Points to Win
               </label>
               <span className="font-bold text-coffee text-xs">
-                {currentSettings.pointsToWin >= 500
+                {currentSettings.pointsToWin >=
+                Math.min(500, (lobby?.flashcards.length || 0) * 10)
                   ? "Play all cards"
                   : currentSettings.pointsToWin || 100}
               </span>
@@ -276,7 +277,7 @@ export function GameSettings({
             <input
               type="range"
               min={10}
-              max={500}
+              max={Math.min(500, (lobby?.flashcards.length || 0) * 10)}
               step={10}
               value={currentSettings.pointsToWin || 100}
               onChange={(e) =>

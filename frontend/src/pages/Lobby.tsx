@@ -82,8 +82,8 @@ export default function Lobby() {
         fuzzyTolerance: true,
         answerByTerm: false,
         multipleChoice: true,
-        roundTime: 10,
-        pointsToWin: 100,
+        roundTime: 12,
+        pointsToWin: set.flashcardCount <= 50 ? 500 : 100,
       };
 
       const newSettings = { ...lobby.settings };
@@ -640,6 +640,7 @@ export default function Lobby() {
                             allow_view: lobby.allowView,
                             allow_save: lobby.allowSave,
                             settings: {},
+                            flashcardCount: lobby.flashcards.length,
                           }
                         : null)
                     }
@@ -730,12 +731,14 @@ export default function Lobby() {
         onDeleteSuccess={() => setRefreshTrigger((prev) => prev + 1)}
         currentSettings={lobby.settings}
         onSetLoaded={handlePrivateSetLoaded}
+        isLeader={isLeader}
       />
 
       <PublicFlashcardsModal
         isOpen={showPublicModal}
         onClose={() => setShowPublicModal(false)}
         onPublicSetLoaded={handlePublicSetLoaded}
+        isLeader={isLeader}
       />
     </div>
   );

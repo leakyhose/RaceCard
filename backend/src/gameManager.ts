@@ -134,12 +134,23 @@ export function cleanupDistractorStatus(lobbyCode: string) {
   distractorStatus.delete(lobbyCode);
 }
 
-// Initialize game for a lobby (without shuffling yet)
+// Initialize game for a lobby
 export function startGame(socketId: string) {
   const lobby = getLobbyBySocket(socketId);
   if (!lobby) return null;
 
-  let gameFlashcards = [...lobby.flashcards];
+  // Check if we have a saved deck state (resuming a shuffled deck)
+  if (!lobby.shuffledFlashcards || lobby.shuffledFlashcards.length === 0) {
+    // New deck or deck exhausted, create new shuffle
+    let deck = [...lobby.flashcards];
+    if (lobby.settings.shuffle) {
+      deck = shuffle(deck);
+    }
+    lobby.shuffledFlashcards = deck;
+  }
+
+  // Use the saved deck state for this game
+  const gameFlashcards = [...lobby.shuffledFlashcards];
 
   codeToGamestate.set(lobby.code, {
     flashcards: gameFlashcards,
@@ -154,15 +165,8 @@ export function startGame(socketId: string) {
 
 // Shuffle cards for a lobby (called after countdown)
 export function shuffleGameCards(lobbyCode: string) {
-  const lobby = getLobbyByCode(lobbyCode);
-  if (!lobby) return;
-
-  const gs = codeToGamestate.get(lobbyCode);
-  if (!gs) return;
-
-  if (lobby.settings.shuffle) {
-    gs.flashcards = shuffle(gs.flashcards);
-  }
+  // Shuffling is now handled in startGame to persist deck state across games
+  return;
 }
 
 // Set round start time when question is emitted
@@ -340,16 +344,38 @@ export function advanceToNextFlashcard(
   lobbyCode: string,
 ): { question: string; choices: string[] | null } | null {
   const gs = codeToGamestate.get(lobbyCode);
-  if (!gs || !gs.flashcards || gs.flashcards.length === 0) return null;
+  const lobby = getLobbyByCode(lobbyCode);
+  if (!gs || !gs.flashcards || gs.flashcards.length === 0 || !lobby)
+    return null;
 
   gs.flashcards.shift();
+  // Also remove from the persistent shuffled deck
+  if (lobby.shuffledFlashcards && lobby.shuffledFlashcards.length > 0) {
+    lobby.shuffledFlashcards.shift();
+  }
 
   gs.correctAnswers = [];
   gs.wrongAnswers = [];
   gs.submittedPlayers = [];
   // roundStart will be set when newFlashcard is emitted
 
-  if (!gs.flashcards[0]) return null;
+  // If we ran out of cards in the current game, check if we need to replenish
+  if (!gs.flashcards[0]) {
+    // If the persistent deck is also empty (it should be), replenish it
+    if (!lobby.shuffledFlashcards || lobby.shuffledFlashcards.length === 0) {
+      let deck = [...lobby.flashcards];
+      if (lobby.settings.shuffle) {
+        deck = shuffle(deck);
+      }
+      lobby.shuffledFlashcards = deck;
+      gs.flashcards = [...deck]; // Continue game with new shuffle
+    } else {
+      // This case shouldn't happen if we sync them, but just in case
+      gs.flashcards = [...lobby.shuffledFlashcards];
+    }
+  }
+
+  if (!gs.flashcards[0]) return null; // Should not happen if we replenished
 
   return getCurrentQuestion(lobbyCode);
 }
