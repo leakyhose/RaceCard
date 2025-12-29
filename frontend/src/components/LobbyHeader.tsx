@@ -1,6 +1,6 @@
 import type { Lobby } from "@shared/types";
 import { socket } from "../socket";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { UserStatusHeader } from "./UserStatusHeader";
 
 interface LobbyHeaderProps {
@@ -20,6 +20,38 @@ export function LobbyHeader({
   userId,
 }: LobbyHeaderProps) {
   const [showCopyMessage, setShowCopyMessage] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const handleNewFlashcard = () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      setTimeLeft(lobby.settings.roundTime);
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev === null || prev <= 0) {
+            if (timerRef.current) clearInterval(timerRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    };
+
+    const handleEndFlashcard = () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      setTimeLeft(null);
+    };
+
+    socket.on("newFlashcard", handleNewFlashcard);
+    socket.on("endFlashcard", handleEndFlashcard);
+
+    return () => {
+      socket.off("newFlashcard", handleNewFlashcard);
+      socket.off("endFlashcard", handleEndFlashcard);
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [lobby.settings.roundTime]);
 
   const handleStartGame = () => {
     socket.emit("startGame");
@@ -135,7 +167,9 @@ export function LobbyHeader({
           ) : lobby.status === "finished" ? (
             <div className="font-bold text-lg">Game Finished</div>
           ) : (
-            <div className="text-terracotta font-bold">Game in Progress</div>
+            <div className="text-coffee font-bold">
+              {timeLeft !== null ? `${timeLeft}` : ""}
+            </div>
           )
         ) : lobby.flashcards.length == 0 ? (
           <div className="font-bold text-lg">
@@ -146,7 +180,9 @@ export function LobbyHeader({
             Error occurred while generating choices
           </div>
         ) : lobby.status === "ongoing" ? (
-          <div className="text-terracotta font-bold">Game in progress...</div>
+          <div className="text-terracotta font-bold">
+            {timeLeft !== null ? `Time Left: ${timeLeft}s` : ""}
+          </div>
         ) : lobby.status === "finished" ? (
           <div className="font-bold text-lg">
             Waiting for leader to continue...

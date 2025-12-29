@@ -268,14 +268,11 @@ export function validateAnswer(socketId: string, answerText: string) {
     if (!gs.correctAnswers.find((a) => a.player === player.name)) {
       let points = 1;
       if (gs.correctAnswers.length === 0) {
-        points = 5;
+        points = 10;
       } else {
         const firstTime = gs.correctAnswers[0]?.time ?? 0;
         const diff = (timeTaken - firstTime) / 1000;
-        if (diff < 1.5) points = 4;
-        else if (diff < 3) points = 3;
-        else if (diff < 5) points = 2;
-        else points = 1;
+        points = Math.max(1, 9 - Math.floor(diff / 0.7));
       }
 
       gs.correctAnswers.push({ player: player.name, time: timeTaken });
