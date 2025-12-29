@@ -1,6 +1,6 @@
 import type { Lobby } from "@shared/types";
 import { socket } from "../socket";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { UserStatusHeader } from "./UserStatusHeader";
 
 interface LobbyHeaderProps {
@@ -20,36 +20,6 @@ export function LobbyHeader({
   userId,
 }: LobbyHeaderProps) {
   const [showCopyMessage, setShowCopyMessage] = useState(false);
-  const [roundCountdown, setRoundCountdown] = useState<number | null>(null);
-
-  useEffect(() => {
-    const handleNewFlashcard = () => {
-      setRoundCountdown(Number(lobby.settings.roundTime) || 10);
-    };
-
-    const handleEndFlashcard = () => {
-      setRoundCountdown(null);
-    };
-
-    socket.on("newFlashcard", handleNewFlashcard);
-    socket.on("endFlashcard", handleEndFlashcard);
-
-    return () => {
-      socket.off("newFlashcard", handleNewFlashcard);
-      socket.off("endFlashcard", handleEndFlashcard);
-    };
-  }, [lobby.settings.roundTime]);
-
-  useEffect(() => {
-    if (roundCountdown === null) return;
-    if (roundCountdown <= 0) return;
-
-    const timer = setInterval(() => {
-      setRoundCountdown((prev) => (prev !== null && prev > 0 ? prev - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [roundCountdown]);
 
   const handleStartGame = () => {
     socket.emit("startGame");
@@ -122,13 +92,11 @@ export function LobbyHeader({
               <button
                 onClick={canGenerate ? handleGenerateMultipleChoice : undefined}
                 disabled={isGenerating || !canGenerate}
-                className="group relative rounded-md bg-coffee border-none p-0 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-powder text-coffee px-6 py-1 font-bold hover:bg-coffee hover:text-vanilla transition-colors tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="block w-full h-full rounded-md border-2 border-coffee px-6 py-1 font-bold text-coffee bg-powder tracking-widest -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0">
-                  {canGenerate
-                    ? "Generate Multiple Choice"
-                    : "Max 200 flashcards for generation"}
-                </span>
+                {canGenerate
+                  ? "Generate Multiple Choice"
+                  : "Max 200 flashcards for generation"}
               </button>
             </div>
           ) : lobby.distractorStatus === "error" ? (
@@ -140,11 +108,9 @@ export function LobbyHeader({
               <button
                 onClick={handleStartGame}
                 disabled={isGenerating}
-                className="group relative rounded-md bg-coffee border-none p-0 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-terracotta text-vanilla px-8 py-1 font-bold hover:bg-coffee hover:text-vanilla transition-colors tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="block w-full h-full rounded-md border-2 border-coffee px-8 py-1 font-bold text-vanilla bg-terracotta tracking-widest -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0">
-                  Start Game
-                </span>
+                Start Game
               </button>
               {lobby.settings.multipleChoice && !isPublicSet && (
                 <button
@@ -152,26 +118,18 @@ export function LobbyHeader({
                     canGenerate ? handleGenerateMultipleChoice : undefined
                   }
                   disabled={isGenerating || !canGenerate}
-                  className="group relative rounded-md bg-coffee border-none p-0 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-powder text-coffee px-6 py-1 font-bold hover:bg-coffee hover:text-vanilla transition-colors tracking-widest border-2 border-coffee shadow-[4px_4px_0px_0px_#644536] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span className="block w-full h-full rounded-md border-2 border-coffee px-6 py-1 font-bold text-coffee bg-powder tracking-widest -translate-y-[0.05rem] transition-transform duration-100 ease-out group-hover:-translate-y-[0.175rem] group-active:translate-y-0">
-                    {canGenerate
-                      ? "Generate Again"
-                      : "Max 200 flashcards for generation"}
-                  </span>
+                  {canGenerate
+                    ? "Generate Again"
+                    : "Max 200 flashcards for generation"}
                 </button>
               )}
             </div>
           ) : lobby.status === "finished" ? (
             <div className="font-bold text-lg">Game Finished</div>
-          ) : lobby.status === "starting" ? (
-            <></>
           ) : (
-            <div className="text-coffee font-bold text-2xl">
-              {roundCountdown !== null && roundCountdown > 0
-                ? `${roundCountdown}`
-                : ""}
-            </div>
+            <div className="text-terracotta font-bold">Game in Progress</div>
           )
         ) : lobby.flashcards.length == 0 ? (
           <div className="font-bold text-lg">
@@ -182,13 +140,7 @@ export function LobbyHeader({
             Error occurred while generating choices
           </div>
         ) : lobby.status === "ongoing" ? (
-            <div className="text-coffee font-bold text-2xl">
-              {roundCountdown !== null && roundCountdown > 0
-                ? `${roundCountdown}`
-                : ""}
-            </div>
-        ) : lobby.status === "starting" ? (
-            <></>
+          <div className="text-terracotta font-bold">Game in progress...</div>
         ) : lobby.status === "finished" ? (
           <div className="font-bold text-lg">
             Waiting for leader to continue...

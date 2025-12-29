@@ -210,13 +210,13 @@ io.on("connection", (socket) => {
       });
       lobby.distractorStatus = "ready";
       lobby.generationProgress = undefined;
-      io.to(lobby.code).emit("distractorStatusUpdated", "ready");
       io.to(lobby.code).emit(
         "flashcardsUpdated",
         lobby.flashcards,
         lobby.flashcardID,
         lobby.flashcardName,
       );
+      io.to(lobby.code).emit("distractorStatusUpdated", "ready");
     } catch (error) {
       console.error("Error generating distractors:", error);
       lobby.distractorStatus = "error";
