@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { socket } from "../socket";
 import type { Lobby } from "@shared/types";
 
@@ -7,6 +8,25 @@ interface GameControlsProps {
 }
 
 export function GameControls({ lobby, userId }: GameControlsProps) {
+  const [cardsPlayed, setCardsPlayed] = useState(0);
+
+  useEffect(() => {
+    const handleNewFlashcard = (
+      _question: string,
+      _choices: string[] | null,
+      playedCount?: number,
+    ) => {
+      if (playedCount !== undefined) {
+        setCardsPlayed(playedCount);
+      }
+    };
+
+    socket.on("newFlashcard", handleNewFlashcard);
+    return () => {
+      socket.off("newFlashcard", handleNewFlashcard);
+    };
+  }, []);
+
   const player = lobby.players.find((p) => p.id === userId);
   const answerTimes = player?.answerTimes || [];
 
@@ -25,7 +45,7 @@ export function GameControls({ lobby, userId }: GameControlsProps) {
 
   const totalPlayers = lobby.players.length;
   const votes = lobby.endGameVotes?.length || 0;
-  // Logic: votes / total > 0.75
+  // Require 75% votes
   const votesNeeded = Math.floor(totalPlayers * 0.75) + 1;
   const hasVoted = lobby.endGameVotes?.includes(userId);
 
@@ -70,6 +90,16 @@ export function GameControls({ lobby, userId }: GameControlsProps) {
             <span>Correct %:</span>
             <span>{correctPercentage}%</span>
           </div>
+          {lobby.settings.pointsToWin === lobby.flashcards.length * 10 && (
+            <div className="flex justify-between items-center text-coffee font-bold">
+              <span>Flashcards played:</span>
+              <span>
+                {lobby.status === "finished"
+                  ? `${lobby.flashcards.length}/${lobby.flashcards.length}`
+                  : `${cardsPlayed + 1}/${lobby.flashcards.length}`}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

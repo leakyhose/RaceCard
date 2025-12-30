@@ -63,6 +63,7 @@ export interface Gamestate {
   wrongAnswers: { player: string; answer: string[] }[];
   correctAnswers: { player: string; time: number }[];
   submittedPlayers: string[];
+  cardsPlayed: number; // Track number of cards played in current game
 }
 
 export interface ServerToClientEvents {
@@ -91,7 +92,11 @@ export interface ServerToClientEvents {
   startCountdown: (secondsRemaining: number | string) => void;
   generationProgress: (progress: string) => void;
 
-  newFlashcard: (question: string, choices: string[] | null) => void;
+  newFlashcard: (
+    question: string,
+    choices: string[] | null,
+    cardsPlayed?: number,
+  ) => void;
   endGuess: (answer: number, isCorrect: boolean) => void; // Time it took took for guess
   endFlashcard: (flashcardEnd: FlashcardEnd) => void;
 }

@@ -45,9 +45,9 @@ export function createLobby(hostID: string, hostName: string): Lobby {
       fuzzyTolerance: true,
       answerByTerm: false,
       multipleChoice: true,
-      roundTime: 12,
+      roundTime: 15,
       pointsToWin: 100,
-    }, // DEFAULT SETTINGS HERE WHEN CREATING LOBBY
+    }, // Default lobby settings
     leader: hostID,
     endGameVotes: [],
     shuffledFlashcards: [],
@@ -78,16 +78,16 @@ export function updateFlashcard(
   lobby.flashcardDescription = description;
   lobby.allowView = allowView;
   lobby.allowSave = allowSave;
-  lobby.shuffledFlashcards = []; // Reset shuffled deck when new cards are loaded
+  lobby.shuffledFlashcards = []; // Reset deck state
 
   // Update pointsToWin default
   const maxPoints = flashcards.length * 10;
   if (maxPoints <= 750) {
-    lobby.settings.pointsToWin = maxPoints; // Play all
+    lobby.settings.pointsToWin = maxPoints; // Default to Play All
   } else {
     lobby.settings.pointsToWin = 100;
   }
-  lobby.settings.roundTime = 12;
+  lobby.settings.roundTime = 15;
 
   resetPlayerStats(lobby.code);
   return lobby;

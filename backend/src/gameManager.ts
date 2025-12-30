@@ -139,6 +139,11 @@ export function startGame(socketId: string) {
   const lobby = getLobbyBySocket(socketId);
   if (!lobby) return null;
 
+  // If shuffle is disabled, always start fresh from the original order
+  if (!lobby.settings.shuffle) {
+    lobby.shuffledFlashcards = [];
+  }
+
   // Check if we have a saved deck state (resuming a shuffled deck)
   if (!lobby.shuffledFlashcards || lobby.shuffledFlashcards.length === 0) {
     // New deck or deck exhausted, create new shuffle
@@ -158,6 +163,7 @@ export function startGame(socketId: string) {
     wrongAnswers: [],
     correctAnswers: [],
     submittedPlayers: [],
+    cardsPlayed: lobby.flashcards.length - gameFlashcards.length,
   });
 
   return lobby;
@@ -179,7 +185,12 @@ export function setRoundStart(lobbyCode: string) {
 // Get the current question for a lobby
 export function getCurrentQuestion(
   lobbyCode: string,
-): { question: string; choices: string[] | null } | null {
+): {
+  question: string;
+  choices: string[] | null;
+  cardsPlayed: number;
+  totalCards: number;
+} | null {
   const gs = codeToGamestate.get(lobbyCode);
   if (!gs || !gs.flashcards || gs.flashcards.length === 0) return null;
 
@@ -215,7 +226,12 @@ export function getCurrentQuestion(
     }
   }
 
-  return { question, choices };
+  return {
+    question,
+    choices,
+    cardsPlayed: gs.cardsPlayed,
+    totalCards: lobby?.flashcards.length || 0,
+  };
 }
 
 // Validate an answer from a player
@@ -248,15 +264,11 @@ export function validateAnswer(socketId: string, answerText: string) {
     ? currentFlashcard.question
     : currentFlashcard.answer;
 
-  // Check if answer is correct
   let isCorrect: boolean;
   
-  // Fuzzy search only works in written mode (not multiple choice) and when setting is enabled
   if (!lobby.settings.multipleChoice && lobby.settings.fuzzyTolerance) {
-    // Use fuzzy matching with normalization
     const normalizedCorrect = normalizeForFuzzy(correctAnswer);
     
-    // If the correct answer is a common word (normalizes to empty), fall back to standard matching
     if (normalizedCorrect.length === 0) {
       isCorrect = correctAnswer.toLowerCase().trim() === answerText.toLowerCase().trim();
     } else {
@@ -264,7 +276,6 @@ export function validateAnswer(socketId: string, answerText: string) {
       isCorrect = normalizedCorrect === normalizedAnswer;
     }
   } else {
-    // Standard exact matching (with basic normalization)
     isCorrect = correctAnswer.toLowerCase().trim() === answerText.toLowerCase().trim();
   }
 
@@ -342,7 +353,12 @@ export function getRoundResults(lobbyCode: string) {
 // Advance to next flashcard
 export function advanceToNextFlashcard(
   lobbyCode: string,
-): { question: string; choices: string[] | null } | null {
+): {
+  question: string;
+  choices: string[] | null;
+  cardsPlayed: number;
+  totalCards: number;
+} | null {
   const gs = codeToGamestate.get(lobbyCode);
   const lobby = getLobbyByCode(lobbyCode);
   if (!gs || !gs.flashcards || gs.flashcards.length === 0 || !lobby)
@@ -357,25 +373,30 @@ export function advanceToNextFlashcard(
   gs.correctAnswers = [];
   gs.wrongAnswers = [];
   gs.submittedPlayers = [];
+  gs.cardsPlayed++;
   // roundStart will be set when newFlashcard is emitted
 
-  // If we ran out of cards in the current game, check if we need to replenish
+  // Check for "Play All" termination
+  const isPlayAllMode =
+    lobby.settings.pointsToWin === lobby.flashcards.length * 10;
+  if (isPlayAllMode && gs.cardsPlayed >= lobby.flashcards.length) {
+    return null; // End game
+  }
+
   if (!gs.flashcards[0]) {
-    // If the persistent deck is also empty (it should be), replenish it
     if (!lobby.shuffledFlashcards || lobby.shuffledFlashcards.length === 0) {
       let deck = [...lobby.flashcards];
       if (lobby.settings.shuffle) {
         deck = shuffle(deck);
       }
       lobby.shuffledFlashcards = deck;
-      gs.flashcards = [...deck]; // Continue game with new shuffle
+      gs.flashcards = [...deck]; // Reshuffle if empty
     } else {
-      // This case shouldn't happen if we sync them, but just in case
       gs.flashcards = [...lobby.shuffledFlashcards];
     }
   }
 
-  if (!gs.flashcards[0]) return null; // Should not happen if we replenished
+  if (!gs.flashcards[0]) return null; // Safety check
 
   return getCurrentQuestion(lobbyCode);
 }

@@ -245,7 +245,7 @@ export function GameSettings({
                 Round Time
               </label>
               <span className="font-bold text-coffee text-xs">
-                {Number(currentSettings.roundTime) || 10}s
+                {Number(currentSettings.roundTime) || 15}s
               </span>
             </div>
             <input
@@ -253,7 +253,7 @@ export function GameSettings({
               min={3}
               max={20}
               step={1}
-              value={Number(currentSettings.roundTime) || 10}
+              value={Number(currentSettings.roundTime) || 15}
               onChange={(e) =>
                 handleChange("roundTime", Number(e.target.value))
               }
@@ -279,10 +279,27 @@ export function GameSettings({
               min={10}
               max={Math.min(500, (lobby?.flashcards.length || 0) * 10)}
               step={10}
-              value={currentSettings.pointsToWin || 100}
-              onChange={(e) =>
-                handleChange("pointsToWin", Number(e.target.value))
+              value={
+                currentSettings.pointsToWin > 500
+                  ? Math.min(500, (lobby?.flashcards.length || 0) * 10)
+                  : currentSettings.pointsToWin || 100
               }
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                const maxVal = Math.min(
+                  500,
+                  (lobby?.flashcards.length || 0) * 10,
+                );
+                // If slider is at max, set points to total cards * 10 (Play All mode)
+                if (val === maxVal) {
+                  handleChange(
+                    "pointsToWin",
+                    (lobby?.flashcards.length || 0) * 10,
+                  );
+                } else {
+                  handleChange("pointsToWin", val);
+                }
+              }}
               disabled={!canEdit}
               className="w-full h-1.5 bg-coffee/20 appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-terracotta [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-coffee [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:bg-terracotta [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-coffee [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-none disabled:opacity-50 disabled:cursor-not-allowed"
             />

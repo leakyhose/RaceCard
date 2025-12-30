@@ -82,7 +82,7 @@ export default function Lobby() {
         fuzzyTolerance: true,
         answerByTerm: false,
         multipleChoice: true,
-        roundTime: 12,
+        roundTime: 15,
         pointsToWin: set.flashcardCount <= 50 ? 500 : 100,
       };
 

@@ -119,7 +119,7 @@ io.on("connection", (socket) => {
       text: `${nickname} joined the lobby`,
     });
 
-    // If game is ongoing, send current question to the new player
+    // Sync new player with current game state
     if (lobby.status === "ongoing") {
       const questionData = getCurrentQuestion(code);
       if (questionData) {
@@ -127,9 +127,10 @@ io.on("connection", (socket) => {
           "newFlashcard",
           questionData.question,
           questionData.choices,
+          questionData.cardsPlayed,
         );
       } else {
-        // If there's no current question (between rounds), show waiting message
+        // Wait for next round
         socket.emit("startCountdown", "Waiting for current round to end");
       }
     }
@@ -354,6 +355,7 @@ io.on("connection", (socket) => {
             "newFlashcard",
             questionData.question,
             questionData.choices,
+            questionData.cardsPlayed,
           );
 
           const roundStartTime = Date.now();
