@@ -32,7 +32,7 @@ export function Game({ lobby }: GameProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isResultsVisible, setIsResultsVisible] = useState(false);
 
-  // Delay results visibility to prevent scroll jump
+  // Handle delayed visibility for results to prevent scrolling issues
   useEffect(() => {
     if (showResults) {
       setIsResultsVisible(true);
@@ -42,14 +42,14 @@ export function Game({ lobby }: GameProps) {
     }
   }, [showResults]);
 
-  // Reset scroll on new question
+  // Reset scroll position when new question arrives
   useEffect(() => {
     if (currentQuestion && scrollRef.current) {
       scrollRef.current.scrollTop = 0;
     }
   }, [currentQuestion]);
 
-  // Manage input focus
+  // Focus management
   useEffect(() => {
     if (hasAnswered || showResults) {
       document.getElementById("chat-input")?.focus();
@@ -66,7 +66,7 @@ export function Game({ lobby }: GameProps) {
     };
   }, []);
 
-  // Update countdown for hot joins
+  // Update countdown message when lobby status changes to ongoing (for hot joins)
   useEffect(() => {
     if (
       lobby?.status === "ongoing" &&
@@ -82,11 +82,8 @@ export function Game({ lobby }: GameProps) {
       setCountdown(seconds);
     };
 
-    const handleNewFlashcard = (
-      question: string,
-      choices: string[] | null,
-    ) => {
-      setCountdown(null); // Clear countdown on question
+    const handleNewFlashcard = (question: string, choices: string[] | null) => {
+      setCountdown(null); // Clear countdown when question arrives
       setCurrentQuestion(question);
       setAnswer("");
       setHasAnswered(false);
@@ -347,7 +344,6 @@ export function Game({ lobby }: GameProps) {
                         {(results || lastResults)!.wrongAnswers.length > 0 && (
                           <MiniLeaderboard
                             leaderboardName="Wrong Answers"
-                            valueDisplay="under"
                             playerList={(results ||
                               lastResults)!.wrongAnswers.map((player) => ({
                               player: player.player,
@@ -362,7 +358,6 @@ export function Game({ lobby }: GameProps) {
                         (results || lastResults)!.wrongAnswers.length > 0 ? (
                           <MiniLeaderboard
                             leaderboardName="Wrong Answers"
-                            valueDisplay="under"
                             playerList={(results ||
                               lastResults)!.wrongAnswers.map((player) => ({
                               player: player.player,

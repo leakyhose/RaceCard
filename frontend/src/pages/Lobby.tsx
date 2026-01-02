@@ -77,7 +77,7 @@ export default function Lobby() {
     setTrackedSetId(set.id);
 
     if (isLeader && lobby) {
-      const defaultPublicSettings: Partial<Settings> = {
+      const defaultPublicSettings: Settings = {
         shuffle: true,
         fuzzyTolerance: true,
         answerByTerm: false,
@@ -86,20 +86,10 @@ export default function Lobby() {
         pointsToWin: set.flashcardCount <= 50 ? 500 : 100,
       };
 
-      const newSettings = { ...lobby.settings };
-
-      // Apply defaults for non-locked settings
-      (Object.keys(defaultPublicSettings) as Array<keyof Settings>).forEach(
-        (key) => {
-          if (set.settings[key] === undefined) {
-            // @ts-expect-error - iterating over keys ensures type safety
-            newSettings[key] = defaultPublicSettings[key];
-          }
-        },
-      );
-
-      // Apply locked settings
-      Object.assign(newSettings, set.settings);
+      const newSettings: Settings = {
+        ...defaultPublicSettings,
+        ...set.settings,
+      } as Settings;
 
       socket.emit("updateSettings", newSettings);
     }

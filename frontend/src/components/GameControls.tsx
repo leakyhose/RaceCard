@@ -92,7 +92,7 @@ export function GameControls({ lobby, userId }: GameControlsProps) {
           </div>
           <div className="flex flex-col gap-1">
             <div className="flex justify-between items-center text-coffee font-bold">
-              <span>Flashcards played:</span>
+              <span>Played:</span>
               <span>
                 {lobby.status === "finished"
                   ? `${lobby.flashcards.length}/${lobby.flashcards.length}`
@@ -101,7 +101,7 @@ export function GameControls({ lobby, userId }: GameControlsProps) {
             </div>
             {lobby.settings.pointsToWin !== lobby.flashcards.length * 10 && (
               <div className="text-[0.65rem] text-coffee/60 font-bold text-right leading-tight">
-                (Also ends when someone reaches {lobby.settings.pointsToWin}{" "}
+                (Also ends at {lobby.settings.pointsToWin}{" "}
                 points)
               </div>
             )}
