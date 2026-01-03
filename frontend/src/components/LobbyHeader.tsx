@@ -212,8 +212,8 @@ export function LobbyHeader({
             Error occurred while generating choices
           </div>
         ) : lobby.status === "ongoing" ? (
-          <div className="text-terracotta font-bold">
-            {timeLeft !== null ? `Time Left: ${timeLeft}s` : ""}
+          <div className="text-coffee font-bold">
+            {timeLeft !== null ? `${timeLeft}` : ""}
           </div>
         ) : lobby.status === "finished" ? (
           <div className="font-bold text-lg">
