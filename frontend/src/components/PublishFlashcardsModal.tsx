@@ -300,7 +300,7 @@ export function PublishFlashcardsModal({
       }}
     >
       <div
-        className="bg-vanilla border-3 border-coffee p-8 max-w-2xl w-full mx-4 max-h-[90vh] flex flex-col overflow-y-auto"
+        className="bg-vanilla border-3 border-coffee p-8 max-w-2xl w-full mx-4 max-h-[90vh] flex flex-col overflow-y-auto select-text"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="font-bold text-2xl tracking-widest border-b-3 border-coffee pb-4 mb-6">

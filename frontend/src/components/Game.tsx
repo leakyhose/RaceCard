@@ -279,7 +279,7 @@ export function Game({ lobby }: GameProps) {
                         value={answer}
                         onChange={(e) => setAnswer(e.target.value)}
                         placeholder="Answer here..."
-                        className="w-full px-6 py-4 text-2xl bg-vanilla border-2 border-coffee rounded-xl text-coffee placeholder:text-coffee/30 -translate-y-0.5 transition-transform duration-100 ease-out hover:-translate-y-1 focus:-translate-y-1 font-bold outline-none focus:shadow-[inset_0_0_0_1px_var(--color-terracotta)] text-center"
+                        className="w-full px-6 py-4 text-2xl bg-vanilla border-2 border-coffee rounded-xl text-coffee placeholder:text-coffee/30 -translate-y-0.5 transition-transform duration-100 ease-out hover:-translate-y-1 focus:-translate-y-1 font-bold outline-none focus:shadow-[inset_0_0_0_1px_var(--color-terracotta)] text-center select-text"
                         autoFocus
                         disabled={showResults}
                         onPaste={(e) => e.preventDefault()}

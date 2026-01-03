@@ -64,7 +64,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-light-vanilla flex items-center justify-center p-4">
+    <div className="min-h-screen bg-light-vanilla flex items-center justify-center p-4 select-none">
       <div className="w-full max-w-md border-3 border-coffee bg-vanilla p-8 shadow-[8px_8px_0px_0px_#644536]">
         <h1 className="text-4xl font-bold text-coffee mb-8 text-center tracking-widest">
           {isLogin ? "Login" : "Sign Up"}
@@ -82,7 +82,7 @@ export default function Auth() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 maxLength={15}
-                className="w-full px-4 py-3 border-2 border-coffee bg-white/50 text-coffee focus:outline-none focus:bg-white font-bold"
+                className="w-full px-4 py-3 border-2 border-coffee bg-white/50 text-coffee focus:outline-none focus:bg-white font-bold select-text"
                 placeholder="Username"
               />
             </div>
@@ -97,7 +97,7 @@ export default function Auth() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 border-2 border-coffee bg-white/50 text-coffee focus:outline-none focus:bg-white font-bold"
+              className="w-full px-4 py-3 border-2 border-coffee bg-white/50 text-coffee focus:outline-none focus:bg-white font-bold select-text"
               placeholder="your@email.com"
             />
           </div>
@@ -112,7 +112,7 @@ export default function Auth() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-4 py-3 border-2 border-coffee bg-white/50 text-coffee focus:outline-none focus:bg-white font-bold"
+              className="w-full px-4 py-3 border-2 border-coffee bg-white/50 text-coffee focus:outline-none focus:bg-white font-bold select-text"
               placeholder="••••••••"
             />
           </div>

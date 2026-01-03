@@ -338,7 +338,7 @@ export function JumboLoadFlashcards({
                 } ${shakingSetId === set.id ? "animate-shake" : ""}`}
               >
                 {/* Under Card */}
-                <div className="absolute inset-0 rounded-[20px] border-2 border-coffee bg-light-vanilla/50 shadow-[0_0_10px_rgba(0,0,0,0.2)] flex items-end justify-center pb-0 -z-10">
+                <div className="absolute inset-0 rounded-[20px] border-2 border-coffee bg-vanilla/50 shadow-[0_0_10px_rgba(0,0,0,0.2)] flex items-end justify-center pb-0 -z-10">
                   <div
                     className={`text-center text-[9px] font-bold tracking-[0.2em] ${
                       shakingSetId === set.id ? "text-terracotta" : "text-coffee/80"

@@ -447,7 +447,7 @@ export default function Lobby() {
 
   if (!nickname || !isInLobby) {
     return (
-      <div>
+      <div className="select-none">
         <h2>Join Lobby: {lobby.code}</h2>
         <p>Please enter your nickname to join:</p>
         <input
@@ -460,6 +460,7 @@ export default function Lobby() {
             if (e.key === "Enter") handleJoinLobby();
           }}
           autoFocus
+          className="select-text"
         />
         <button onClick={handleJoinLobby}>Join</button>
       </div>
@@ -467,7 +468,7 @@ export default function Lobby() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-light-vanilla text-coffee font-executive overflow-hidden relative">
+    <div className="flex flex-col h-screen bg-light-vanilla text-coffee font-executive overflow-hidden relative select-none">
       {/* Global Tooltip */}
       {showTooltip && tooltipText && (
         <div

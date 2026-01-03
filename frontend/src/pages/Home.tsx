@@ -111,7 +111,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-light-vanilla text-coffee font-executive p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-light-vanilla text-coffee font-executive p-4 select-none">
       {user ? (
         <div className="absolute top-4 right-4 flex items-center gap-4 border-2 border-coffee bg-vanilla px-4 py-2">
           <span className="text-sm">
@@ -154,7 +154,7 @@ export default function Home() {
           </label>
           <div className="flex gap-2">
             <input
-              className="flex-1 border-2 border-coffee bg-transparent p-3 placeholder-coffee/50 focus:outline-none focus:bg-white/20"
+              className="flex-1 border-2 border-coffee bg-transparent p-3 placeholder-coffee/50 focus:outline-none focus:bg-white/20 select-text"
               maxLength={15}
               placeholder="YOUR NICKNAME"
               value={nickname}
@@ -181,7 +181,7 @@ export default function Home() {
           </label>
           <div className="flex gap-2">
             <input
-              className="flex-1 border-2 border-coffee bg-transparent p-3 placeholder-coffee/50 focus:outline-none focus:bg-white/20 uppercase"
+              className="flex-1 border-2 border-coffee bg-transparent p-3 placeholder-coffee/50 focus:outline-none focus:bg-white/20 uppercase select-text"
               maxLength={4}
               placeholder="LOBBY CODE"
               value={codeInput}

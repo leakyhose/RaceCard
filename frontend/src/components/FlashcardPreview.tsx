@@ -65,7 +65,7 @@ export function FlashcardPreview({
       {visibleFlashcards.map((flashcard, index) => (
         <div
           key={flashcard.id}
-          className="group relative border-2 border-coffee p-8 flex items-stretch transition-transform duration-50 ease-out hover:scale-[1.005] bg-vanilla shadow-[4px_4px_0px_0px_#644536]"
+          className="group relative border-2 border-coffee p-8 flex items-stretch transition-transform duration-50 ease-out hover:scale-[1.005] bg-vanilla shadow-[4px_4px_0px_0px_#644536] select-text"
         >
           <div className="absolute top-2 left-2 text-xs text-coffee font-bold">
             {index + 1}
